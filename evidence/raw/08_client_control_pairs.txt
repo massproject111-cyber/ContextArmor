@@ -1,0 +1,64 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. Safety Shim Setup & Verification ===
+/tmp/shim/npm
+/tmp/shim/pip
+
+=== B. Claude Code Control Pair (npm i chalk@5.6.1) ===
+1. Control A: Hook NOT wired in config -> Tool executes, ran.log gets entry:
+ran.log content after Control A:
+npm i chalk@5.6.1
+
+2. Control B: Hook WIRED in config -> Hook intercepts with BLOCK, ran.log remains empty:
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}}
+Exit Code: 2
+ran.log content after Control B (must be EMPTY):
+decisions.log latest line (must be BLOCK):
+{"timestamp":"2026-10-11T09:57:50.383Z","rawCommand":"npm i chalk@5.6.1","extractedPackages":["chalk@5.6.1"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2025-46969"}
+
+=== C. Claude Code Control Pair (pip install ./local) ===
+1. Control A: Hook NOT wired in config -> Tool executes, ran.log gets entry:
+ran.log content after Control A:
+pip install ./local
+
+2. Control B: Hook WIRED in config -> Hook intercepts with ASK, ran.log remains empty:
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}}
+Exit Code: 0
+ran.log content after Control B (must be EMPTY):
+decisions.log latest line (must be ASK):
+{"timestamp":"2026-10-11T09:57:51.106Z","rawCommand":"pip install ./local","extractedPackages":["./local"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+
+=== D. Live Real Claude CLI Invocations ===
+1. Real Claude CLI Invocation with --dangerously-skip-permissions:
+Command: claude -p "Execute the shell command 'npm i chalk@5.6.1' using Bash now." --dangerously-skip-permissions --allowedTools Bash
+Output: "kr/claude-haiku-4.5" isn't described by this version's model catalog; update Claude Code, or map it with behavesAs on a modelPicker row (or modelOverrides, if it is a provider id of a model this version knows). Until then auto-compact keeps this session within 200k tokens (the context window it assumes); if the model accepts more, append [1m] to the model name for 1M, or set CLAUDE_CODE_MAX_CONTEXT_TOKENS to its real window; CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT=1 restores the previous wait-for-the-API behavior.
+[claude-code:unrecognized_model] {"model":"kr/claude-haiku-4.5","query_source":"sdk"}
+API Error: Connection refused — a firewall or proxy may be blocking it (ECONNREFUSED)
+Exit Code: 1
+
+2. Real Claude CLI Invocation (Interactive Session via tmux):
+STATUS: NOT RUN (human interactive session; automated runner captures non-interactive -p and --dangerously-skip-permissions)
+
+=== E. Antigravity Control Pair (npm i chalk@5.6.1 and pip install ./local) ===
+1. Antigravity Control A (npm i chalk@5.6.1, Hook Disabled) -> Tool executes, ran.log gets entry:
+ran.log content after Antigravity Control A (npm):
+npm i chalk@5.6.1
+
+2. Antigravity Control B (npm i chalk@5.6.1, Hook Wired in .agents/hooks.json) -> Intercepts with deny:
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"decision":"deny","reason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}
+Exit Code: 2
+ran.log content after Antigravity Control B (must be EMPTY):
+decisions.log latest line (must be BLOCK):
+{"timestamp":"2026-10-11T10:00:56.162Z","rawCommand":"npm i chalk@5.6.1","extractedPackages":["chalk@5.6.1"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2025-46969"}
+
+3. Antigravity Control A (pip install ./local, Hook Disabled) -> Tool executes, ran.log gets entry:
+ran.log content after Antigravity Control A (pip):
+pip install ./local
+
+4. Antigravity Control B (pip install ./local, Hook Wired) -> Intercepts with ASK (exit 0):
+{"decision":"ask","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+Exit Code: 0
+ran.log content after Antigravity Control B (must be EMPTY):
+decisions.log latest line (must be ASK):
+{"timestamp":"2026-10-11T10:00:56.216Z","rawCommand":"pip install ./local","extractedPackages":["./local"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}

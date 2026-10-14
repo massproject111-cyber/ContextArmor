@@ -1,0 +1,16 @@
+.agents/**
+.claude/**
+data/**
+evidence/**
+scripts/**
+src/**
+tests/**
+corpus.json
+split.json
+PHASE0_EVIDENCE.md
+PLAN.md
+STATE.md
+tsconfig*.json
+esbuild.js
+*.ts
+*.map

@@ -1,0 +1,31 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. Interactive / Attended Mode (Default) ===
+1. Claude Code ASK (npm i ./local) - Expect permissionDecision: ask, exit 0:
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}}
+Exit Code: 0
+2. Antigravity ASK (npm i ./local) - Expect decision: ask, exit 0:
+{"decision":"ask","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+Exit Code: 0
+3. Cursor ASK (npm i ./local) - Expect permission: ask, exit 0:
+{"permission":"ask","user_message":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?","agent_message":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+Exit Code: 0
+
+=== B. Claude Code Unattended (permission_mode: bypassPermissions) ===
+Claude Code bypassPermissions ASK -> Expect permissionDecision: deny, exit 2:
+[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)"}}
+Exit Code: 2
+
+=== C. Unattended Mode (CONTEXTARMOR_UNATTENDED=1) ===
+1. Claude Code Unattended ASK - Expect permissionDecision: deny, exit 2:
+[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)"}}
+Exit Code: 2
+2. Antigravity Unattended ASK - Expect decision: deny, exit 2:
+[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)
+{"decision":"deny","reason":"[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)"}
+Exit Code: 2
+3. Cursor Unattended ASK - Expect permission: deny, exit 2:
+[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)
+{"permission":"deny","user_message":"[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)","agent_message":"[ContextArmor UNATTENDED POLICY] [ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation? (denied: unattended policy)"}
+Exit Code: 2

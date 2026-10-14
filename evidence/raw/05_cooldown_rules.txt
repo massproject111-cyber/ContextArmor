@@ -1,0 +1,15 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Case 1: Fresh popular version (<72h) -> Expect ASK ===
+Stdout: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [express: Package 'express@5.3.0' was published 45.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '4.22.3'. Suggested pin: 'npm i express@4.22.3'.]. Confirm installation?"}}
+Exit Code: 0
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:26.818Z","rawCommand":"npm i express","extractedPackages":["express@5.3.0"],"decision":"ASK","reason":"express: Package 'express@5.3.0' was published 45.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '4.22.3'. Suggested pin: 'npm i express@4.22.3'."}
+
+=== Case 2: Same version in HEAD lockfile -> Expect ALLOW (no ASK) ===
+Stdout: []
+Exit Code: 0
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:26.926Z","rawCommand":"npm ci","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+
+=== Case 3: Pinned old version (>72h) -> Expect ALLOW (no ASK) ===
+Stdout: []
+Exit Code: 0
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:26.969Z","rawCommand":"npm i chalk@4.1.2","extractedPackages":["chalk@4.1.2"],"decision":"ALLOW","reason":"All target packages passed clean"}

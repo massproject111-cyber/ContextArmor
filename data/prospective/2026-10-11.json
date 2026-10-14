@@ -1,0 +1,774 @@
+[
+  {
+    "name": "testseed",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:15.846Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Realistic, safe and reproducible synthetic data for software testing.",
+      "created_at": "2026-10-11T04:22:18.210052Z",
+      "author": "JAVZDEV and TestSeed contributors",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:22:11 GMT"
+    }
+  },
+  {
+    "name": "pd-dataset-manager",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:15.881Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.0a0",
+      "description": "Reserved name held by Enigmata, Inc. Not a usable package.",
+      "created_at": "2026-10-11T04:18:54.325171Z",
+      "author": "Enigmata, Inc.",
+      "repository": "https://www.enigmata.xyz/",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:18:54 GMT"
+    }
+  },
+  {
+    "name": "pd-classifier",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:15.917Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.0a0",
+      "description": "Reserved name held by Enigmata, Inc. Not a usable package.",
+      "created_at": "2026-10-11T04:18:52.915926Z",
+      "author": "Enigmata, Inc.",
+      "repository": "https://www.enigmata.xyz/",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:18:52 GMT"
+    }
+  },
+  {
+    "name": "pd-cipher",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:15.951Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.0a0",
+      "description": "Reserved name held by Enigmata, Inc. Not a usable package.",
+      "created_at": "2026-10-11T04:18:51.386036Z",
+      "author": "Enigmata, Inc.",
+      "repository": "https://www.enigmata.xyz/",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:18:51 GMT"
+    }
+  },
+  {
+    "name": "enigmata-sentinel-stores",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:15.987Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.0a0",
+      "description": "Reserved name held by Enigmata, Inc. Not a usable package.",
+      "created_at": "2026-10-11T04:17:49.486974Z",
+      "author": "Enigmata, Inc.",
+      "repository": "https://www.enigmata.xyz/",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:17:49 GMT"
+    }
+  },
+  {
+    "name": "katafm",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.024Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Send PDF scores from this machine to a Kata account.",
+      "created_at": "2026-10-11T04:16:06.918499Z",
+      "author": "Loopflow Studio",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:16:06 GMT"
+    }
+  },
+  {
+    "name": "cloakroom",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.060Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Local privacy gate for AI coding agents: secrets and PII are masked before the model sees them, restored only for local tools.",
+      "created_at": "2026-10-11T04:15:43.200604Z",
+      "author": "The Cloakroom authors",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:15:38 GMT"
+    }
+  },
+  {
+    "name": "lochinvar-modbus",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.100Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Read Lochinvar boilers and water heaters with the MODB-I-O Modbus communication board.",
+      "created_at": "2026-10-11T04:13:43.938759Z",
+      "author": "lochinvar-modbus contributors",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:13:38 GMT"
+    }
+  },
+  {
+    "name": "hotkv-client",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.140Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.0.0",
+      "description": "A high-performance Python client for HotKV, a RESP2/RESP3-compatible in-memory data store with built-in AI and LLM-serving features.",
+      "created_at": "2026-10-11T04:10:54.427964Z",
+      "author": null,
+      "repository": "https://github.com/hotkv-ltd/hotkv-python-client",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:10:54 GMT"
+    }
+  },
+  {
+    "name": "ark-audio-agent",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.179Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.3",
+      "description": "Autonomous text-to-music composer driven by a multi-agent ReAct harness (Claude API, with an offline deterministic fallback).",
+      "created_at": "2026-10-11T04:09:01.209776Z",
+      "author": "Immanuel R",
+      "repository": "https://github.com/ir-dev/ark-audio-agent",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:09:01 GMT"
+    }
+  },
+  {
+    "name": "dot-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.213Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.1",
+      "description": "Personal MCP agent: shell, files, memory, goals, inbox, scheduler, capability URL + self-hosted OAuth",
+      "created_at": "2026-10-11T04:07:51.694704Z",
+      "author": "Ashveil1",
+      "repository": "https://github.com/Ashveil1/dot-mcp",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:07:46 GMT"
+    }
+  },
+  {
+    "name": "beelinebench",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.252Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.0.0",
+      "description": "How efficiently do decision models navigate multi-step problems?",
+      "created_at": "2026-10-11T03:59:33.240488Z",
+      "author": "Kyle Pena",
+      "repository": "https://github.com/kyle-pena-nlp/beelinebench",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:59:26 GMT"
+    }
+  },
+  {
+    "name": "SKSurrogate",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.290Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.1",
+      "description": "A python package that implements or wraps a few machine learning tools Scikit-Learn style.",
+      "created_at": "2026-10-11T03:56:34.834126Z",
+      "author": "Mehdi Ghasemi",
+      "repository": "https://github.com/mghasemi/sksurrogate.git",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:56:34 GMT"
+    }
+  },
+  {
+    "name": "Irene",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.327Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.4.0",
+      "description": "Polynomial optimization via SOS/SONC/SDP hierarchies — modernized rewrite with SymEngine, CVXPY, and structural reductions.",
+      "created_at": "2026-10-11T03:56:22.840243Z",
+      "author": null,
+      "repository": "https://github.com/mghasemi/Irene",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:56:22 GMT"
+    }
+  },
+  {
+    "name": "self-learning-agent",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.365Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.3.1",
+      "description": "Turn creator videos into vault notes and human-approved setup actions",
+      "created_at": "2026-10-11T03:55:55.792594Z",
+      "author": "Soham-1827",
+      "repository": "https://github.com/Soham-1827/Self-Learning-Agent-Claude",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:55:46 GMT"
+    }
+  },
+  {
+    "name": "arraypipe",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.401Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.1",
+      "description": "Pipelines for arrays: a domain-agnostic dataflow compiler and runtime over arrays with declared axes",
+      "created_at": "2026-10-11T03:52:24.131049Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:52:15 GMT"
+    }
+  },
+  {
+    "name": "shipwatch",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.438Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Know what AI companies actually shipped this week: changelogs in, a cited briefing out.",
+      "created_at": "2026-10-11T03:45:45.202305Z",
+      "author": "Andy McCutcheon",
+      "repository": "https://github.com/andymccutcheon/shipwatch",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:45:40 GMT"
+    }
+  },
+  {
+    "name": "logalog",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.477Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.0.0",
+      "description": "Readable and structured logging with Loguru and Rich",
+      "created_at": "2026-10-11T03:45:09.414189Z",
+      "author": "Taran Lu",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:45:04 GMT"
+    }
+  },
+  {
+    "name": "failure-pattern-memory",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.514Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Learn from AI agent failures - record patterns, get pre-emptive warnings.",
+      "created_at": "2026-10-11T03:41:33.140526Z",
+      "author": "Manoj Kumar",
+      "repository": "https://github.com/manojkumar16122/Failure-pattern-memory",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:41:33 GMT"
+    }
+  },
+  {
+    "name": "framesight",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.550Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Linux CLI alternative to Apple's Vision framework: faces, head pose, mouth openness, upper bodies and person masks from video, as JSON. CPU-only, no AVX2 needed.",
+      "created_at": "2026-10-11T03:36:36.745545Z",
+      "author": "Gustavo Belo",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:36:31 GMT"
+    }
+  },
+  {
+    "name": "chiliarch",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.590Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "An outbound-only agent orchestration platform with a first-class AI supervisor.",
+      "created_at": "2026-10-11T03:24:30.461207Z",
+      "author": null,
+      "repository": "https://github.com/69gg/chiliarch",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:24:29 GMT"
+    }
+  },
+  {
+    "name": "ElectronAi",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.628Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "One CLI. A Complete AI Development Team powered by Ollama.",
+      "created_at": "2026-10-11T03:39:51.226117Z",
+      "author": null,
+      "repository": "https://github.com/25it038-beep/Electron",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:21:54 GMT"
+    }
+  },
+  {
+    "name": "tmp-transfer-9x7k2q",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.662Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.1",
+      "description": "x",
+      "created_at": "2026-10-11T03:17:12.085590Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:17:12 GMT"
+    }
+  },
+  {
+    "name": "latris",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.699Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.3.1",
+      "description": "Latris — an AI-assisted, evidence-native causal-modelling workbench (Python CLI + server backend).",
+      "created_at": "2026-10-11T03:08:28.384426Z",
+      "author": "Shannon Bengtson",
+      "repository": "https://github.com/Shannon-Bengtson/latris",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:08:28 GMT"
+    }
+  },
+  {
+    "name": "nanosandbox-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.737Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.3.0",
+      "description": "MCP server (stdio) that runs commands in a nanosandbox sandbox",
+      "created_at": "2026-10-11T03:05:31.436356Z",
+      "author": null,
+      "repository": "https://github.com/Erio-Harrison/nanosandbox",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:05:31 GMT"
+    }
+  },
+  {
+    "name": "cfglens",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.775Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Deterministic, secret-safe configuration comparisons with CLI and optional MCP",
+      "created_at": "2026-10-11T03:13:20.366087Z",
+      "author": "Ofelia B Webb",
+      "repository": "https://github.com/dimpletz/cfglens",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:04:56 GMT"
+    }
+  },
+  {
+    "name": "qwuiklib",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.816Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.0.1",
+      "description": "A lightweight terminal utility library",
+      "created_at": "2026-10-11T03:01:10.799371Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 03:01:10 GMT"
+    }
+  },
+  {
+    "name": "bing-webmaster-ai-cli-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.853Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.2",
+      "description": "bing-webmaster-ai-cli-mcp gives an AI agent read access to what Bing knows about your sites — traffic, indexing, crawl issues, inbound links, keywords — and a write path you choose: direct by default, or reviewed plan-and-apply.",
+      "created_at": "2026-10-11T02:57:32.115030Z",
+      "author": null,
+      "repository": "https://github.com/stufently/bing-webmaster-ai-cli-mcp",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:57:24 GMT"
+    }
+  },
+  {
+    "name": "colabo",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.890Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.2.0",
+      "description": "Work locally with Claude Code, run on a Google Colab GPU: two-way sync + SSH via the official colab CLI.",
+      "created_at": "2026-10-11T02:55:37.393942Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:55:37 GMT"
+    }
+  },
+  {
+    "name": "trading-position-risk-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.929Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Deterministic position sizing and pre-trade risk gate for trading agents, served over MCP",
+      "created_at": "2026-10-11T02:50:51.295931Z",
+      "author": "Dinesh Ramalingam",
+      "repository": "https://github.com/dineshrm15/trading-position-risk-mcp",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:50:42 GMT"
+    }
+  },
+  {
+    "name": "wildtunnel",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:16.963Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.1",
+      "description": "Expose a local service to the internet at a wildcard subdomain, tunneled through a VPS running frps. Ships with AWS EC2 and AWS Lightsail providers.",
+      "created_at": "2026-10-11T02:49:33.062443Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:49:32 GMT"
+    }
+  },
+  {
+    "name": "mantisfetch",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.007Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.9.7",
+      "description": "Open-source data collection and document parsing platform",
+      "created_at": "2026-10-11T02:49:29.229202Z",
+      "author": null,
+      "repository": "https://github.com/ReadyForAI/MantisFetch",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:49:22 GMT"
+    }
+  },
+  {
+    "name": "yonga",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.047Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.5.0",
+      "description": "Linux-first local AI model manager for Intel AI PCs (OpenVINO, Optimum Intel, Hugging Face Hub)",
+      "created_at": "2026-10-11T02:48:15.045141Z",
+      "author": "Özcan Oğuz",
+      "repository": "https://github.com/ooguz/yonga",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:48:09 GMT"
+    }
+  },
+  {
+    "name": "stack-guardian",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.082Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "A health doctor for a home AI stack: Ollama nodes, GPUs and tailnet, with graded confidence.",
+      "created_at": "2026-10-11T02:47:09.266122Z",
+      "author": "LuminariSoftwares",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:47:09 GMT"
+    }
+  },
+  {
+    "name": "telegram-ai-cli-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.125Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.1",
+      "description": "AI-first CLI and MCP server for Telegram user accounts over MTProto, with plan-and-apply approval, chat allowlists and an audit log for every outgoing message.",
+      "created_at": "2026-10-11T02:45:48.860166Z",
+      "author": "Roman T",
+      "repository": "https://github.com/stufently/telegram-ai-cli-mcp",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:45:43 GMT"
+    }
+  },
+  {
+    "name": "ernie-renderer",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.162Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0.dev202",
+      "description": "Efficient Renderer for Natural and Interplanetary Environments: a spectral Vulkan renderer with a USD-style scene and batched cameras",
+      "created_at": "2026-10-11T02:40:37.763415Z",
+      "author": "Alex Maietta",
+      "repository": "https://github.com/alexmaietta/ernie",
+      "releases_count": 3,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:40:31 GMT"
+    }
+  },
+  {
+    "name": "openpyxl-enhanced",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.205Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "3.2.0b3",
+      "description": "An openpyxl fork for Excel xlsx/xlsm files with formula-aware row/column edits and merged-cell formatting fixes",
+      "created_at": "2026-10-11T02:39:41.922114Z",
+      "author": "See AUTHORS",
+      "repository": "https://github.com/EugeneRymarev/openpyxl-enhanced",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:39:41 GMT"
+    }
+  },
+  {
+    "name": "django-rusty-templates-agentic",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.249Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "2026.10.2",
+      "description": "An agentic fork of Django Rusty Templates with a compatible Python API",
+      "created_at": "2026-10-11T02:37:09.983435Z",
+      "author": "Lily Foote, Jeff Triplett",
+      "repository": "https://github.com/jefftriplett/django-rusty-templates-agentic",
+      "releases_count": 2,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:37:09 GMT"
+    }
+  },
+  {
+    "name": "membase-bench",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:35:17.283Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.0.1",
+      "description": "Use membase-bench: https://github.com/unibaseio/membase-bench",
+      "created_at": "2026-10-11T02:36:44.751068Z",
+      "author": "Unibase",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 02:36:44 GMT"
+    }
+  },
+  {
+    "name": "@brianzhu/ui",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T04:35:21.905Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.0.0",
+      "created_at": "2026-10-11T04:18:04.208Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/nong824/monorepo-test.git",
+      "releases_count": 2
+    }
+  },
+  {
+    "name": "@crossbind/port-zstd-standalone-napi-win32-arm64",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T04:35:23.861Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.0.0-bootstrap.0",
+      "description": "Placeholder that let npm trust the crossbind release workflow; install @crossbind/port-zstd-standalone-napi-win32-arm64@beta.",
+      "created_at": "2026-10-10T11:20:20.653Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/crossbind/crossbind.git",
+      "releases_count": 3
+    }
+  },
+  {
+    "name": "@atape/adapter-cursor",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T04:35:31.889Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.5.8",
+      "description": "ATape Adapter for controlled Cursor sessions and native transcripts",
+      "created_at": "2026-10-10T09:44:26.808Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/SingleMai/ATape.git",
+      "releases_count": 4
+    }
+  },
+  {
+    "name": "jiujiubiao",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.618Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.3.0",
+      "description": "JiuJiuBiao (九九表): unified question answering over tables and databases — disambiguation, agentic solving with self-consistency, and self-criticism refinement",
+      "created_at": "2026-10-11T04:50:49.344585Z",
+      "author": "XuanJi Developers",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:50:39 GMT"
+    }
+  },
+  {
+    "name": "krita-mcp",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.679Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "1.4.0",
+      "description": "MCP server that lets agents drive Krita",
+      "created_at": "2026-10-11T04:46:37.858943Z",
+      "author": "thuanlm215",
+      "repository": "https://github.com/thuanlm215/krita-mcp",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:46:36 GMT"
+    }
+  },
+  {
+    "name": "Vostok-Save-Manager",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.739Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "2.0.0",
+      "description": "None",
+      "created_at": "2026-10-11T04:40:03.493924Z",
+      "author": null,
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:40:03 GMT"
+    }
+  },
+  {
+    "name": "actions-radar",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.802Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.2.0",
+      "description": "Tells you when a GitHub Actions run fails, and which line explains it.",
+      "created_at": "2026-10-11T04:38:30.552450Z",
+      "author": "rmz-oz",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:38:26 GMT"
+    }
+  },
+  {
+    "name": "streaming-community",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.866Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.14.0",
+      "description": "Streaming lets users create PyTorch compatible datasets that can be streamed from cloud-based object stores",
+      "created_at": "2026-10-11T04:32:59.978871Z",
+      "author": "streaming-community contributors",
+      "repository": "https://github.com/secondwindoss/streaming-community",
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:32:54 GMT"
+    }
+  },
+  {
+    "name": "laya-guardrail",
+    "ecosystem": "pypi",
+    "first_seen": "2026-10-11T04:54:35.902Z",
+    "source_feed": "https://pypi.org/rss/packages.xml",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "OpenClaw/OpenCode tool_call guardrail - every call judged locally by Laya (free), not billed per decision like Jev",
+      "created_at": "2026-10-11T04:30:58.353193Z",
+      "author": "scs0209",
+      "repository": null,
+      "releases_count": 1,
+      "raw_feed_pubdate": "Sun, 11 Oct 2026 04:30:54 GMT"
+    }
+  },
+  {
+    "name": "@dbx-tools/model-protocol",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T04:54:36.349Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.9.116",
+      "description": "Vercel AI SDK providers and model protocol transforms for Databricks serving",
+      "created_at": "2026-10-10T15:01:50.627Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/reggie-db/dbx-tools.git",
+      "releases_count": 8
+    }
+  },
+  {
+    "name": "@neruok/pi-compaction-model",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T04:54:40.698Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.1.1",
+      "description": "Select a separate summarization model for Pi compaction",
+      "created_at": "2026-10-11T03:51:34.532Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/neruok/pi-compaction-model.git",
+      "releases_count": 3
+    }
+  },
+  {
+    "name": "@mohammedabdelkrimguendouz/face-liveness-sdk",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T05:05:14.508Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "0.1.0",
+      "description": "Browser SDK for passive face liveness verification. Captures a facial frame sequence and streams it to a liveness backend over WebSocket.",
+      "created_at": "2026-10-11T05:03:59.938Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/mohammedabdelkrimguendouz/face-liveness-platform.git",
+      "releases_count": 2
+    }
+  },
+  {
+    "name": "@rexezuge/i18n",
+    "ecosystem": "npm",
+    "first_seen": "2026-10-11T05:05:23.778Z",
+    "source_feed": "https://replicate.npmjs.com/_changes",
+    "initial_metadata": {
+      "version": "1.0.4",
+      "description": "Backend string bundle with twelve locales and Accept-Language-aware lookup.",
+      "created_at": "2026-10-11T02:07:16.976Z",
+      "has_install_scripts": false,
+      "repository": "git+https://github.com/Rexezuge-CloudflareWorkers/SDK.git",
+      "releases_count": 6
+    }
+  }
+]

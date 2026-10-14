@@ -1,0 +1,1 @@
+{"name": "json-stable-stringify-without-jsonify", "dist-tags": {"latest": "1.0.1"}, "time": {"modified": "2023-06-22T16:32:42.071Z", "created": "2016-12-15T22:00:35.805Z", "1.0.1": "2016-12-15T22:00:35.805Z"}, "versions": {"1.0.1": {"name": "json-stable-stringify-without-jsonify", "version": "1.0.1", "scripts": {"test": "tape test/*.js"}}}}

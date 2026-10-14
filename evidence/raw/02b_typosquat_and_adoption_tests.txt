@@ -1,0 +1,75 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. Established Popular Packages (Expected: Clean SAFE, 0/100, Block: NO) ===
+--- Checking globby (npm) ---
+[ContextArmor] Auditing npm package: 'globby'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking glob (npm) ---
+[ContextArmor] Auditing npm package: 'glob'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking got (npm) ---
+[ContextArmor] Auditing npm package: 'got'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking ms (npm) ---
+[ContextArmor] Auditing npm package: 'ms'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking nanoid (npm) ---
+[ContextArmor] Auditing npm package: 'nanoid'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking chai (npm) ---
+[ContextArmor] Auditing npm package: 'chai'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking pug (npm) ---
+[ContextArmor] Auditing npm package: 'pug'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking ws (npm) ---
+[ContextArmor] Auditing npm package: 'ws'...
+Risk Level: WARNING (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+--- Checking six (pypi) ---
+[ContextArmor] Auditing pypi package: 'six'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+Exit Code: 0
+
+=== B. Typosquats Requiring Confirmation (Expected: WARNING tier, Block: NO -> ASK) ===
+--- Checking reqeusts (pypi) ---
+[ContextArmor] Auditing pypi package: 'reqeusts'...
+Risk Level: CRITICAL (Score: 71/100)
+Block Recommended: YES
+
+Detected Signals Breakdown:
+  - [unregistered_hallucination] Raw Score: 100/100, Weight: 0.4: Package 'reqeusts' does not exist on pypi registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+  - [typosquat_similarity] Raw Score: 60/100, Weight: 1: Package name 'reqeusts' is edit distance 2 from popular package 'requests' (possible typosquat). Confirm installation?

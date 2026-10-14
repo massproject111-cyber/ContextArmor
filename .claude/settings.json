@@ -1,0 +1,22 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/nufoos/dev-projects/ContextArmor/dist/cli.js hook"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Edit(.claude/settings.json)",
+      "Edit(.agents/hooks.json)",
+      "Edit(~/.contextarmor/**)"
+    ]
+  }
+}

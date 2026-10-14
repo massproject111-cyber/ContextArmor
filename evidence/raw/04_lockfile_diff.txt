@@ -1,0 +1,42 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Test 1: package-lock.json nested node_modules bumped to chalk@5.6.1 (MAL-2025-46969) ===
+Running bare npm ci on bumped nested lockfile (MUST BLOCK on MAL-2025-46969):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:21.209Z","rawCommand":"npm ci","extractedPackages":["chalk@5.6.1"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2025-46969"}
+
+=== Test 2: pnpm-lock.yaml bumped to chalk@5.6.1 (MAL-2025-46969) ===
+Running bare pnpm install on bumped pnpm-lock.yaml (MUST BLOCK on MAL-2025-46969):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:24.101Z","rawCommand":"pnpm install","extractedPackages":["chalk@5.6.1"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2025-46969"}
+
+=== Test 3: yarn.lock bumped to chalk@5.6.1 (MAL-2025-46969) ===
+Running bare yarn install on bumped yarn.lock (MUST BLOCK on MAL-2025-46969):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:24.232Z","rawCommand":"yarn install","extractedPackages":["chalk@5.6.1"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2025-46969"}
+
+=== Test 4: uv.lock bumped to durabletask@1.4.2 (MAL-2026-4174) ===
+Running bare uv sync on bumped uv.lock (MUST BLOCK on MAL-2026-4174):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:25.636Z","rawCommand":"uv sync","extractedPackages":["durabletask@1.4.2"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2026-4174"}
+
+=== Test 5: poetry.lock bumped to durabletask@1.4.2 (MAL-2026-4174) ===
+Running bare poetry install on bumped poetry.lock (MUST BLOCK on MAL-2026-4174):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:25.753Z","rawCommand":"poetry install","extractedPackages":["durabletask@1.4.2"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2026-4174"}
+
+=== Test 6: requirements.txt bumped to durabletask==1.4.2 (MAL-2026-4174) ===
+Running pip install -r requirements.txt on bumped requirements (MUST BLOCK on MAL-2026-4174):
+[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'durabletask' (pypi): Package has confirmed malicious advisory: MAL-2026-4174"}}
+Exit Code: 2
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:25.862Z","rawCommand":"pip install -r requirements.txt","extractedPackages":["durabletask@1.4.2"],"decision":"BLOCK","reason":"Package has confirmed malicious advisory: MAL-2026-4174"}

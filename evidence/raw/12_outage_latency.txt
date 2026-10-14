@@ -1,0 +1,14 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Outage Latency Test (node dist/outageLatency.js) ===
+=====================================================
+   ContextArmor Outage Latency Verification Suite    
+=====================================================
+
+Command: npm i express
+Network condition: Black-holed (injected non-resolving fetch in test code)
+Measured Time: 20006 ms
+Decision: ASK (Exit Code: 0)
+Reason: [ContextArmor TIMEOUT] Package evaluation exceeded budget. The following packages could not be verified: [express]. Confirm installation?
+Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor TIMEOUT] Package evaluation exceeded budget. The following packages could not be verified: [express]. Confirm installation?"}}
+
+[PASS] Total hook time capped at 20s budget and fail-open to ASK listing unchecked packages.

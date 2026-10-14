@@ -1,0 +1,42 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. CLAUDE SHAPED PAYLOAD ===
+1. Clean Allow (npm i chalk@4.1.2) - Expect empty stdout/stderr, exit 0:
+Stdout: []
+Exit Code: 0
+
+2. Ask (npm i ./local) - Expect permissionDecision: ask, exit 0:
+Stdout: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}}
+Exit Code: 0
+
+3. Block (npm i chalk@5.6.1) - Expect permissionDecision: deny, exit 2:
+Output: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}}
+Exit Code: 2
+
+=== B. ANTIGRAVITY SHAPED PAYLOAD ===
+1. Clean Allow (npm i chalk@4.1.2) - Expect empty stdout, exit 0:
+Stdout: []
+Exit Code: 0
+
+2. Ask (npm i ./local) - Expect decision: ask, exit 0:
+Stdout: {"decision":"ask","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+Exit Code: 0
+
+3. Block (npm i chalk@5.6.1) - Expect decision: deny, exit 2:
+Output: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"decision":"deny","reason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}
+Exit Code: 2
+
+=== C. CURSOR SHAPED PAYLOAD ===
+1. Clean Allow (npm i chalk@4.1.2) - Expect empty stdout, exit 0:
+Stdout: []
+Exit Code: 0
+
+2. Ask (npm i ./local) - Expect permission: ask, exit 0:
+Stdout: {"permission":"ask","user_message":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?","agent_message":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+Exit Code: 0
+
+3. Block (npm i chalk@5.6.1) - Expect permission: deny, exit 2:
+Output: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+{"permission":"deny","user_message":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969","agent_message":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969"}
+Exit Code: 2

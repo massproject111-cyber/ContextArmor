@@ -1,0 +1,73 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. node dist/cli.js check playwright ===
+[ContextArmor] Auditing npm package: 'playwright'...
+Risk Level: SAFE (Score: 0/100)
+Block Recommended: NO
+
+No risk signals detected.
+
+=== B. node dist/cli.js doctor --canary ===
+[ContextArmor Doctor] Auditing environment and hook configurations...
+
+[OK] Claude Code Hook (.claude/settings.json): Wired: YES, Hash: d75e06788fe21e06
+[OK] Agent Deny Rules (Claude Code): Claude Config: YES, AG Config: YES, Decisions: YES
+[OK] Antigravity Hook (.agents/hooks.json): Wired: YES, Hash: ea75830056a220c6
+[OK] Decisions Directory (~/.contextarmor): Mode: 700 (Recommended: 700)
+[OK] Decisions Log (~/.contextarmor/decisions.log): Mode: 600 (Recommended: 600)
+
+--- Running Live Canary Probes ---
+[OK] Canary 1 (Malicious Package): Intercepted chalk@5.6.1 with BLOCK (exitCode 2)
+     Reason: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'chalk' (npm): Package has confirmed malicious advisory: MAL-2025-46969
+[OK] Canary 2 (Config Tamper Attempt): Intercepted write to .claude/settings.json with BLOCK (exitCode 2)
+     Reason: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+[OK] Canary 3 (Audit Log Deletion): Intercepted deletion of ~/.contextarmor/decisions.log with BLOCK (exitCode 2)
+     Reason: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+
+[OK] All Live Canary Probes PASSED.
+
+Doctor check complete.
+
+=== C. Grep Proof: Zero CONTEXTARMOR_DISABLE or /tmp toggle in src/ ===
+CLEAN: Zero CONTEXTARMOR_DISABLE occurrences
+CLEAN: Zero contextarmor_disable occurrences
+
+=== D. cat .claude/settings.json ===
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/nufoos/dev-projects/ContextArmor/dist/cli.js hook"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Edit(.claude/settings.json)",
+      "Edit(.agents/hooks.json)",
+      "Edit(~/.contextarmor/**)"
+    ]
+  }
+}
+
+=== E. cat .agents/hooks.json ===
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /Users/nufoos/dev-projects/ContextArmor/dist/cli.js hook"
+          }
+        ]
+      }
+    ]
+  }
+}

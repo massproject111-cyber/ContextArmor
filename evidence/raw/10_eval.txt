@@ -1,0 +1,101 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Benchmark Evaluation Suite (node dist/eval.js --verbose) ===
+=====================================================
+       ContextArmor Benchmark Evaluation Suite       
+=====================================================
+
+Running on Dev Split (35 packages)...
+  [CASE] name: super-fast-audio-speech-12345@latest | ecosystem: pypi  | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 23 (importlib-metadata) | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: ai-stream-optimizer-hallucinated@latest | ecosystem: npm   | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 25 (superagent) | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: reqeusts@latest                      | ecosystem: pypi  | label: MALICIOUS | decision: BLOCK | score: 71/100  | downloads: N/A            | dist: 2 (requests)   | signals: unregistered_hallucination (100pts), typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: lodsh@latest                         | ecosystem: npm   | label: MALICIOUS | decision: ASK   | score: 55/100  | downloads: N/A            | dist: 1 (lodash)     | signals: unpublished_package (50pts), typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: requests@2.31.0                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (requests)   | signals: none | network_errors: none
+  [CASE] name: urllib3@2.2.1                        | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (urllib3)    | signals: none | network_errors: none
+  [CASE] name: express@4.19.2                       | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 143244952/wk   | dist: 0 (express)    | signals: none | network_errors: none
+  [CASE] name: react@18.3.1                         | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 187492785/wk   | dist: 0 (react)      | signals: none | network_errors: none
+  [CASE] name: pug@3.0.2                            | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 3756834/wk     | dist: 0 (pug)        | signals: none | network_errors: none
+  [CASE] name: six@1.16.0                           | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (six)        | signals: none | network_errors: none
+  [CASE] name: ws@8.16.0                            | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 285727822/wk   | dist: 0 (ws)         | signals: none | network_errors: none
+  [CASE] name: ora@8.0.1                            | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 95695644/wk    | dist: 2 (cors)       | signals: none | network_errors: none
+  [CASE] name: kleur@4.1.5                          | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 113859536/wk   | dist: 4 (debug)      | signals: none | network_errors: none
+  [CASE] name: colorette@2.0.20                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 80961409/wk    | dist: 4 (colors)     | signals: none | network_errors: none
+  [CASE] name: mime-types@2.1.35                    | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 287080987/wk   | dist: 4 (prop-types) | signals: none | network_errors: none
+  [CASE] name: is-glob@4.0.3                        | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 196394779/wk   | dist: 3 (glob)       | signals: none | network_errors: none
+  [CASE] name: flit-core@3.9.0                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 4 (botocore)   | signals: none | network_errors: none
+  [CASE] name: pyasn1@0.5.1                         | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 4 (pyyaml)     | signals: none | network_errors: none
+  [CASE] name: iniconfig@2.0.0                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (sniffio)    | signals: none | network_errors: none
+  [CASE] name: zipp@3.17.0                          | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 2 (pip)        | signals: none | network_errors: none
+  [CASE] name: pathspec@0.12.1                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (pytest)     | signals: none | network_errors: none
+  [CASE] name: esbuild@0.20.2                       | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 302235917/wk   | dist: 0 (esbuild)    | signals: none | network_errors: none
+  [CASE] name: puppeteer@22.4.1                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 11427216/wk    | dist: 5 (prettier)   | signals: none | network_errors: none
+  [CASE] name: playwright@1.42.1                    | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 111779275/wk   | dist: 7 (yargs)      | signals: none | network_errors: none
+  [CASE] name: globs@0.1.4                          | ecosystem: npm   | label: BENIGN    | decision: ASK   | score: 60/100  | downloads: 56097/wk       | dist: 1 (glob)       | signals: typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: colorsys@1.0.22                      | ecosystem: npm   | label: BENIGN    | decision: ASK   | score: 60/100  | downloads: 3405/wk        | dist: 2 (colors)     | signals: typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: rot@0.1.0                            | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 2650/wk        | dist: 1 (got)        | signals: none | network_errors: none
+  [CASE] name: chai-spies@1.0.0                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 74522/wk       | dist: 6 (chai)       | signals: none | network_errors: none
+  [CASE] name: dotenv-yaml@0.1.4                    | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 5523/wk        | dist: 5 (dotenv)     | signals: none | network_errors: none
+  [CASE] name: yaml-front-matter@4.1.1              | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 47410/wk       | dist: 12 (commander) | signals: none | network_errors: none
+  [CASE] name: markdown-it-toc-done-right@4.2.0     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 47576/wk       | dist: 20 (mongoose)  | signals: none | network_errors: none
+  [CASE] name: requests-cache@1.1.1                 | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 6 (requests)   | signals: none | network_errors: none
+  [CASE] name: pyyaml-env-tag@0.1                   | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 8 (pyyaml)     | signals: none | network_errors: none
+  [CASE] name: pydantic-settings@2.2.1              | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 9 (pydantic)   | signals: none | network_errors: none
+  [CASE] name: @myorg/internal-auth@latest          | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 15 (moment)    | signals: allowlisted_or_private (0pts) | network_errors: none
+
+Running on Hold-Out Test Split (37 packages)...
+  [CASE] name: langchain-chroma-memory-v9@latest    | ecosystem: pypi  | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 20 (charset-normalizer) | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: huggingface-cli-utils-fake@latest    | ecosystem: pypi  | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 19 (python-dateutil) | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: react-copilot-engine-xyz@latest      | ecosystem: npm   | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 17 (react-dom) | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: chalk@5.6.1                          | ecosystem: npm   | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: 495401264/wk   | dist: 0 (chalk)      | signals: osv_malicious_advisory (100pts) | network_errors: none
+  [CASE] name: tnsorflow@latest                     | ecosystem: pypi  | label: MALICIOUS | decision: BLOCK | score: 71/100  | downloads: N/A            | dist: 1 (tensorflow) | signals: unregistered_hallucination (100pts), typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: expres-generator@latest              | ecosystem: npm   | label: MALICIOUS | decision: BLOCK | score: 100/100 | downloads: N/A            | dist: 10 (express)   | signals: unregistered_hallucination (100pts) | network_errors: none
+  [CASE] name: numpy@1.26.4                         | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (numpy)      | signals: none | network_errors: none
+  [CASE] name: flask@3.0.3                          | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (flask)      | signals: none | network_errors: none
+  [CASE] name: lodash@4.17.21                       | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 163422747/wk   | dist: 0 (lodash)     | signals: none | network_errors: none
+  [CASE] name: commander@12.0.0                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 532756361/wk   | dist: 0 (commander)  | signals: none | network_errors: none
+  [CASE] name: chai@4.4.1                           | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 141333631/wk   | dist: 0 (chai)       | signals: none | network_errors: none
+  [CASE] name: colorama@0.4.6                       | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (colorama)   | signals: none | network_errors: none
+  [CASE] name: fastapi@0.110.0                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 0 (fastapi)    | signals: none | network_errors: none
+  [CASE] name: picocolors@1.0.0                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 246727715/wk   | dist: 4 (colors)     | signals: none | network_errors: none
+  [CASE] name: statuses@2.0.1                       | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 199275685/wk   | dist: 5 (postcss)    | signals: none | network_errors: none
+  [CASE] name: bytes@3.1.2                          | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 140263201/wk   | dist: 3 (vite)       | signals: none | network_errors: none
+  [CASE] name: supports-color@9.4.0                 | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 402506592/wk   | dist: 10 (colors)    | signals: none | network_errors: none
+  [CASE] name: strip-ansi@7.1.0                     | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 528161837/wk   | dist: 7 (core-js)    | signals: none | network_errors: none
+  [CASE] name: filelock@3.13.1                      | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 4 (pillow)     | signals: none | network_errors: none
+  [CASE] name: platformdirs@4.2.0                   | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 6 (transformers) | signals: none | network_errors: none
+  [CASE] name: cachetools@5.3.3                     | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (setuptools) | signals: none | network_errors: none
+  [CASE] name: tomli@2.0.1                          | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 3 (torch)      | signals: none | network_errors: none
+  [CASE] name: distlib@0.3.8                        | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (urllib3)    | signals: none | network_errors: none
+  [CASE] name: sharp@0.33.2                         | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 115326409/wk   | dist: 3 (chalk)      | signals: none | network_errors: none
+  [CASE] name: husky@9.0.11                         | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 36721479/wk    | dist: 4 (chalk)      | signals: none | network_errors: none
+  [CASE] name: chalker@1.2.0                        | ecosystem: npm   | label: BENIGN    | decision: ASK   | score: 60/100  | downloads: 15601/wk       | dist: 2 (chalk)      | signals: typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: rimraf2@0.1.0                        | ecosystem: npm   | label: BENIGN    | decision: ASK   | score: 60/100  | downloads: 1073/wk        | dist: 1 (rimraf)     | signals: typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: clack@1.2.0                          | ecosystem: pypi  | label: BENIGN    | decision: ASK   | score: 60/100  | downloads: N/A            | dist: 1 (click)      | signals: typosquat_similarity (60pts) | network_errors: none
+  [CASE] name: mocha-clean@0.4.0                    | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 9279/wk        | dist: 7 (chalk)      | signals: none | network_errors: none
+  [CASE] name: cross-port-killer@1.4.0              | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 20203/wk       | dist: 11 (body-parser) | signals: none | network_errors: none
+  [CASE] name: archiver-zip-encryptable@1.0.10      | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: 13260/wk       | dist: 18 (typescript) | signals: none | network_errors: none
+  [CASE] name: click-repl@0.3.0                     | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (click)      | signals: none | network_errors: none
+  [CASE] name: flask-jwt-extended@4.6.0             | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 13 (flask)     | signals: none | network_errors: none
+  [CASE] name: types-six@1.16.21.9                  | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 6 (six)        | signals: none | network_errors: none
+  [CASE] name: pytest-mock@3.12.0                   | ecosystem: pypi  | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 5 (pytest)     | signals: none | network_errors: none
+  [CASE] name: @corp/data-pipeline@latest           | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 14 (prop-types) | signals: allowlisted_or_private (0pts) | network_errors: none
+  [CASE] name: workspace:packages/ui@latest         | ecosystem: npm   | label: BENIGN    | decision: ALLOW | score: 0/100   | downloads: N/A            | dist: 15 (webpack)   | signals: allowlisted_or_private (0pts) | network_errors: none
+
+-----------------------------------------------------
+DEV SPLIT RESULTS (n=35, n_benign=31, n_malicious=4):
+  block_FPR: 0.0% (0/31) [Wilson 95% CI: [0.00%, 11.03%]] | alert_FPR: 6.5% (2/31) [Wilson 95% CI: [1.79%, 20.72%]]
+  block_Recall: 75.0% (3/4) [Wilson 95% CI: [30.06%, 95.44%]] | alert_Recall: 100.0% (4/4) [Wilson 95% CI: [51.01%, 100.00%]] | alert_Precision: 66.7% (4/6)
+  Block Breakdown: TP=3 | FP=0 | TN=31 | FN=1
+  Alert Breakdown: TP=4 | FP=2 | TN=29 | FN=0
+
+HOLD-OUT TEST SPLIT RESULTS (n=37, n_benign=31, n_malicious=6):
+  block_FPR: 0.0% (0/31) [Wilson 95% CI: [0.00%, 11.03%]] | alert_FPR: 9.7% (3/31) [Wilson 95% CI: [3.35%, 24.90%]]
+  block_Recall: 100.0% (6/6) [Wilson 95% CI: [60.97%, 100.00%]] | alert_Recall: 100.0% (6/6) [Wilson 95% CI: [60.97%, 100.00%]] | alert_Precision: 66.7% (6/9)
+  Block Breakdown: TP=6 | FP=0 | TN=31 | FN=0
+  Alert Breakdown: TP=6 | FP=3 | TN=28 | FN=0
+
+OVERALL CORPUS SUMMARY:
+  Total Cases: 72 | Benign: 62 | Malicious/Squat: 10
+  block_FPR: 0.0% (0/62) [Wilson 95% CI: [0.00%, 5.83%]] | alert_FPR: 8.1% (5/62) [Wilson 95% CI: [3.49%, 17.53%]]
+  block_Recall: 90.0% (9/10) [Wilson 95% CI: [59.59%, 98.21%]] | alert_Recall: 100.0% (10/10) [Wilson 95% CI: [72.25%, 100.00%]]
+-----------------------------------------------------
+

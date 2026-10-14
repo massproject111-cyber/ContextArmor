@@ -1,0 +1,67 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Fault Injection Test Suite (node dist/faultInjection.js) ===
+=====================================================
+       ContextArmor Fault Injection Test Suite       
+=====================================================
+
+=== (a) Fault Injection: Registry Timeout ===
+Command: npm i express
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [express: [UNCHECKED] Registry lookup failed for 'express' (npm): ETIMEDOUT: Connection timed out after 8000ms]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with unchecked warning.
+
+Command: npm i nope-xyz-9
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [nope-xyz-9: [UNCHECKED] Registry lookup failed for 'nope-xyz-9' (npm): ETIMEDOUT: Connection timed out after 8000ms]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with unchecked warning.
+
+Command: npm i chalk@5.6.1
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [chalk: [UNCHECKED] Registry lookup failed for 'chalk' (npm): ETIMEDOUT: Connection timed out after 8000ms]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with unchecked warning.
+
+=== (b) Fault Injection: OSV Only Down ===
+Command: npm i chalk@5.6.1
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [chalk: [UNCHECKED] OSV advisory check failed for 'chalk' (npm): OSV API down: 503 Service Unavailable]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with OSV unchecked warning.
+
+=== (c) Fault Injection: Registry 429 and 503 ===
+1. Registry 429 Rate Limit (npm i express):
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [express: [UNCHECKED] Registry lookup failed for 'express' (npm): HTTP 429 Too Many Requests]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with unchecked on 429.
+
+2. Registry 503 Service Unavailable (npm i express):
+  Decision: ASK (Exit Code: 0)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [express: [UNCHECKED] Registry lookup failed for 'express' (npm): HTTP 503 Service Unavailable]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK with unchecked on 503.
+
+=== (d) Real 404 on nope-xyz-9 (Network Up) ===
+Command: npm i nope-xyz-9
+  Decision: BLOCK (Exit Code: 2)
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+  [PASS] Correctly BLOCKED on confirmed HTTP 404 unregistered hallucination.
+
+=== (e) Cooldown ASK Text Demonstration ===
+1. npm Cooldown Test (npm i my-cool-pkg):
+  Decision: ASK (Exit Code: 0)
+  Reason: [ContextArmor WARNING] Flagged packages: [my-cool-pkg: Package 'my-cool-pkg@2.0.0' was published 5.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '1.0.0'. Suggested pin: 'npm i my-cool-pkg@1.0.0'.]. Confirm installation?
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [my-cool-pkg: Package 'my-cool-pkg@2.0.0' was published 5.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '1.0.0'. Suggested pin: 'npm i my-cool-pkg@1.0.0'.]. Confirm installation?"}}
+  [PASS] Correctly formatted npm cooldown ASK text with latest version, age, stable version, and suggested pin command.
+
+2. PyPI Cooldown Test (pip install my-py-pkg):
+  Decision: ASK (Exit Code: 0)
+  Reason: [ContextArmor WARNING] Flagged packages: [my-py-pkg: Package 'my-py-pkg@2.0.0' was published 5.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '1.0.0'. Suggested pin: 'pip install my-py-pkg==1.0.0'.]. Confirm installation?
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [my-py-pkg: Package 'my-py-pkg@2.0.0' was published 5.0 hours ago (< 72h cooldown). High risk of unvetted fresh release or hijack. Newest version older than 72h: '1.0.0'. Suggested pin: 'pip install my-py-pkg==1.0.0'.]. Confirm installation?"}}
+  [PASS] Correctly formatted PyPI cooldown ASK text with latest version, age, stable version, and suggested pin command.
+
+=== (f) Fault Injection: Unresolved Version on Registered Package ===
+Command: npm i unresolved-ver-pkg
+  Decision: ASK (Exit Code: 0)
+  Reason: [ContextArmor WARNING] Flagged packages: [unresolved-ver-pkg: [UNCHECKED] OSV advisory check failed for 'unresolved-ver-pkg' (npm): version unresolved; OSV unchecked]. Confirm installation?
+  Payload: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor WARNING] Flagged packages: [unresolved-ver-pkg: [UNCHECKED] OSV advisory check failed for 'unresolved-ver-pkg' (npm): version unresolved; OSV unchecked]. Confirm installation?"}}
+  [PASS] Correctly dispatched to ASK when version cannot be resolved for registered package.
+
+-----------------------------------------------------
+All Fault Injection Tests Passed Successfully (0 failures).

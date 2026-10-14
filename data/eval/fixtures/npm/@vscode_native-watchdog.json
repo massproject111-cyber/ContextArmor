@@ -1,0 +1,1 @@
+{"name": "@vscode/native-watchdog", "dist-tags": {"latest": "1.4.6"}, "time": {"created": "2026-01-14T19:00:20.985Z", "1.4.6": "2026-01-14T19:00:21.187Z", "modified": "2026-01-14T19:00:21.429Z"}, "versions": {"1.4.6": {"name": "@vscode/native-watchdog", "version": "1.4.6", "scripts": {"test": "node test/test.js", "install": "node-gyp rebuild"}}}}

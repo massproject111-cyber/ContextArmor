@@ -1,0 +1,67 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== A. NEGATIVE TAMPER ATTEMPTS (MUST BLOCK, EXIT 2) ===
+--------------------------------------------------------
+TEST COMMAND: cp /tmp/evil .claude/settings.json
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: python3 -c "open('.claude/settings.json', 'w').write('')"
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: sed -i '' 's/allow/deny/' .claude/settings.json
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: echo evil | tee .claude/settings.json
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: cd .claude && echo foo >> settings.json
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: git checkout -- .claude/settings.json
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: rm ~/.contextarmor/decisions.log
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+--------------------------------------------------------
+TEST COMMAND: echo evil > .cla*/set*
+Output: [ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker.
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor PROTECTED_PATH] Command attempts to modify protected configuration path: '.claude/settings.json'. Blocked by circuit breaker."}}
+Exit Code: 2
+PASSED: Intercepted with exit code 2 (BLOCK)
+
+=== B. POSITIVE INSPECTION COMMANDS (MUST ALLOW, EXIT 0) ===
+--------------------------------------------------------
+TEST COMMAND: cat .claude/settings.json
+Output: []
+Exit Code: 0
+PASSED: Allowed inspection with exit code 0
+--------------------------------------------------------
+TEST COMMAND: ls -la .claude/settings.json
+Output: []
+Exit Code: 0
+PASSED: Allowed inspection with exit code 0
+--------------------------------------------------------
+TEST COMMAND: git diff .claude/settings.json
+Output: []
+Exit Code: 0
+PASSED: Allowed inspection with exit code 0

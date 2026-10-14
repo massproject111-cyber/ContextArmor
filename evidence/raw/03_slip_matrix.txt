@@ -1,0 +1,120 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+==========================================================
+COMMAND: pip install ./local
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2502, AFTER_LINES:     2503
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:18.905Z","rawCommand":"pip install ./local","extractedPackages":["./local"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+==========================================================
+COMMAND: npm i ./local
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2503, AFTER_LINES:     2504
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:18.946Z","rawCommand":"npm i ./local","extractedPackages":["./local"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: './local'. Confirm installation?"}
+==========================================================
+COMMAND: npm i git+https://github.com/chalk/chalk.git
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: 'git+https://github.com/chalk/chalk.git'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2504, AFTER_LINES:     2505
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:18.984Z","rawCommand":"npm i git+https://github.com/chalk/chalk.git","extractedPackages":["git+https://github.com/chalk/chalk.git"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: 'git+https://github.com/chalk/chalk.git'. Confirm installation?"}
+==========================================================
+COMMAND: npm i https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: 'https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2505, AFTER_LINES:     2506
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:19.022Z","rawCommand":"npm i https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz","extractedPackages":["https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: 'https://registry.npmjs.org/chalk/-/chalk-5.3.0.tgz'. Confirm installation?"}
+==========================================================
+COMMAND: npx -y nope-xyz-9@latest
+STDOUT/STDERR: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+EXIT CODE: 2
+BEFORE_LINES:     2506, AFTER_LINES:     2507
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:19.822Z","rawCommand":"npx -y nope-xyz-9@latest","extractedPackages":["nope-xyz-9@latest"],"decision":"BLOCK","reason":"Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}
+==========================================================
+COMMAND: uv sync
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2507, AFTER_LINES:     2508
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:19.879Z","rawCommand":"uv sync","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+==========================================================
+COMMAND: poetry install
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2508, AFTER_LINES:     2509
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:19.918Z","rawCommand":"poetry install","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+==========================================================
+COMMAND: pnpm install
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2509, AFTER_LINES:     2510
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:19.976Z","rawCommand":"pnpm install","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+==========================================================
+COMMAND: yarn install
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2510, AFTER_LINES:     2511
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.033Z","rawCommand":"yarn install","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+==========================================================
+COMMAND: bun install
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2511, AFTER_LINES:     2512
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.089Z","rawCommand":"bun install","extractedPackages":[],"decision":"ALLOW","reason":"NOTHING_TO_CHECK: manifest unchanged vs HEAD"}
+==========================================================
+COMMAND: uv add
+STDOUT/STDERR: 
+EXIT CODE: 0
+BEFORE_LINES:     2512, AFTER_LINES:     2513
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.127Z","rawCommand":"uv add","extractedPackages":[],"decision":"ALLOW","reason":"INSTALL_NO_TARGETS: No packages targeted in install command"}
+==========================================================
+COMMAND: uv pip install -r requirements.txt
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor PARSE_FAIL] Requirements file 'requirements.txt' does not exist on disk. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2513, AFTER_LINES:     2514
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.164Z","rawCommand":"uv pip install -r requirements.txt","extractedPackages":[],"decision":"ASK","reason":"[ContextArmor PARSE_FAIL] Requirements file 'requirements.txt' does not exist on disk. Confirm installation?"}
+==========================================================
+COMMAND: pip install .[extra]
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: '.[extra]'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2514, AFTER_LINES:     2515
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.202Z","rawCommand":"pip install .[extra]","extractedPackages":[".[extra]"],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: '.[extra]'. Confirm installation?"}
+==========================================================
+COMMAND: pip install .
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: '.'. Confirm installation?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2515, AFTER_LINES:     2516
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.244Z","rawCommand":"pip install .","extractedPackages":["."],"decision":"ASK","reason":"[ContextArmor DIRECT_SOURCE] Installing from local path/URL/git repository bypasses registry scanning: '.'. Confirm installation?"}
+==========================================================
+COMMAND: $(npm i nope-xyz-9)
+STDOUT/STDERR: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+EXIT CODE: 2
+BEFORE_LINES:     2516, AFTER_LINES:     2517
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.463Z","rawCommand":"$(npm i nope-xyz-9)","extractedPackages":["nope-xyz-9@latest"],"decision":"BLOCK","reason":"Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}
+==========================================================
+COMMAND: eval "npm i nope-xyz-9"
+STDOUT/STDERR: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+EXIT CODE: 2
+BEFORE_LINES:     2517, AFTER_LINES:     2518
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.653Z","rawCommand":"eval \"npm i nope-xyz-9\"","extractedPackages":["nope-xyz-9@latest"],"decision":"BLOCK","reason":"Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}
+==========================================================
+COMMAND: echo nope-xyz-9 | xargs npm i
+STDOUT/STDERR: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+EXIT CODE: 2
+BEFORE_LINES:     2518, AFTER_LINES:     2519
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:20.832Z","rawCommand":"echo nope-xyz-9 | xargs npm i","extractedPackages":["nope-xyz-9@latest"],"decision":"BLOCK","reason":"Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}
+==========================================================
+COMMAND: bash -c "bash -c 'npm i nope-xyz-9'"
+STDOUT/STDERR: [ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting).
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[ContextArmor CIRCUIT BREAKER] Blocked installation of 'nope-xyz-9' (npm): Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}}
+EXIT CODE: 2
+BEFORE_LINES:     2519, AFTER_LINES:     2520
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:21.018Z","rawCommand":"bash -c \"bash -c 'npm i nope-xyz-9'\"","extractedPackages":["nope-xyz-9@latest"],"decision":"BLOCK","reason":"Package 'nope-xyz-9' does not exist on npm registry (HTTP 404: unregistered AI hallucination, vulnerable to slopsquatting)."}
+==========================================================
+COMMAND: bash -c "bash -c \"bash -c \\"bash -c \\\"bash -c \\\\"bash -c \\\\\"npm i nope-xyz-9\\\\\"\\\\"\\\"\\"\""
+STDOUT/STDERR: {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[ContextArmor NESTED_SHELL] Command exceeds subshell/wrapper unwrapping depth limit (depth > 5). Confirm execution?"}}
+EXIT CODE: 0
+BEFORE_LINES:     2520, AFTER_LINES:     2521
+DECISIONS.LOG: {"timestamp":"2026-10-11T09:57:21.070Z","rawCommand":"bash -c \"bash -c \\\"bash -c \\\\\"bash -c \\\\\\\"bash -c \\\\\\\\\"bash -c \\\\\\\\\\\"npm i nope-xyz-9\\\\\\\\\\\"\\\\\\\\\"\\\\\\\"\\\\\"\\\"\"","extractedPackages":[],"decision":"ASK","reason":"[ContextArmor NESTED_SHELL] Command exceeds subshell/wrapper unwrapping depth limit (depth > 5). Confirm execution?"}

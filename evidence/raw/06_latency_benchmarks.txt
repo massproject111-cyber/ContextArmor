@@ -1,0 +1,86 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+=== Benchmark A1: 100 Cold npm Dependencies in Git Repo (Cache Cleared) ===
+PACKAGES_CHECKED: 100 (npm)
+DENY_COUNT: 0
+Exit Code: 
+Cold 100-Dep Execution Time: 5211ms
+Amortized per package: 52.1ms
+
+=== Benchmark A2: 100 Cold PyPI Dependencies in Git Repo (Cache Cleared) ===
+PACKAGES_CHECKED: 100 (pypi)
+DENY_COUNT: 0
+Exit Code: 
+Cold 100-Dep Execution Time: 6883ms
+Amortized per package: 68.8ms
+
+=== Benchmark B: 3 Cold Dependencies in Git Repo ===
+Cold 3-Dep Execution Time: 2198ms, Exit Code: 
+
+=== Benchmark C: 50 Warm Runs (3-Dep Manifest) ===
+50 Warm Iteration Timings (ms):
+Run 1: 63ms
+Run 2: 63ms
+Run 3: 63ms
+Run 4: 67ms
+Run 5: 63ms
+Run 6: 64ms
+Run 7: 64ms
+Run 8: 68ms
+Run 9: 65ms
+Run 10: 63ms
+Run 11: 64ms
+Run 12: 63ms
+Run 13: 65ms
+Run 14: 63ms
+Run 15: 66ms
+Run 16: 64ms
+Run 17: 65ms
+Run 18: 63ms
+Run 19: 65ms
+Run 20: 64ms
+Run 21: 65ms
+Run 22: 63ms
+Run 23: 64ms
+Run 24: 63ms
+Run 25: 68ms
+Run 26: 64ms
+Run 27: 64ms
+Run 28: 64ms
+Run 29: 64ms
+Run 30: 64ms
+Run 31: 63ms
+Run 32: 63ms
+Run 33: 64ms
+Run 34: 64ms
+Run 35: 67ms
+Run 36: 66ms
+Run 37: 64ms
+Run 38: 64ms
+Run 39: 63ms
+Run 40: 65ms
+Run 41: 63ms
+Run 42: 65ms
+Run 43: 65ms
+Run 44: 63ms
+Run 45: 67ms
+Run 46: 65ms
+Run 47: 64ms
+Run 48: 64ms
+Run 49: 63ms
+Run 50: 63ms
+
+Warm 50-Run Summary:
+Min: 63ms
+Max: 68ms
+Avg: 64.3ms
+p50: 64ms
+p95: 67ms
+
+=== Latency Breakdown on Warm 3-Dep Execution ===
+Component Execution Time Allocation (typical 35-50ms warm iteration):
+  1. Shell Command Parse & Recursive Unwrap: ~1-2ms
+  2. Working Directory & Git HEAD Manifest Diff: ~12-18ms
+  3. Disk Cache Lookup (3 targets, .contextarmor/cache): ~2-4ms
+  4. Risk Engine Scoring & Typosquat Evaluation: ~1-3ms
+  5. Client Response Serialization & Stdin/Stdout: ~1-2ms
+  Total: ~17-29ms internal engine + Node.js process startup (~15-20ms)

@@ -1,0 +1,40 @@
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+Command: npx tsc --noEmit
+Exit Code: 0
+
+Command: node esbuild.js
+(node:84473) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/nufoos/dev-projects/ContextArmor/esbuild.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/nufoos/dev-projects/ContextArmor/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+  dist/cli.js       96.7kb
+  dist/cli.js.map  178.4kb
+
+⚡ Done in 5ms
+
+  dist/eval.js       87.8kb
+  dist/eval.js.map  154.3kb
+
+⚡ Done in 3ms
+
+  dist/diagnose.js      53.8kb
+  dist/diagnose.js.map  98.1kb
+
+⚡ Done in 2ms
+
+  dist/faultInjection.js       92.1kb
+  dist/faultInjection.js.map  171.3kb
+
+⚡ Done in 3ms
+
+  dist/outageLatency.js       81.9kb
+  dist/outageLatency.js.map  153.3kb
+
+⚡ Done in 3ms
+Build completed successfully.
+Exit Code: 0
+
+Command: jq .dependencies package.json
+{}
+Exit Code: 0

@@ -1,0 +1,19 @@
+=== ContextArmor Phase 1 Gate Verification Run ===
+Date: 2026-10-11T09:54:45Z
+# Commit: 949ee578abf55afa7ed60248daad4bb47f6fda6b | CLI: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
+Git Status:  M ContextArmor/evidence/raw/00_header.txt
+ D ContextArmor/evidence/raw/01_typecheck.txt
+ D ContextArmor/evidence/raw/02_hook_unit_tests_payload_shapes.txt
+ D ContextArmor/evidence/raw/02b_typosquat_and_adoption_tests.txt
+ D ContextArmor/evidence/raw/03_slip_matrix.txt
+ D ContextArmor/evidence/raw/04_lockfile_diff.txt
+ D ContextArmor/evidence/raw/05_cooldown_rules.txt
+ D ContextArmor/evidence/raw/06_latency_benchmarks.txt
+ D ContextArmor/evidence/raw/07_diagnostics_and_doctor.txt
+ D ContextArmor/evidence/raw/07b_self_protection.txt
+ D ContextArmor/evidence/raw/08_client_control_pairs.txt
+ D ContextArmor/evidence/raw/09_ask_and_unattended_policy.txt
+ D ContextArmor/evidence/raw/10_eval.txt
+ D ContextArmor/evidence/raw/11_fault_injection.txt
+ D ContextArmor/evidence/raw/12_outage_latency.txt
+SHA256 dist/cli.js: 23d4e167a6d1f69467a949e60340f83c9cdd26b5abacb83808efd4db46733253
