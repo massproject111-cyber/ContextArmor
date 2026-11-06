@@ -354,6 +354,20 @@ export function activate(context: vscode.ExtensionContext) {
           outputChannel.append(chunk);
         });
 
+        if (res.hasLlmError) {
+          vscode.window
+            .showWarningMessage(
+              'Strix LLM connection issue detected. ContextArmor completed the scan using the built-in Sandbox engine. Would you like to log in to your AI provider?',
+              'Log In / Connect AI Brain',
+              'Dismiss'
+            )
+            .then((choice) => {
+              if (choice === 'Log In / Connect AI Brain') {
+                vscode.commands.executeCommand('contextarmor.configureLlm');
+              }
+            });
+        }
+
         if (res.threats.length > 0) {
           currentThreats = [
             ...currentThreats.filter((t) => !t.title.includes('Pentest')),

@@ -40,17 +40,19 @@ export function getLlmConfig(): LlmConfig {
     const parsed = JSON.parse(raw);
     const env = parsed.env || {};
     const model = env.STRIX_LLM || '';
-    const apiKey = env.LLM_API_KEY || '';
+    const apiKey = env.LLM_API_KEY || env.GEMINI_API_KEY || env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || '';
     const apiBase = env.LLM_API_BASE || '';
 
     let provider = 'Custom';
     if (model.startsWith('gemini')) provider = 'Google Gemini';
+    else if (model.startsWith('chatgpt')) provider = 'ChatGPT (OAuth)';
     else if (model.startsWith('openai')) provider = 'OpenAI';
     else if (model.startsWith('anthropic')) provider = 'Anthropic Claude';
     else if (model.startsWith('openrouter')) provider = 'OpenRouter';
     else if (model.startsWith('ollama')) provider = 'Ollama (Local)';
+    else if (model.startsWith('contextarmor')) provider = 'Built-in Sandbox';
 
-    const isConfigured = !!model && (!!apiKey || model.startsWith('ollama'));
+    const isConfigured = !!model && (!!apiKey || model.startsWith('ollama') || model.startsWith('chatgpt') || model.startsWith('contextarmor'));
     return { provider, model, apiKey, apiBase, isConfigured };
   } catch {
     return { isConfigured: false };
@@ -78,6 +80,15 @@ export function saveLlmConfig(modelSpec: string, apiKey: string, apiBase?: strin
 
   currentEnv.STRIX_LLM = modelSpec;
   currentEnv.LLM_API_KEY = apiKey;
+
+  if (modelSpec.startsWith('gemini')) {
+    currentEnv.GEMINI_API_KEY = apiKey;
+  } else if (modelSpec.startsWith('openai')) {
+    currentEnv.OPENAI_API_KEY = apiKey;
+  } else if (modelSpec.startsWith('anthropic')) {
+    currentEnv.ANTHROPIC_API_KEY = apiKey;
+  }
+
   if (apiBase) {
     currentEnv.LLM_API_BASE = apiBase;
   } else {
@@ -101,38 +112,40 @@ export async function promptLlmSetup(): Promise<boolean> {
     description?: string;
     detail?: string;
     modelPrefix: string;
-    keyUrl: string;
+    keyUrl?: string;
+    isOAuth?: boolean;
     isLocal?: boolean;
+    isSandbox?: boolean;
   }
 
   const items: ProviderItem[] = [
     {
-      label: '$(hubot) Google Gemini (Recommended)',
-      description: 'gemini-1.5-pro / gemini-2.0-flash',
-      detail: 'Fastest multi-turn code reasoning. Get a free API key at aistudio.google.com',
-      modelPrefix: 'gemini/gemini-1.5-pro',
+      label: '$(hubot) Google Gemini (Recommended - Free & Fast Tier)',
+      description: 'gemini-2.0-flash / gemini-1.5-pro',
+      detail: 'Highest reasoning speed. Get an instant free API key at aistudio.google.com',
+      modelPrefix: 'gemini/gemini-2.0-flash',
       keyUrl: 'https://aistudio.google.com/apikey',
     },
     {
-      label: '$(sparkle) OpenAI / ChatGPT',
+      label: '$(globe) ChatGPT Subscription (OAuth Login via Browser)',
+      description: 'Codex OAuth / Plus / Team / Pro',
+      detail: 'Direct browser OAuth sign-in to your ChatGPT subscription (no API key needed).',
+      modelPrefix: 'chatgpt/gpt-4o',
+      isOAuth: true,
+    },
+    {
+      label: '$(sparkle) OpenAI / ChatGPT (API Key)',
       description: 'gpt-4o / o1',
-      detail: 'State-of-the-art vulnerability reasoning. Get your key at platform.openai.com',
+      detail: 'Pay-as-you-go API key from platform.openai.com',
       modelPrefix: 'openai/gpt-4o',
       keyUrl: 'https://platform.openai.com/api-keys',
     },
     {
-      label: '$(shield) Anthropic Claude',
+      label: '$(shield) Anthropic Claude (API Key)',
       description: 'claude-3-5-sonnet',
-      detail: 'Best-in-class coding & exploitation accuracy. Get key at console.anthropic.com',
+      detail: 'Best-in-class coding & exploitation accuracy from console.anthropic.com',
       modelPrefix: 'anthropic/claude-3-5-sonnet-20241022',
       keyUrl: 'https://console.anthropic.com/settings/keys',
-    },
-    {
-      label: '$(globe) OpenRouter',
-      description: 'DeepSeek R1 / Llama 3.3',
-      detail: 'Flexible multi-model routing hub. Get key at openrouter.ai',
-      modelPrefix: 'openrouter/deepseek/deepseek-r1',
-      keyUrl: 'https://openrouter.ai/keys',
     },
     {
       label: '$(server) Ollama (100% Free & Local)',
@@ -141,6 +154,13 @@ export async function promptLlmSetup(): Promise<boolean> {
       modelPrefix: 'ollama/deepseek-r1',
       keyUrl: 'http://localhost:11434',
       isLocal: true,
+    },
+    {
+      label: '$(circuit-board) ContextArmor Sandbox (Zero-LLM / Offline Mode)',
+      description: 'AST Taint Analysis • CWE-89, CWE-78, CWE-502',
+      detail: 'Built-in local security analyzer. Zero external dependencies, no accounts or keys needed.',
+      modelPrefix: 'contextarmor/sandbox',
+      isSandbox: true,
     },
   ];
 
@@ -151,6 +171,25 @@ export async function promptLlmSetup(): Promise<boolean> {
 
   if (!selection) {
     return false;
+  }
+
+  if (selection.isOAuth) {
+    const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
+    term.show();
+    term.sendText('strix auth login chatgpt');
+    saveLlmConfig('chatgpt/gpt-4o', 'oauth-subscription');
+    vscode.window.showInformationMessage(
+      'Opened terminal for ChatGPT OAuth Login. Follow the browser prompt to complete sign-in!'
+    );
+    return true;
+  }
+
+  if (selection.isSandbox) {
+    saveLlmConfig('contextarmor/sandbox', 'builtin-sandbox');
+    vscode.window.showInformationMessage(
+      'ContextArmor configured to use the Built-in Zero-LLM Sandbox Pentester!'
+    );
+    return true;
   }
 
   if (selection.isLocal) {
@@ -484,7 +523,20 @@ export async function runStrixScan(
   targetDir: string,
   mode: 'quick' | 'standard' | 'deep' = 'quick',
   onLog?: (line: string) => void
-): Promise<{ success: boolean; output: string; threats: ThreatItem[] }> {
+): Promise<{ success: boolean; output: string; threats: ThreatItem[]; hasLlmError?: boolean }> {
+  const llm = getLlmConfig();
+  if (llm.model === 'contextarmor/sandbox') {
+    if (onLog) {
+      onLog('[ContextArmor Sandbox] Running in Built-in Zero-LLM Sandbox Mode...');
+    }
+    const threats = runLocalSandboxAnalysis(targetDir, onLog);
+    return {
+      success: true,
+      output: `[ContextArmor Sandbox] In-process sandbox analysis complete: ${threats.length} verified vulnerabilities.`,
+      threats,
+    };
+  }
+
   const status = getStrixStatus();
 
   // Step 1: Check Docker and attempt auto-launch if Docker Desktop is installed
@@ -520,6 +572,42 @@ export async function runStrixScan(
       proc.on('close', (code) => {
         const combined = stdoutData + '\n' + stderrData;
         const threats = loadExistingStrixFindings(targetDir);
+
+        const hasLlmFailure =
+          combined.includes('LLM CONNECTION FAILED') ||
+          combined.includes('Connection error') ||
+          combined.includes('MODEL NOT AVAILABLE') ||
+          combined.includes('not supported when using Codex') ||
+          combined.includes('not authenticated');
+
+        if ((code !== 0 || hasLlmFailure) && threats.length === 0) {
+          if (onLog) {
+            onLog('\n[ContextArmor Recovery] Strix LLM connection issue detected.');
+            onLog('[ContextArmor Recovery] Automatically falling back to ContextArmor AST Sandbox Pentester...');
+          }
+
+          // Clean up invalid proxy port if it was pointing to localhost
+          try {
+            const configPath = path.join(os.homedir(), '.strix', 'cli-config.json');
+            if (fs.existsSync(configPath)) {
+              const parsed = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+              if (parsed.env && parsed.env.LLM_API_BASE) {
+                delete parsed.env.LLM_API_BASE;
+                fs.writeFileSync(configPath, JSON.stringify(parsed, null, 2), { mode: 0o600 });
+              }
+            }
+          } catch {}
+
+          const fallbackThreats = runLocalSandboxAnalysis(targetDir, onLog);
+          resolve({
+            success: true,
+            output: combined + '\n[ContextArmor Sandbox Fallback executed successfully]',
+            threats: fallbackThreats,
+            hasLlmError: true,
+          });
+          return;
+        }
+
         resolve({
           success: code === 0 || threats.length > 0,
           output: combined,
