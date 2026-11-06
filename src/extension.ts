@@ -2,17 +2,22 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as child_process from 'node:child_process';
+import * as os from 'node:os';
 import {
   extractAddedNpmDeps,
   extractAddedPypiDeps,
+  extractAllNpmDeps,
+  extractAllPypiDeps,
   extractPythonThreats,
   mapCheckResultToDiagnostic,
   CliCheckResult,
 } from './ui/diagnosticMapper.js';
 import { QuickFixProvider } from './ui/quickFixes.js';
-import { ContextArmorTreeProvider, ThreatItem } from './ui/treeView.js';
+import { ThreatItem } from './ui/treeView.js';
 import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
+import { auditWorkspace } from './core/projectAuditor.js';
+import { runStrixScan, getStrixStatus } from './integrations/strix.js';
 
 interface CacheEntry {
   result: CliCheckResult;
@@ -27,7 +32,7 @@ const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
  */
 function getNodeCommand(): { nodePath: string; env: NodeJS.ProcessEnv } {
   const customEnv: NodeJS.ProcessEnv = { ...process.env };
-  const standardPaths = '/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin';
+  const standardPaths = `${os.homedir()}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin`;
   if (customEnv.PATH) {
     if (!customEnv.PATH.includes('/opt/homebrew/bin')) {
       customEnv.PATH = `${standardPaths}:${customEnv.PATH}`;
@@ -171,6 +176,147 @@ export function activate(context: vscode.ExtensionContext) {
   // Initial status bar check
   updateStatusBar();
 
+  // Full Project Audit Command
+  async function runFullWorkspaceAudit() {
+    sidebarProvider.setScanning(true, 'Auditing workspace dependencies & code...');
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const rootPath =
+      workspaceFolders && workspaceFolders.length > 0
+        ? workspaceFolders[0].uri.fsPath
+        : process.cwd();
+
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'ContextArmor: Project Audit',
+        cancellable: false,
+      },
+      async (progress) => {
+        progress.report({ message: 'Scanning project manifests and code...' });
+        const result = await auditWorkspace(
+          rootPath,
+          (spec, eco) => spawnCliCheck(cliPath, spec, eco),
+          (msg, inc) => progress.report({ message: msg, increment: inc })
+        );
+
+        // Clear and set diagnostics across all audited files
+        diagnosticCollection.clear();
+        for (const [filePath, diags] of result.fileDiagnostics.entries()) {
+          diagnosticCollection.set(vscode.Uri.file(filePath), diags);
+        }
+
+        currentThreats = result.threats;
+        sidebarProvider.update(currentThreats);
+        if (DashboardPanel.currentPanel) {
+          DashboardPanel.currentPanel.update(currentThreats);
+        }
+
+        const critCount = result.threats.filter((t) => t.severity === 'CRITICAL').length;
+        const warnCount = result.threats.filter((t) => t.severity === 'WARNING').length;
+
+        if (critCount > 0) {
+          vscode.window
+            .showErrorMessage(
+              `ContextArmor Audit: Found ${critCount} critical threats and ${warnCount} warnings across ${result.stats.auditedFiles} files!`,
+              'Open Dashboard'
+            )
+            .then((choice) => {
+              if (choice === 'Open Dashboard') {
+                vscode.commands.executeCommand('contextarmor.openDashboard');
+              }
+            });
+        } else if (warnCount > 0) {
+          vscode.window
+            .showWarningMessage(
+              `ContextArmor Audit: Found ${warnCount} warnings across ${result.stats.auditedFiles} files.`,
+              'Open Dashboard'
+            )
+            .then((choice) => {
+              if (choice === 'Open Dashboard') {
+                vscode.commands.executeCommand('contextarmor.openDashboard');
+              }
+            });
+        } else {
+          vscode.window.showInformationMessage(
+            `ContextArmor Audit: All ${result.stats.totalDeps} dependencies & code files verified clean! (Score: 100/100)`
+          );
+        }
+      }
+    );
+  }
+
+  // Register audit command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('contextarmor.auditWorkspace', runFullWorkspaceAudit)
+  );
+
+  // Strix Pentest Command
+  async function runStrixPentest() {
+    const status = getStrixStatus();
+    if (!status.installed || !status.binaryPath) {
+      vscode.window.showWarningMessage(
+        'Strix AI Pentesting CLI not found at ~/.local/bin/strix. Install it via: curl -sSL https://strix.ai/install | bash'
+      );
+      return;
+    }
+
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const rootPath =
+      workspaceFolders && workspaceFolders.length > 0
+        ? workspaceFolders[0].uri.fsPath
+        : process.cwd();
+
+    const outputChannel = vscode.window.createOutputChannel('ContextArmor: Strix Pentest');
+    outputChannel.show();
+    outputChannel.appendLine(`[Strix Pentest] Launching autonomous pentesting against: ${rootPath}`);
+
+    sidebarProvider.setScanning(true, 'Running autonomous Strix pentest agents...');
+
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: 'ContextArmor: Running Strix Pentest',
+        cancellable: false,
+      },
+      async (progress) => {
+        progress.report({ message: 'Launching Strix agents...' });
+        const res = await runStrixScan(rootPath, 'quick', (chunk) => {
+          outputChannel.append(chunk);
+        });
+
+        if (res.threats.length > 0) {
+          currentThreats = [
+            ...currentThreats.filter((t) => !t.title.startsWith('[Strix')),
+            ...res.threats,
+          ];
+          sidebarProvider.update(currentThreats);
+          if (DashboardPanel.currentPanel) {
+            DashboardPanel.currentPanel.update(currentThreats);
+          }
+          vscode.window
+            .showErrorMessage(
+              `Strix Pentest completed with ${res.threats.length} vulnerabilities detected!`,
+              'View Dashboard'
+            )
+            .then((choice) => {
+              if (choice === 'View Dashboard') {
+                vscode.commands.executeCommand('contextarmor.openDashboard');
+              }
+            });
+        } else {
+          sidebarProvider.update(currentThreats);
+          vscode.window.showInformationMessage(
+            'Strix Pentest completed. No exploitable vulnerabilities verified.'
+          );
+        }
+      }
+    );
+  }
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('contextarmor.runStrix', runStrixPentest)
+  );
+
   // Register dashboard command
   context.subscriptions.push(
     vscode.commands.registerCommand('contextarmor.openDashboard', () => {
@@ -243,11 +389,16 @@ export function activate(context: vscode.ExtensionContext) {
 
     const headText = await getGitHeadContent(fileName);
 
-    const addedDeps = isNpm
+    // If file has git diff, check added deps. If clean/untracked, check all deps.
+    let depsToCheck = isNpm
       ? extractAddedNpmDeps(currentText, headText)
       : extractAddedPypiDeps(currentText, headText);
 
-    if (addedDeps.length === 0) {
+    if (depsToCheck.length === 0 && !headText) {
+      depsToCheck = isNpm ? extractAllNpmDeps(currentText) : extractAllPypiDeps(currentText);
+    }
+
+    if (depsToCheck.length === 0) {
       diagnosticCollection.set(document.uri, []);
       currentThreats = currentThreats.filter((t) => t.file !== fileName);
       sidebarProvider.update(currentThreats);
@@ -260,7 +411,7 @@ export function activate(context: vscode.ExtensionContext) {
     const diagnostics: vscode.Diagnostic[] = [];
     const newDocThreats: ThreatItem[] = [];
 
-    for (const dep of addedDeps) {
+    for (const dep of depsToCheck) {
       const spec = dep.version ? `${dep.name}@${dep.version}` : dep.name;
       const result = await spawnCliCheck(cliPath, spec, dep.ecosystem);
       const mapped = mapCheckResultToDiagnostic(dep, result);
@@ -326,14 +477,8 @@ export function activate(context: vscode.ExtensionContext) {
     auditDocument(vscode.window.activeTextEditor.document);
   }
 
-  // Initial audit of all workspace candidate files
-  vscode.workspace.findFiles('{**/package.json,**/requirements.txt,**/*.py}', '**/node_modules/**').then((uris) => {
-    for (const uri of uris) {
-      vscode.workspace.openTextDocument(uri).then((doc) => {
-        auditDocument(doc);
-      });
-    }
-  });
+  // Perform initial project audit in background on workspace open
+  runFullWorkspaceAudit().catch(() => {});
 }
 
 export function deactivate() {

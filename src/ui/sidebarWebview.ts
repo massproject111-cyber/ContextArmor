@@ -5,6 +5,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'contextarmorSidebarView';
   private _view?: vscode.WebviewView;
   private _threats: ThreatItem[] = [];
+  private _isScanning: boolean = false;
+  private _statusMessage?: string;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -24,6 +26,22 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
       switch (data.command) {
+        case 'auditWorkspace': {
+          vscode.commands.executeCommand('contextarmor.auditWorkspace');
+          break;
+        }
+        case 'runStrix': {
+          vscode.commands.executeCommand('contextarmor.runStrix');
+          break;
+        }
+        case 'openDashboard': {
+          vscode.commands.executeCommand('contextarmor.openDashboard');
+          break;
+        }
+        case 'runDoctor': {
+          vscode.commands.executeCommand('contextarmor.doctor');
+          break;
+        }
         case 'removeDep': {
           if (data.file && data.line !== undefined) {
             const uri = vscode.Uri.file(data.file);
@@ -67,16 +85,22 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           }
           break;
         }
-        case 'runDoctor': {
-          vscode.commands.executeCommand('contextarmor.doctor');
-          break;
-        }
       }
     });
   }
 
+  public setScanning(isScanning: boolean, statusMessage?: string) {
+    this._isScanning = isScanning;
+    this._statusMessage = statusMessage;
+    if (this._view) {
+      this._view.webview.html = this._getHtmlForWebview();
+    }
+  }
+
   public update(threats: ThreatItem[]) {
     this._threats = threats;
+    this._isScanning = false;
+    this._statusMessage = undefined;
     if (this._view) {
       this._view.webview.html = this._getHtmlForWebview();
     }
@@ -91,13 +115,23 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
     let contentHtml = '';
 
-    if (this._threats.length === 0) {
+    if (this._isScanning) {
+      contentHtml = `
+        <div style="padding: 20px 12px; text-align: center; border: 1px dashed var(--vscode-editorWidget-border); border-radius: 8px; margin-top: 12px; background: var(--vscode-editorWidget-background);">
+          <div class="spinner" style="margin: 0 auto 10px auto;"></div>
+          <div style="font-weight: 600; font-size: 13px; color: var(--vscode-focusBorder, #007acc);">Auditing Workspace...</div>
+          <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px;">
+            ${this._statusMessage || 'Checking dependencies, code deserialization & security risks...'}
+          </div>
+        </div>
+      `;
+    } else if (this._threats.length === 0) {
       contentHtml = `
         <div style="padding: 24px 12px; text-align: center; border: 1px dashed var(--vscode-editorWidget-border); border-radius: 8px; margin-top: 12px;">
           <div style="font-size: 24px; margin-bottom: 6px;">🛡️</div>
           <div style="font-weight: 600; font-size: 13px; color: #4caf50;">All Dependencies Clean</div>
           <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px;">
-            No malicious advisories or unregistered hallucinations detected.
+            No malicious advisories, unregistered hallucinations, or code risks detected.
           </div>
         </div>
       `;
@@ -110,9 +144,16 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           const badgeText = isCrit ? 'BLOCK' : 'ASK';
 
           // Extract suggested pin if available
-          const pinMatch = t.desc.match(/Suggested pin:\s*['"`](?:npm\s+i\s+[^@]+@|pip\s+install\s+[^=]+=+|uv\s+add\s+[^=]+=*)([^'"`\s]+)['"`]/i)
-            || t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
+          const pinMatch =
+            t.desc.match(/Suggested pin:\s*['"`](?:npm\s+i\s+[^@]+@|pip\s+install\s+[^=]+=+|uv\s+add\s+[^=]+=*)([^'"`\s]+)['"`]/i) ||
+            t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
           const pin = pinMatch ? pinMatch[1] : undefined;
+
+          // Determine category tag
+          let tag = 'DEP';
+          if (t.title.startsWith('[Strix')) tag = 'STRIX';
+          else if (t.title.startsWith('[MCP')) tag = 'MCP';
+          else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) tag = 'CODE';
 
           return `
             <div style="background: var(--vscode-editorWidget-background); border: 1px solid ${
@@ -120,14 +161,19 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
             }; border-radius: 6px; padding: 10px; margin-top: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                 <span style="font-weight: 600; font-size: 12px; font-family: monospace;">${t.title}</span>
-                <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px;">
-                  ${badgeText}
-                </span>
+                <div style="display: flex; gap: 4px;">
+                  <span style="background: var(--vscode-badge-background, #333); color: var(--vscode-badge-foreground, #ccc); padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 600;">
+                    ${tag}
+                  </span>
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 1px 5px; border-radius: 4px; font-weight: bold; font-size: 10px;">
+                    ${badgeText}
+                  </span>
+                </div>
               </div>
               <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-bottom: 8px; line-height: 1.4;">
                 ${t.desc}
               </div>
-              <div style="display: flex; gap: 6px;">
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${
                   pin
                     ? `<button onclick="pin('${t.file}', ${t.line}, '${pin}')" style="background: var(--vscode-button-background); color: var(--vscode-button-foreground); border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">
@@ -139,9 +185,13 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
                       </button>`
                     : ''
                 }
-                <button onclick="remove('${t.file}', ${t.line})" style="background: var(--vscode-button-secondaryBackground, #3a3d41); color: var(--vscode-button-secondaryForeground, #fff); border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">
-                  🗑️ Remove Line
-                </button>
+                ${
+                  t.file && t.line !== undefined
+                    ? `<button onclick="remove('${t.file}', ${t.line})" style="background: var(--vscode-button-secondaryBackground, #3a3d41); color: var(--vscode-button-secondaryForeground, #fff); border: none; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">
+                        🗑️ Remove Line
+                      </button>`
+                    : ''
+                }
               </div>
             </div>
           `;
@@ -172,6 +222,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .score-card:hover {
+      border-color: var(--vscode-focusBorder);
     }
     .score-title {
       font-size: 11px;
@@ -183,8 +237,36 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       font-size: 18px;
       font-weight: 700;
     }
-    .btn-audit {
+    .btn-primary {
       width: 100%;
+      background: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #fff);
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary:hover {
+      background: var(--vscode-button-hoverBackground, #1177bb);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .btn-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .btn-secondary {
+      flex: 1;
       background: var(--vscode-button-secondaryBackground, #3a3d41);
       color: var(--vscode-button-secondaryForeground, #fff);
       border: none;
@@ -192,15 +274,27 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
-      margin-top: 14px;
+      text-align: center;
     }
-    .btn-audit:hover {
-      background: var(--vscode-button-hoverBackground);
+    .btn-secondary:hover {
+      background: var(--vscode-button-secondaryHoverBackground, #45494e);
+    }
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top: 2px solid var(--vscode-focusBorder, #007acc);
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <div class="score-card">
+  <div class="score-card" onclick="openDashboard()" title="Click to view full Security Dashboard">
     <div>
       <div class="score-title">Security Score</div>
       <div style="font-size: 11px; color: var(--vscode-descriptionForeground);">${scoreLabel}</div>
@@ -208,16 +302,44 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     <div class="score-val" style="color: ${scoreColor};">${score} / 100</div>
   </div>
 
-  <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--vscode-descriptionForeground); margin-bottom: 4px;">
-    Active Threat Radar
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+    <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--vscode-descriptionForeground);">
+      Active Threat Radar
+    </span>
+    <span style="font-size: 10px; color: var(--vscode-descriptionForeground); cursor: pointer;" onclick="openDashboard()">
+      📊 Full Dashboard
+    </span>
   </div>
 
   ${contentHtml}
 
-  <button class="btn-audit" onclick="runDoctor()">Run Diagnostics Audit</button>
+  <button class="btn-primary" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()">
+    🛡️ Run Full Project Audit
+  </button>
+
+  <div class="btn-row">
+    <button class="btn-secondary" onclick="runStrix()" title="Run autonomous AI pentesting on workspace">
+      🦅 Strix Pentest
+    </button>
+    <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & tamper protection">
+      🩺 Doctor
+    </button>
+  </div>
 
   <script>
     const vscode = acquireVsCodeApi();
+    function auditWorkspace() {
+      vscode.postMessage({ command: 'auditWorkspace' });
+    }
+    function runStrix() {
+      vscode.postMessage({ command: 'runStrix' });
+    }
+    function openDashboard() {
+      vscode.postMessage({ command: 'openDashboard' });
+    }
+    function runDoctor() {
+      vscode.postMessage({ command: 'runDoctor' });
+    }
     function remove(file, line) {
       vscode.postMessage({ command: 'removeDep', file, line });
     }
@@ -226,9 +348,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     function fixTorch(file, line) {
       vscode.postMessage({ command: 'fixTorch', file, line });
-    }
-    function runDoctor() {
-      vscode.postMessage({ command: 'runDoctor' });
     }
   </script>
 </body>

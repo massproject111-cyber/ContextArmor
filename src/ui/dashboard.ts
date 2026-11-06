@@ -42,7 +42,14 @@ export class DashboardPanel {
     this._panel.webview.onDidReceiveMessage(
       (message) => {
         switch (message.command) {
+          case 'auditWorkspace':
+            vscode.commands.executeCommand('contextarmor.auditWorkspace');
+            return;
+          case 'runStrix':
+            vscode.commands.executeCommand('contextarmor.runStrix');
+            return;
           case 'scanWorkspace':
+          case 'runDoctor':
             vscode.commands.executeCommand('contextarmor.doctor');
             return;
         }
@@ -71,7 +78,7 @@ export class DashboardPanel {
   private _getHtmlForWebview(): string {
     const criticalCount = this._threats.filter((t) => t.severity === 'CRITICAL').length;
     const warningCount = this._threats.filter((t) => t.severity === 'WARNING').length;
-    const score = criticalCount > 0 ? 65 : warningCount > 0 ? 82 : 98;
+    const score = criticalCount > 0 ? 65 : warningCount > 0 ? 82 : 100;
     const scoreColor = score >= 90 ? '#4caf50' : score >= 75 ? '#ff9800' : '#f44336';
     const statusText =
       criticalCount > 0
@@ -87,7 +94,7 @@ export class DashboardPanel {
             .map(
               (t) => `
           <tr style="border-bottom: 1px solid var(--vscode-editorWidget-border);">
-            <td style="padding: 12px; font-weight: 600;">${t.title}</td>
+            <td style="padding: 12px; font-weight: 600; font-family: monospace;">${t.title}</td>
             <td style="padding: 12px;">
               <span style="background: ${
                 t.severity === 'CRITICAL' ? '#f4433622' : '#ff980022'
@@ -100,7 +107,7 @@ export class DashboardPanel {
             <td style="padding: 12px; color: var(--vscode-foreground);">${t.desc}</td>
             <td style="padding: 12px; color: var(--vscode-descriptionForeground); font-size: 12px;">${
               t.file || 'Workspace'
-            }</td>
+            }${t.line !== undefined ? `:${t.line + 1}` : ''}</td>
           </tr>`
             )
             .join('');
@@ -134,9 +141,13 @@ export class DashboardPanel {
       font-size: 22px;
       font-weight: 700;
     }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
       margin-bottom: 28px;
     }
@@ -183,8 +194,8 @@ export class DashboardPanel {
       border-bottom: 1px solid var(--vscode-editorWidget-border);
     }
     .btn {
-      background: var(--vscode-button-background);
-      color: var(--vscode-button-foreground);
+      background: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #fff);
       border: none;
       padding: 8px 16px;
       border-radius: 4px;
@@ -193,7 +204,20 @@ export class DashboardPanel {
       font-size: 13px;
     }
     .btn:hover {
-      background: var(--vscode-button-hoverBackground);
+      background: var(--vscode-button-hoverBackground, #1177bb);
+    }
+    .btn-secondary {
+      background: var(--vscode-button-secondaryBackground, #3a3d41);
+      color: var(--vscode-button-secondaryForeground, #fff);
+      border: none;
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn-secondary:hover {
+      background: var(--vscode-button-secondaryHoverBackground, #45494e);
     }
   </style>
 </head>
@@ -202,8 +226,10 @@ export class DashboardPanel {
     <div class="header-title">
       🛡️ ContextArmor AI Security Dashboard
     </div>
-    <div>
-      <button class="btn" onclick="vscode.postMessage({command: 'scanWorkspace'})">Run Diagnostics</button>
+    <div class="header-actions">
+      <button class="btn" onclick="vscode.postMessage({command: 'auditWorkspace'})">🛡️ Run Full Project Audit</button>
+      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runStrix'})">🦅 Strix Pentest</button>
+      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runDoctor'})">🩺 Doctor</button>
     </div>
   </div>
 
@@ -224,7 +250,7 @@ export class DashboardPanel {
       <div class="card-desc">72h cooldowns, low adoption, unvetted releases</div>
     </div>
     <div class="card">
-      <div class="card-title">Circuit Breaker & Hooks</div>
+      <div class="card-title">Pre-Execution Circuit Breaker</div>
       <div class="card-value" style="color: #4caf50;">ENFORCED</div>
       <div class="card-desc">PreToolUse hooks active in Claude Code & Antigravity</div>
     </div>
@@ -235,7 +261,7 @@ export class DashboardPanel {
     <table>
       <thead>
         <tr>
-          <th>Dependency</th>
+          <th>Dependency / Finding</th>
           <th>Risk Tier</th>
           <th>Security Reason</th>
           <th>Location</th>

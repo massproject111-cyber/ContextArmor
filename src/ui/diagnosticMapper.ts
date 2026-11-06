@@ -174,6 +174,20 @@ export function extractAddedPypiDeps(currentText: string, headText?: string): Ad
 }
 
 /**
+ * Extracts all dependencies from package.json without requiring git diff.
+ */
+export function extractAllNpmDeps(currentText: string): AddedDependency[] {
+  return extractAddedNpmDeps(currentText, undefined);
+}
+
+/**
+ * Extracts all dependencies from requirements.txt without requiring git diff.
+ */
+export function extractAllPypiDeps(currentText: string): AddedDependency[] {
+  return extractAddedPypiDeps(currentText, undefined);
+}
+
+/**
  * Parses the suggested pin version from ASK text.
  */
 export function extractSuggestedPin(reason: string): string | undefined {

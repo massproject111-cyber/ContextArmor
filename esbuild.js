@@ -63,6 +63,13 @@ async function main() {
     outfile: 'dist/extensionDiagnostics.test.js',
   });
 
+  // Build Project Auditor Unit Test
+  await esbuild.build({
+    ...common,
+    entryPoints: ['tests/projectAuditor.test.ts'],
+    outfile: 'dist/projectAuditor.test.js',
+  });
+
   console.log('Build completed successfully.');
 }
 

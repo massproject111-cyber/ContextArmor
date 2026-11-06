@@ -2,7 +2,7 @@
   "name": "contextarmor",
   "displayName": "ContextArmor",
   "description": "AI Supply Chain & Model Deserialization Security Circuit Breaker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "contextarmor",
   "engines": {
     "node": ">=18.0.0",
@@ -47,6 +47,16 @@
       ]
     },
     "commands": [
+      {
+        "command": "contextarmor.auditWorkspace",
+        "title": "ContextArmor: Run Full Project Audit",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "contextarmor.runStrix",
+        "title": "ContextArmor: Run Strix Pentest",
+        "icon": "$(bug)"
+      },
       {
         "command": "contextarmor.openDashboard",
         "title": "ContextArmor: Open Security Dashboard",
