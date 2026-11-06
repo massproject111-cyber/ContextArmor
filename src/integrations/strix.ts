@@ -309,6 +309,18 @@ export function getStrixStatus(): StrixStatus {
   };
 }
 
+const COMMON_CWE_NAMES: Record<string, string> = {
+  'CWE-89': 'SQL Injection in Database Query',
+  'CWE-502': 'Insecure AI Model Loading (torch.load / pickle)',
+  'CWE-78': 'OS Command Injection',
+  'CWE-79': 'Cross-Site Scripting (XSS)',
+  'CWE-670': 'TLS Certificate Verification Bypass',
+  'CWE-522': 'Credential Exposure in Requests',
+  'CWE-377': 'Insecure Temporary File Creation',
+  'CWE-22': 'Path Traversal File Access',
+  'CWE-94': 'Code Injection',
+};
+
 /**
  * Searches for any strix_runs directory in workspace and extracts SARIF findings.
  */
@@ -381,8 +393,11 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
 
         const ruleObj = ruleMap.get(ruleId);
         const ruleName = ruleObj?.name || ruleObj?.shortDescription?.text;
+        const cweFriendly = COMMON_CWE_NAMES[ruleId];
         const displayTitle = ruleName
           ? `[Pentest] ${ruleName}`
+          : cweFriendly
+          ? `[Pentest] ${ruleId}: ${cweFriendly}`
           : `[ContextArmor Pentest] ${ruleId}`;
 
         const level = res.level === 'error' ? 'CRITICAL' : 'WARNING';
