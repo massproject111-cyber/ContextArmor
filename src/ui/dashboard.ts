@@ -690,21 +690,21 @@ export class DashboardPanel {
   <div class="strix-station">
     <div class="strix-station-header">
       <div>
-        <span class="strix-badge">FLAGSHIP OFFENSIVE MODULE</span>
-        <div class="strix-title">🦅 Strix Autonomous AI Penetration Testing</div>
+        <span class="strix-badge">DEEP AI SECURITY TEST</span>
+        <div class="strix-title">🦅 Autonomous AI Vulnerability Simulation</div>
         <div class="strix-desc">
-          Simulates active cyber attacks in an isolated Docker sandbox. Autonomous multi-agent testing probes SQL injections, command injections, and insecure deserialization, outputting verifiable OASIS SARIF exploit reports.
+          Simulates real-world attack scenarios in an isolated sandbox. Autonomous AI agents discover code vulnerabilities and dependency exploits before deployment.
         </div>
       </div>
       <div class="strix-ctrls">
         <div class="brain-pill" onclick="openLlmModal()" title="Click to change AI Brain or connect API keys">
-          <span>⚡ Active AI Brain:</span>
+          <span>⚡ Active AI Engine:</span>
           <strong style="color: #4caf50;">${activeProviderName}</strong>
           <span style="font-size: 10px; color: var(--muted);">${activeModelName}</span>
           <span style="font-size: 11px;">⚙️</span>
         </div>
         <button class="btn-strix-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()">
-          <span>🦅 Run Deep AI Pentest</span>
+          <span>🦅 Start Deep Security Test</span>
         </button>
       </div>
     </div>
@@ -714,7 +714,7 @@ export class DashboardPanel {
         ? `
       <div class="progress-box">
         <div class="progress-header">
-          <span style="color: #e53935;">● Pentest in Progress: ${this._scanStage || 'Executing multi-agent security simulation...'}</span>
+          <span style="color: #64b5f6; font-weight: 600;">● Security Test in Progress: ${this._scanStage || 'Executing security simulation...'}</span>
           <span>${this._scanPercent}%</span>
         </div>
         <div class="progress-track">
@@ -726,9 +726,9 @@ export class DashboardPanel {
         : `
       <div style="background: rgba(0, 0, 0, 0.25); border: 1px dashed rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-size: 12px; color: var(--muted);">
-          Ready to scan workspace. Tests SQLi, Command Injection, and Model Deserialization. Generates OASIS SARIF 2.1.0 reports.
+          Ready to test project. Simulates attack patterns in a safe sandbox to verify your defenses.
         </span>
-        <span style="font-size: 11px; color: #4caf50; font-weight: 600;">Sandbox Ready (Zero-Host Friction)</span>
+        <span style="font-size: 11px; color: #4caf50; font-weight: 600;">Sandbox Ready</span>
       </div>
     `
     }
@@ -738,11 +738,11 @@ export class DashboardPanel {
   <div class="modal-overlay" id="llmModal">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">⚙️ Configure AI Brain for Strix Pentest</div>
+        <div class="modal-title">⚙️ Connect AI Assistant</div>
         <button class="modal-close" onclick="closeLlmModal()">✕</button>
       </div>
       <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
-        Choose the intelligence model that drives your autonomous exploit generation and vulnerability proofs:
+        Choose which AI model powers your deep security testing:
       </div>
 
       <!-- OPTION 1: CHATGPT SUBSCRIPTION (LUNA 6) -->
@@ -825,6 +825,11 @@ export class DashboardPanel {
     const vscode = acquireVsCodeApi();
 
     function runPentest() {
+      const isConfigured = ${llm.isConfigured};
+      if (!isConfigured) {
+        openLlmModal();
+        return;
+      }
       vscode.postMessage({ command: 'runStrix' });
     }
 

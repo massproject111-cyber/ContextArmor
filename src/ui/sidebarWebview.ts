@@ -149,22 +149,48 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(): string {
     const criticalCount = this._threats.filter((t) => t.severity === 'CRITICAL').length;
     const warningCount = this._threats.filter((t) => t.severity === 'WARNING').length;
-    const score = criticalCount > 0 ? 65 : warningCount > 0 ? 82 : 100;
-    const scoreColor = score === 100 ? '#4caf50' : score >= 80 ? '#ff9800' : '#f44336';
-    const scoreLabel = score === 100 ? 'Clean' : score >= 80 ? 'Warning' : 'Critical';
+    const totalIssues = this._threats.length;
+
+    let statusTitle = 'Your Project is Safe';
+    let statusColor = '#4caf50';
+    let statusDesc = 'All dependencies and code files are verified safe.';
+    let statusIcon = '🛡️';
+    let statusBadge = 'PROTECTED';
+
+    if (criticalCount > 0) {
+      statusTitle = `${criticalCount} Security Risk${criticalCount > 1 ? 's' : ''} Found`;
+      statusColor = '#f44336';
+      statusDesc = 'Dangerous packages or vulnerabilities require immediate attention.';
+      statusIcon = '🚨';
+      statusBadge = 'ACTION NEEDED';
+    } else if (warningCount > 0) {
+      statusTitle = `${warningCount} Item${warningCount > 1 ? 's' : ''} to Review`;
+      statusColor = '#ff9800';
+      statusDesc = 'Newly published or unverified packages detected.';
+      statusIcon = '⚠️';
+      statusBadge = 'REVIEW';
+    }
 
     const llm = getLlmConfig();
-    const activeProviderName = llm.isConfigured ? llm.provider : 'Not Configured';
+    let activeProviderName = 'Not Connected';
+    if (llm.isConfigured) {
+      if (llm.provider === 'ChatGPT (OAuth)') activeProviderName = 'ChatGPT (Luna 6)';
+      else if (llm.provider === 'Google Gemini') activeProviderName = 'Google Gemini';
+      else if (llm.provider === 'Anthropic Claude') activeProviderName = 'Anthropic Claude';
+      else if (llm.provider === 'OpenAI') activeProviderName = 'OpenAI';
+      else if (llm.provider === 'Built-in Sandbox') activeProviderName = 'Offline Mode';
+      else activeProviderName = llm.provider || 'Active AI';
+    }
 
     let contentHtml = '';
 
-    if (this._threats.length === 0) {
+    if (totalIssues === 0) {
       contentHtml = `
-        <div style="padding: 20px 10px; text-align: center; border: 1px dashed var(--vscode-editorWidget-border); border-radius: 8px; margin-top: 8px; background: rgba(0,0,0,0.1);">
-          <div style="font-size: 22px; margin-bottom: 4px;">🛡️</div>
-          <div style="font-weight: 600; font-size: 12px; color: #4caf50;">All Dependencies Clean</div>
-          <div style="font-size: 10px; color: var(--vscode-descriptionForeground); margin-top: 3px;">
-            No malicious packages, 404 hallucinations, or code risks detected.
+        <div class="empty-state">
+          <div style="font-size: 24px; margin-bottom: 6px;">✨</div>
+          <div style="font-weight: 700; font-size: 13px; color: #4caf50;">Everything Looks Great</div>
+          <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px; line-height: 1.4;">
+            No fake packages, malicious dependencies, or code vulnerabilities detected.
           </div>
         </div>
       `;
@@ -174,40 +200,47 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           const isCrit = t.severity === 'CRITICAL';
           const badgeBg = isCrit ? '#f4433622' : '#ff980022';
           const badgeColor = isCrit ? '#f44336' : '#ff9800';
-          const badgeText = isCrit ? 'BLOCK' : 'ASK';
+          const badgeText = isCrit ? 'High Risk' : 'Review';
 
           const pinMatch =
             t.desc.match(/Suggested pin:\s*['"`](?:npm\s+i\s+[^@]+@|pip\s+install\s+[^=]+=+|uv\s+add\s+[^=]+=*)([^'"`\s]+)['"`]/i) ||
             t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
           const pin = pinMatch ? pinMatch[1] : undefined;
 
-          let tag = 'DEP';
-          if (t.title.includes('Pentest')) tag = 'PENTEST';
-          else if (t.title.startsWith('[MCP')) tag = 'MCP';
-          else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) tag = 'CODE';
+          let categoryLabel = 'Package';
+          if (t.title.includes('Pentest') || t.desc.includes('pentest')) categoryLabel = 'Security Finding';
+          else if (t.title.startsWith('[MCP')) categoryLabel = 'MCP Server';
+          else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) categoryLabel = 'Python Code';
+
+          // Make description simple and readable for non-experts
+          let humanDesc = t.desc
+            .replace(/Suggested pin:\s*['"`][^'"`]+['"`]/i, '')
+            .replace(/Package is younger than 72h\./i, 'Published less than 72 hours ago. Unverified packages can be risky.')
+            .replace(/Blocked by ContextArmor circuit breaker\./i, 'Blocked to prevent potential malware execution.')
+            .trim();
 
           return `
-            <div class="threat-card" style="border-left: 3px solid ${isCrit ? '#f44336' : '#ff9800'};">
+            <div class="threat-card" style="border-left: 3px solid ${badgeColor};">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px;">
-                <span style="font-weight: 700; font-size: 11px; font-family: monospace; word-break: break-all;">${t.title}</span>
-                <div style="display: flex; gap: 3px; flex-shrink: 0;">
-                  <span style="background: var(--vscode-badge-background, #333); color: var(--vscode-badge-foreground, #ccc); padding: 1px 4px; border-radius: 3px; font-size: 9px; font-weight: 700;">
-                    ${tag}
+                <span style="font-weight: 700; font-size: 12px; font-family: monospace; word-break: break-all;">${t.title}</span>
+                <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                  <span style="background: var(--vscode-badge-background, #333); color: var(--vscode-badge-foreground, #ccc); padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700;">
+                    ${categoryLabel}
                   </span>
-                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 9px;">
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 9px;">
                     ${badgeText}
                   </span>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-bottom: 6px; line-height: 1.35;">
-                ${t.desc}
+              <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-bottom: 8px; line-height: 1.4;">
+                ${humanDesc}
               </div>
-              <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${
                   pin
-                    ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">💡 Pin to ${pin}</button>`
+                    ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">✨ Auto-Fix to ${pin}</button>`
                     : t.desc.includes('weights_only')
-                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">💡 Patch weights_only</button>`
+                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Safe Load Fix</button>`
                     : ''
                 }
                 ${
@@ -237,7 +270,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       --accent: var(--vscode-focusBorder, #007acc);
     }
     body {
-      font-family: var(--vscode-font-family, -apple-system, sans-serif);
+      font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
       padding: 10px;
       margin: 0;
       color: var(--text);
@@ -247,54 +280,76 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       flex-direction: column;
       min-height: 100vh;
     }
-    .score-card {
+
+    /* TOP STATUS HERO BANNER */
+    .hero-banner {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 12px;
+      border: 1.5px solid ${statusColor}44;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
-      transition: border-color 0.15s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
-    .score-card:hover {
-      border-color: var(--accent);
+    .hero-banner:hover {
+      border-color: ${statusColor};
+      transform: translateY(-1px);
     }
-    .score-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-      letter-spacing: 0.4px;
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .score-val {
-      font-size: 18px;
+    .hero-icon {
+      font-size: 24px;
+    }
+    .hero-title {
+      font-size: 13px;
       font-weight: 700;
+      color: ${statusColor};
+      letter-spacing: 0.2px;
+    }
+    .hero-desc {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .hero-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: ${statusColor}22;
+      color: ${statusColor};
+      letter-spacing: 0.5px;
     }
 
-    /* Core Native Audit Button */
-    .btn-audit {
+    /* QUICK SECURITY CHECK BUTTON */
+    .btn-quick-scan {
       width: 100%;
-      background: linear-gradient(135deg, #0277bd 0%, #0d47a1 100%);
+      background: linear-gradient(135deg, #0288d1 0%, #0d47a1 100%);
       color: #fff;
       border: 1px solid rgba(120, 180, 255, 0.35);
       border-radius: 6px;
       padding: 10px 12px;
-      margin-top: 10px;
+      margin-bottom: 6px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 6px rgba(2, 119, 189, 0.25);
+      box-shadow: 0 2px 8px rgba(2, 136, 209, 0.3);
       transition: all 0.15s ease;
       box-sizing: border-box;
     }
-    .btn-audit:hover {
+    .btn-quick-scan:hover {
       filter: brightness(1.1);
       transform: translateY(-1px);
     }
-    .btn-audit:disabled {
+    .btn-quick-scan:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
@@ -302,13 +357,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .btn-content {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       text-align: left;
     }
     .btn-title {
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.2px;
     }
     .btn-desc {
       font-size: 10px;
@@ -321,13 +375,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       padding: 2px 6px;
       border-radius: 3px;
       background: rgba(255, 255, 255, 0.2);
-      letter-spacing: 0.5px;
     }
 
+    /* UTILITY NAVIGATION ROW */
     .util-row {
       display: flex;
       gap: 6px;
-      margin-top: 6px;
       margin-bottom: 14px;
     }
     .btn-util {
@@ -341,17 +394,18 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       cursor: pointer;
       text-align: center;
       font-weight: 600;
+      transition: background 0.15s ease;
     }
     .btn-util:hover {
       background: var(--vscode-button-secondaryHoverBackground, #45494e);
     }
 
-    /* Threat List */
-    .threat-section {
+    /* FINDINGS / THREAT RADAR LIST */
+    .findings-section {
       flex: 1;
       margin-bottom: 14px;
     }
-    .section-hdr {
+    .findings-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -360,22 +414,27 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       text-transform: uppercase;
       color: var(--muted);
       letter-spacing: 0.5px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     .threat-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 8px 10px;
-      margin-top: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
     .action-mini {
-      padding: 3px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 10px;
       font-weight: 600;
       cursor: pointer;
       border: none;
+      transition: filter 0.15s;
+    }
+    .action-mini:hover {
+      filter: brightness(1.15);
     }
     .btn-fix {
       background: var(--vscode-button-background, #0e639c);
@@ -386,16 +445,25 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       color: #ccc;
     }
 
+    /* EMPTY SAFE STATE */
+    .empty-state {
+      padding: 22px 14px;
+      text-align: center;
+      border: 1px dashed var(--vscode-editorWidget-border);
+      border-radius: 8px;
+      background: rgba(76, 175, 80, 0.04);
+    }
+
     /* =========================================================
-       STRIX PENTEST STATION ANCHORED AT THE BOTTOM OF SIDEBAR
+       DEEP AI SECURITY TEST (STRIX) ANCHORED AT BOTTOM
        ========================================================= */
-    .strix-bottom-station {
-      background: linear-gradient(180deg, rgba(35, 20, 30, 0.7) 0%, rgba(20, 20, 25, 0.95) 100%);
-      border: 1.5px solid rgba(229, 57, 53, 0.4);
+    .deep-station {
+      background: linear-gradient(180deg, rgba(30, 25, 35, 0.8) 0%, rgba(18, 18, 22, 0.98) 100%);
+      border: 1.5px solid rgba(229, 57, 53, 0.45);
       border-radius: 8px;
       padding: 12px;
       margin-top: auto;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
     .station-badge {
       background: linear-gradient(135deg, #e53935 0%, #8e24aa 100%);
@@ -406,7 +474,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       padding: 2px 6px;
       border-radius: 3px;
       display: inline-block;
-      margin-bottom: 4px;
+      margin-bottom: 5px;
     }
     .station-title {
       font-size: 13px;
@@ -414,79 +482,82 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       color: #fff;
     }
     .station-desc {
-      font-size: 10px;
+      font-size: 11px;
       color: var(--muted);
-      margin-top: 2px;
-      line-height: 1.3;
-      margin-bottom: 8px;
+      margin-top: 3px;
+      line-height: 1.35;
+      margin-bottom: 10px;
     }
 
-    .brain-strip {
-      background: rgba(0, 0, 0, 0.35);
+    /* AI MODEL CHIP */
+    .ai-chip {
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 5px;
-      padding: 6px 8px;
+      border-radius: 6px;
+      padding: 8px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
       font-size: 11px;
-      margin-bottom: 8px;
-      transition: border-color 0.15s;
+      margin-bottom: 10px;
+      transition: all 0.15s ease;
     }
-    .brain-strip:hover {
+    .ai-chip:hover {
       border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.04);
     }
-    .brain-left {
+    .ai-chip-left {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 7px;
     }
-    .brain-dot {
-      width: 7px;
-      height: 7px;
+    .status-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: #888;
     }
-    .brain-dot.active {
+    .status-dot.active {
       background: #4caf50;
-      box-shadow: 0 0 6px #4caf50;
+      box-shadow: 0 0 8px #4caf50;
     }
 
-    .btn-pentest {
+    /* MAIN RUN DEEP TEST BUTTON */
+    .btn-deep-run {
       width: 100%;
-      background: linear-gradient(135deg, #b71c1c 0%, #6a1b9a 100%);
+      background: linear-gradient(135deg, #c62828 0%, #6a1b9a 100%);
       color: #fff;
       border: 1px solid rgba(255, 120, 120, 0.4);
       border-radius: 6px;
-      padding: 10px 12px;
+      padding: 11px 12px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 3px 8px rgba(183, 28, 28, 0.4);
+      box-shadow: 0 3px 10px rgba(198, 40, 40, 0.35);
       transition: all 0.15s ease;
       box-sizing: border-box;
     }
-    .btn-pentest:hover {
-      filter: brightness(1.1);
+    .btn-deep-run:hover {
+      filter: brightness(1.12);
       transform: translateY(-1px);
     }
-    .btn-pentest:disabled {
+    .btn-deep-run:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
     }
 
-    /* Live Progress Bar */
+    /* LIVE PROGRESS INDICATOR */
     .progress-box {
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 6px;
       padding: 10px;
-      margin-top: 8px;
+      margin-top: 10px;
     }
-    .progress-header {
+    .progress-hdr {
       display: flex;
       justify-content: space-between;
       font-size: 11px;
@@ -505,7 +576,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       transition: width 0.3s ease;
       box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);
     }
-    .telemetry-mini {
+    .telemetry-line {
       font-family: monospace;
       font-size: 10px;
       color: #98c379;
@@ -516,12 +587,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     /* =========================================================
-       IN-WEBVIEW MODAL DIALOG (REPLACES TOP SEARCH BAR DROP-DOWN)
+       IN-WEBVIEW MODAL DIALOG (REPLACES TOP SEARCH BAR POP-UP)
        ========================================================= */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(4px);
       display: none;
       flex-direction: column;
@@ -542,103 +613,108 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       overflow-y: auto;
       box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     }
-    .modal-title-row {
+    .modal-hdr {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
-    .provider-card-sm {
+    .provider-card {
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 8px 10px;
+      border-radius: 6px;
+      padding: 9px 10px;
       margin-top: 8px;
       background: rgba(255, 255, 255, 0.02);
+      transition: border-color 0.15s;
     }
-    .provider-card-sm:hover {
+    .provider-card:hover {
       border-color: var(--accent);
     }
-    .provider-row-top {
+    .provider-hdr {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
   </style>
 </head>
 <body>
 
-  <!-- TOP SECTION: CONTEXTARMOR CORE SECURITY -->
+  <!-- TOP SECTION: OVERALL PROJECT SAFETY STATUS -->
   <div>
-    <div class="score-card" onclick="openDashboard()" title="Click to view full Security Dashboard">
-      <div>
-        <div class="score-title">Project Safety</div>
-        <div style="font-size: 11px; color: ${scoreColor}; font-weight: 600;">Status: ${scoreLabel}</div>
+    <div class="hero-banner" onclick="openDashboard()" title="Click to view full Security Dashboard">
+      <div class="hero-left">
+        <span class="hero-icon">${statusIcon}</span>
+        <div>
+          <div class="hero-title">${statusTitle}</div>
+          <div class="hero-desc">${statusDesc}</div>
+        </div>
       </div>
-      <div class="score-val" style="color: ${scoreColor};">${score} / 100</div>
+      <span class="hero-badge">${statusBadge}</span>
     </div>
 
-    <!-- MAIN PROJECT AUDIT BUTTON -->
-    <button class="btn-audit" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()" title="Fast static audit of manifests, hallucinations & code">
+    <!-- MAIN QUICK SCAN BUTTON -->
+    <button class="btn-quick-scan" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()" title="Fast 1-second check of dependencies and code">
       <div class="btn-content">
-        <span style="font-size: 18px;">🛡️</span>
+        <span style="font-size: 18px;">⚡</span>
         <div>
-          <div class="btn-title">Run Project Audit</div>
-          <div class="btn-desc">Manifests • Hallucinations • Deserialization</div>
+          <div class="btn-title">Quick Security Check</div>
+          <div class="btn-desc">Instant 1-second check of packages & code</div>
         </div>
       </div>
       <span class="badge-pill">FAST</span>
     </button>
 
+    <!-- NAVIGATION UTILITY BUTTONS -->
     <div class="util-row">
       <button class="btn-util" onclick="openDashboard()" title="Open comprehensive visual Security Dashboard">
-        📊 Dashboard
+        📊 Full Dashboard
       </button>
-      <button class="btn-util" onclick="runDoctor()" title="Inspect hooks & system health">
+      <button class="btn-util" onclick="runDoctor()" title="Inspect system health & security status">
         🩺 System Health
       </button>
     </div>
   </div>
 
-  <!-- MIDDLE SECTION: ACTIVE THREAT RADAR -->
-  <div class="threat-section">
-    <div class="section-hdr">
-      <span>Threat Radar</span>
-      <span style="color: var(--muted); font-size: 10px;">${this._threats.length} Active</span>
+  <!-- MIDDLE SECTION: ACTIVE PROJECT FINDINGS -->
+  <div class="findings-section">
+    <div class="findings-header">
+      <span>Project Findings</span>
+      <span style="color: var(--muted); font-size: 10px;">${totalIssues} Detected</span>
     </div>
     ${contentHtml}
   </div>
 
-  <!-- BOTTOM SECTION: STRIX PENTEST FLAGSHIP STATION (MAIN MODULE AT BOTTOM) -->
-  <div class="strix-bottom-station">
-    <span class="station-badge">FLAGSHIP OFFENSIVE MODULE</span>
-    <div class="station-title">🦅 Strix Autonomous Pentest</div>
+  <!-- BOTTOM SECTION: DEEP AI SECURITY TEST (AUTONOMOUS PENTEST) -->
+  <div class="deep-station">
+    <span class="station-badge">DEEP AI SECURITY TEST</span>
+    <div class="station-title">🤖 AI Vulnerability Simulation</div>
     <div class="station-desc">
-      Simulates real cyber attacks in an isolated sandbox. Probes SQLi, command injection & deserialization.
+      Simulates attack scenarios in an isolated sandbox to verify your code won't get exploited.
     </div>
 
-    <!-- ACTIVE AI BRAIN STRIP -->
-    <div class="brain-strip" onclick="openModal()" title="Click to configure or switch AI Brain">
-      <div class="brain-left">
-        <span class="brain-dot ${llm.isConfigured ? 'active' : ''}"></span>
-        <span style="font-size: 11px; font-weight: 600;">Brain:</span>
+    <!-- AI ENGINE CONNECTION CHIP -->
+    <div class="ai-chip" onclick="openModal()" title="Click to connect or switch AI model">
+      <div class="ai-chip-left">
+        <span class="status-dot ${llm.isConfigured ? 'active' : ''}"></span>
+        <span style="font-size: 11px; font-weight: 600;">AI Engine:</span>
         <span style="font-size: 11px; color: ${llm.isConfigured ? '#4caf50' : '#ff9800'}; font-weight: 700;">
           ${activeProviderName}
         </span>
       </div>
-      <span style="font-size: 10px; color: var(--muted);">${llm.isConfigured ? '⚙️ Switch' : '🔑 Connect'}</span>
+      <span style="font-size: 10px; color: var(--muted);">${llm.isConfigured ? 'Change ▾' : 'Connect ▾'}</span>
     </div>
 
-    <!-- MAIN PENTEST BUTTON -->
-    <button class="btn-pentest" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()" title="Run autonomous deep AI pentest">
+    <!-- MAIN START DEEP TEST BUTTON -->
+    <button class="btn-deep-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()" title="Run autonomous deep AI security test">
       <div class="btn-content">
-        <span style="font-size: 18px;">🦅</span>
+        <span style="font-size: 18px;">▶</span>
         <div>
-          <div class="btn-title">Run Deep AI Pentest</div>
-          <div class="btn-desc">Simulate exploit PoCs in sandbox</div>
+          <div class="btn-title">Start Deep Security Test</div>
+          <div class="btn-desc">Simulate exploit scenarios in sandbox</div>
         </div>
       </div>
-      <span class="badge-pill" style="background: rgba(255,255,255,0.25);">STRIX</span>
+      <span class="badge-pill" style="background: rgba(255,255,255,0.25);">AI AGENT</span>
     </button>
 
     <!-- LIVE PROGRESS BAR WHEN SCANNING -->
@@ -646,91 +722,97 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       this._isScanning
         ? `
       <div class="progress-box">
-        <div class="progress-header">
-          <span style="color: #ff5252;">● ${this._statusMessage || 'Executing pentest...'}</span>
+        <div class="progress-hdr">
+          <span style="color: #64b5f6; font-weight: 600;">● ${this._statusMessage || 'Testing project security...'}</span>
           <span>${this._scanPercent}%</span>
         </div>
         <div class="progress-track">
-          <div class="progress-fill" style="width: ${Math.max(5, this._scanPercent)}%;"></div>
+          <div class="progress-fill" style="width: ${Math.max(8, this._scanPercent)}%;"></div>
         </div>
-        ${this._scanLogLine ? `<div class="telemetry-mini">${this._scanLogLine.slice(0, 100)}</div>` : ''}
+        ${this._scanLogLine ? `<div class="telemetry-line">${this._scanLogLine.slice(0, 95)}</div>` : ''}
       </div>
     `
         : ''
     }
   </div>
 
-  <!-- IN-WEBVIEW MODAL DIALOG (REPLACES TOP SEARCH BAR POP-UP) -->
+  <!-- IN-WEBVIEW MODAL (CLEAN CONSUMER-FRIENDLY AI SELECTOR) -->
   <div class="modal-overlay" id="sidebarModal">
     <div class="modal-card">
-      <div class="modal-title-row">
-        <strong style="font-size: 13px;">⚙️ Select AI Brain Provider</strong>
+      <div class="modal-hdr">
+        <strong style="font-size: 13px;">⚙️ Connect AI Assistant</strong>
         <button style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px;" onclick="closeModal()">✕</button>
       </div>
-      <div style="font-size: 10px; color: var(--muted); margin-bottom: 6px;">
-        Choose the model that drives autonomous exploit testing:
+      <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">
+        Choose which AI model powers your deep security testing:
       </div>
 
-      <!-- CHATGPT OAUTH -->
-      <div class="provider-card-sm">
-        <div class="provider-row-top">
+      <!-- CHATGPT OAUTH (RECOMMENDED) -->
+      <div class="provider-card">
+        <div class="provider-hdr">
           <strong style="font-size: 11px;">🌐 ChatGPT Subscription</strong>
           <span style="font-size: 9px; color: #4caf50; font-weight: 700;">LUNA 6 · $0</span>
         </div>
-        <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">
-          1-click sign-in via browser on your existing plan.
+        <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
+          1-click sign-in in your browser. Runs free on your existing plan.
         </div>
-        <button style="width: 100%; background: #10a37f; color: #fff; border: none; padding: 6px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="startOauth()">
+        <button style="width: 100%; background: #10a37f; color: #fff; border: none; padding: 7px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="startOauth()">
           Sign In with OpenAI (OAuth)
         </button>
       </div>
 
       <!-- GOOGLE GEMINI -->
-      <div class="provider-card-sm">
-        <div class="provider-row-top">
+      <div class="provider-card">
+        <div class="provider-hdr">
           <strong style="font-size: 11px;">✨ Google Gemini</strong>
           <span style="font-size: 9px; color: var(--muted);">gemini-3.7-flash</span>
         </div>
-        <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">
+        <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Free tier API key from aistudio.google.com
         </div>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideGemini" placeholder="Paste Gemini Key..." style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 4px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('gemini', 'sideGemini')">Save</button>
+          <input type="password" id="sideGemini" placeholder="Paste Gemini Key..." style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('gemini', 'sideGemini')">Save</button>
         </div>
       </div>
 
       <!-- OPENAI API KEY -->
-      <div class="provider-card-sm">
-        <div class="provider-row-top">
+      <div class="provider-card">
+        <div class="provider-hdr">
           <strong style="font-size: 11px;">🤖 OpenAI (API Key)</strong>
           <span style="font-size: 9px; color: var(--muted);">gpt-5.6-luna</span>
         </div>
+        <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
+          Direct API key from platform.openai.com
+        </div>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideOpenai" placeholder="Paste OpenAI Key (sk-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 4px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('openai', 'sideOpenai')">Save</button>
+          <input type="password" id="sideOpenai" placeholder="Paste OpenAI Key (sk-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('openai', 'sideOpenai')">Save</button>
         </div>
       </div>
 
       <!-- ANTHROPIC CLAUDE -->
-      <div class="provider-card-sm">
-        <div class="provider-row-top">
+      <div class="provider-card">
+        <div class="provider-hdr">
           <strong style="font-size: 11px;">🛡️ Anthropic Claude</strong>
           <span style="font-size: 9px; color: var(--muted);">claude-sonnet-5</span>
         </div>
+        <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
+          Direct API key from console.anthropic.com
+        </div>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 4px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
+          <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
         </div>
       </div>
 
-      <!-- OFFLINE SANDBOX -->
-      <div class="provider-card-sm">
-        <strong style="font-size: 11px;">⚡ Built-in Offline Sandbox</strong>
-        <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">
-          AST taint analysis without external keys or network.
+      <!-- OFFLINE LOCAL MODE -->
+      <div class="provider-card">
+        <strong style="font-size: 11px;">⚡ Built-in Offline Mode</strong>
+        <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
+          Runs local security analysis without external keys or internet.
         </div>
-        <button style="width: 100%; background: var(--vscode-button-secondaryBackground); color: #fff; border: 1px solid var(--border); padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('sandbox', '')">
+        <button style="width: 100%; background: var(--vscode-button-secondaryBackground); color: #fff; border: 1px solid var(--border); padding: 6px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('sandbox', '')">
           Select 100% Offline Mode
         </button>
       </div>
@@ -744,6 +826,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       vscode.postMessage({ command: 'auditWorkspace' });
     }
     function runPentest() {
+      const isConfigured = ${llm.isConfigured};
+      if (!isConfigured) {
+        openModal();
+        return;
+      }
       vscode.postMessage({ command: 'runStrix' });
     }
     function openModal() {

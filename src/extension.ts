@@ -363,18 +363,18 @@ export function activate(context: vscode.ExtensionContext) {
 
           if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
             currentPct = 35;
-            updateProgress(currentPct, 'Sandbox ready · Dispatching attack agents...', chunk);
+            updateProgress(currentPct, 'Secure sandbox ready · Testing project code...', chunk);
           } else if (chunk.includes('Waiting for the first model response') || chunk.includes('gpt-5.6-luna')) {
             currentPct = 55;
-            updateProgress(currentPct, 'Simulating exploits with Luna 6...', chunk);
+            updateProgress(currentPct, 'AI assistant testing security defenses...', chunk);
           } else if (chunk.includes('ast') || chunk.includes('Analyzing') || chunk.includes('Scanning')) {
             currentPct = 75;
-            updateProgress(currentPct, 'Analyzing code taint & vulnerabilities...', chunk);
+            updateProgress(currentPct, 'Analyzing code safety and dependencies...', chunk);
           } else if (chunk.includes('findings.sarif') || chunk.includes('complete')) {
             currentPct = 90;
-            updateProgress(currentPct, 'Synthesizing OASIS SARIF report...', chunk);
+            updateProgress(currentPct, 'Finalizing project security report...', chunk);
           } else {
-            updateProgress(Math.min(85, currentPct + 1), 'Executing exploit tests...', chunk);
+            updateProgress(Math.min(85, currentPct + 1), 'Running security simulation...', chunk);
           }
         });
 
