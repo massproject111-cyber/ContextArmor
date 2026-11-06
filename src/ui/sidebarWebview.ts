@@ -212,6 +212,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           else if (t.title.startsWith('[MCP')) categoryLabel = 'MCP Server';
           else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) categoryLabel = 'Python Code';
 
+          // Safe removal is ONLY for malicious / hallucinated packages in manifests
+          const isManifest = !!(t.file?.endsWith('package.json') || t.file?.endsWith('requirements.txt'));
+          const isMaliciousPackage = isManifest && (t.severity === 'CRITICAL' || t.desc.toLowerCase().includes('hallucinat') || t.desc.toLowerCase().includes('not found on npm') || t.desc.toLowerCase().includes('not found on pypi'));
+          const showRemove = isMaliciousPackage && t.file && t.line !== undefined;
+
+          // Insecure torch.load fix
+          const isTorchFix = !!(t.file?.endsWith('.py') && (t.title.includes('torch.load') || t.desc.includes('weights_only')));
+
           // Make description simple and readable for non-experts
           let humanDesc = t.desc
             .replace(/Suggested pin:\s*['"`][^'"`]+['"`]/i, '')
@@ -239,13 +247,16 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
                 ${
                   pin
                     ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">✨ Auto-Fix to ${pin}</button>`
-                    : t.desc.includes('weights_only')
-                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Safe Load Fix</button>`
                     : ''
                 }
                 ${
-                  t.file && t.line !== undefined
-                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">🗑️ Remove</button>`
+                  isTorchFix && t.file && t.line !== undefined
+                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Add weights_only=True</button>`
+                    : ''
+                }
+                ${
+                  showRemove
+                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">🗑️ Remove Package</button>`
                     : ''
                 }
               </div>

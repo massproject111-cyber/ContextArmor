@@ -187,6 +187,11 @@ export class DashboardPanel {
                 t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
               const pin = pinMatch ? pinMatch[1] : undefined;
 
+              const isManifest = !!(t.file?.endsWith('package.json') || t.file?.endsWith('requirements.txt'));
+              const isMaliciousPackage = isManifest && (t.severity === 'CRITICAL' || t.desc.toLowerCase().includes('hallucinat') || t.desc.toLowerCase().includes('not found on npm') || t.desc.toLowerCase().includes('not found on pypi'));
+              const showRemove = isMaliciousPackage && t.file && t.line !== undefined;
+              const isTorchFix = !!(t.file?.endsWith('.py') && (t.title.includes('torch.load') || t.desc.includes('weights_only')));
+
               return `
           <tr style="border-bottom: 1px solid var(--vscode-editorWidget-border);">
             <td style="padding: 12px; font-weight: 600; font-family: monospace;">${t.title}</td>
@@ -202,14 +207,17 @@ export class DashboardPanel {
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
               ${
                 pin
-                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${t.file}', ${t.line}, '${pin}')">💡 Pin to ${pin}</button>`
-                  : t.desc.includes('weights_only')
-                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${t.file}', ${t.line})">💡 Patch weights_only</button>`
+                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${t.file}', ${t.line}, '${pin}')">✨ Auto-Fix to ${pin}</button>`
                   : ''
               }
               ${
-                t.file && t.line !== undefined
-                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">🗑️ Remove</button>`
+                isTorchFix && t.file && t.line !== undefined
+                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Add weights_only=True</button>`
+                  : ''
+              }
+              ${
+                showRemove
+                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">🗑️ Remove Package</button>`
                   : ''
               }
             </td>

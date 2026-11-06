@@ -351,9 +351,40 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
 
     for (const run of runs) {
       const results = run.results || [];
+      const rules = run.tool?.driver?.rules || [];
+      const ruleMap = new Map<string, any>();
+      for (const r of rules) {
+        if (r.id) {
+          ruleMap.set(r.id, r);
+        }
+      }
+
       for (const res of results) {
         const ruleId = res.ruleId || 'VULN';
         const message = res.message?.text || 'Vulnerability detected by Strix';
+
+        // Filter out Strix internal coverage checklist items & non-issues
+        if (ruleId.startsWith('strix-coverage')) {
+          continue;
+        }
+        if (res.level === 'none') {
+          continue;
+        }
+        const lowerMsg = message.toLowerCase();
+        if (
+          lowerMsg.includes('not applicable') ||
+          lowerMsg.includes('no issue identified') ||
+          lowerMsg.includes('ruled out')
+        ) {
+          continue;
+        }
+
+        const ruleObj = ruleMap.get(ruleId);
+        const ruleName = ruleObj?.name || ruleObj?.shortDescription?.text;
+        const displayTitle = ruleName
+          ? `[Pentest] ${ruleName}`
+          : `[ContextArmor Pentest] ${ruleId}`;
+
         const level = res.level === 'error' ? 'CRITICAL' : 'WARNING';
 
         let relativeFile = '';
@@ -372,7 +403,7 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
           : workspaceRoot;
 
         threats.push({
-          title: `[ContextArmor Pentest] ${ruleId}`,
+          title: displayTitle,
           desc: message,
           severity: level,
           file: absoluteFile,
