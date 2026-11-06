@@ -176,9 +176,6 @@ export class DashboardPanel {
         ? 'Unverified packages detected — Review recommendations'
         : 'All packages & code verified clean';
 
-    const codeThreats = this._threats.filter((t) => t.title.includes('torch.load') || t.file?.endsWith('.py'));
-    const codeSafe = codeThreats.length === 0;
-
     const threatsHtml =
       this._threats.length === 0
         ? `<tr><td colspan="5" style="text-align: center; color: var(--vscode-descriptionForeground); padding: 32px; font-size: 13px;">🛡️ All dependencies and code files are verified safe. No vulnerabilities or hallucinations found.</td></tr>`
@@ -664,11 +661,6 @@ export class DashboardPanel {
       <div class="card-title">Unvetted / New Packages</div>
       <div class="card-value" style="color: ${warningCount > 0 ? '#ff9800' : '#4caf50'};">${warningCount}</div>
       <div class="card-desc">Packages published less than 72 hours ago requiring verification</div>
-    </div>
-    <div class="card">
-      <div class="card-title">AI Model Deserialization</div>
-      <div class="card-value" style="color: ${codeSafe ? '#4caf50' : '#ff9800'};">${codeSafe ? 'Protected' : 'Action Needed'}</div>
-      <div class="card-desc">${codeSafe ? 'PyTorch torch.load uses weights_only=True' : 'Insecure model deserialization detected in Python code'}</div>
     </div>
   </div>
 
