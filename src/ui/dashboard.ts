@@ -73,6 +73,12 @@ export class DashboardPanel {
             this.update(this._threats);
             return;
           }
+          case 'openUrl': {
+            if (message.url) {
+              vscode.env.openExternal(vscode.Uri.parse(message.url));
+            }
+            return;
+          }
           case 'runDoctor':
             vscode.commands.executeCommand('contextarmor.doctor');
             return;
@@ -767,14 +773,19 @@ export class DashboardPanel {
         </button>
       </div>
 
-      <!-- OPTION 2: GOOGLE GEMINI -->
+      <!-- OPTION 2: GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">✨ Google Gemini</span>
-          <span class="provider-tag">gemini-3.7-flash</span>
+          <span class="provider-name">✨ Google Gemini (Antigravity Brain)</span>
+          <span class="provider-tag" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">FREE · gemini-3.7-flash</span>
         </div>
         <div class="provider-desc">
-          Ultra-fast multi-turn reasoning. Get a free API key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">aistudio.google.com</a>.
+          Ultra-fast multi-turn reasoning. 100% free with any personal Google account via Google AI Studio.
+        </div>
+        <div style="margin-bottom: 8px;">
+          <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
+            🌐 1-Click: Open Google AI Studio (Copy Free Key)
+          </button>
         </div>
         <div class="input-row">
           <input type="password" class="input-field" id="geminiKey" placeholder="Paste Gemini API Key (AIzaSy...)">
@@ -804,7 +815,12 @@ export class DashboardPanel {
           <span class="provider-tag">claude-sonnet-5</span>
         </div>
         <div class="provider-desc">
-          Best-in-class coding accuracy from <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color: var(--accent);">console.anthropic.com</a>.
+          Best-in-class coding accuracy. Anthropic requires a direct API key (consumer OAuth is not provided by Anthropic).
+        </div>
+        <div style="margin-bottom: 8px;">
+          <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
+            🌐 1-Click: Open Anthropic Console (Copy Key)
+          </button>
         </div>
         <div class="input-row">
           <input type="password" class="input-field" id="claudeKey" placeholder="Paste Claude Key (sk-ant-...)">
@@ -847,6 +863,10 @@ export class DashboardPanel {
 
     function closeLlmModal() {
       document.getElementById('llmModal').style.display = 'none';
+    }
+
+    function openExternal(url) {
+      vscode.postMessage({ command: 'openUrl', url: url });
     }
 
     function startOauth() {

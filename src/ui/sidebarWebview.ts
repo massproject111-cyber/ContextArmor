@@ -58,6 +58,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           this.update(this._threats);
           break;
         }
+        case 'openUrl': {
+          if (data.url) {
+            vscode.env.openExternal(vscode.Uri.parse(data.url));
+          }
+          break;
+        }
         case 'openDashboard': {
           vscode.commands.executeCommand('contextarmor.openDashboard');
           break;
@@ -772,17 +778,20 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         </button>
       </div>
 
-      <!-- GOOGLE GEMINI -->
+      <!-- GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">✨ Google Gemini</strong>
-          <span style="font-size: 9px; color: var(--muted);">gemini-3.7-flash</span>
+          <strong style="font-size: 11px;">✨ Google Gemini (Antigravity Brain)</strong>
+          <span style="font-size: 9px; color: #4caf50; font-weight: 700;">FREE · gemini-3.7-flash</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
-          Free tier API key from aistudio.google.com
+          Free tier with any Google account. No credit card required.
         </div>
+        <button style="width: 100%; background: rgba(66, 133, 244, 0.15); border: 1px solid #4285f4; color: #64b5f6; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
+          🌐 1-Click: Open Google AI Studio (Copy Free Key)
+        </button>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideGemini" placeholder="Paste Gemini Key..." style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
+          <input type="password" id="sideGemini" placeholder="Paste Gemini Key (AIza...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
           <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('gemini', 'sideGemini')">Save</button>
         </div>
       </div>
@@ -809,8 +818,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           <span style="font-size: 9px; color: var(--muted);">claude-sonnet-5</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
-          Direct API key from console.anthropic.com
+          Anthropic does not offer consumer web OAuth for third-party CLIs. Requires an API key.
         </div>
+        <button style="width: 100%; background: rgba(217, 119, 87, 0.15); border: 1px solid #d97757; color: #ffab91; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
+          🌐 1-Click: Open Anthropic Console (Copy Key)
+        </button>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
           <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
@@ -849,6 +861,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     function closeModal() {
       document.getElementById('sidebarModal').style.display = 'none';
+    }
+    function openExternal(url) {
+      vscode.postMessage({ command: 'openUrl', url: url });
     }
     function startOauth() {
       closeModal();
