@@ -120,3 +120,35 @@ test('parseStrixSarif: parses SARIF 2.1.0 findings into ThreatItem model', () =>
   // Clean up
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('runLocalSandboxAnalysis: performs zero-Docker sandbox pentest and emits SARIF', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sandbox-test-'));
+  const vulnerablePy = path.join(tmpDir, 'vuln.py');
+  fs.writeFileSync(
+    vulnerablePy,
+    `
+import sqlite3
+import subprocess
+
+def query_user(user_input):
+    cursor.execute(f"SELECT * FROM users WHERE id = {user_input}")
+
+def run_command(cmd):
+    subprocess.Popen(f"echo {cmd}", shell=True)
+`
+  );
+
+  const { runLocalSandboxAnalysis } = require('../src/integrations/strix.js');
+  const threats = runLocalSandboxAnalysis(tmpDir);
+
+  assert.ok(threats.length >= 2);
+  const titles = threats.map((t: any) => t.title);
+  assert.ok(titles.includes('[ContextArmor Pentest] CWE-89'));
+  assert.ok(titles.includes('[ContextArmor Pentest] CWE-78'));
+
+  const emittedSarif = path.join(tmpDir, 'strix_runs', 'contextarmor_sandbox', 'findings.sarif');
+  assert.ok(fs.existsSync(emittedSarif));
+
+  // Clean up
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
