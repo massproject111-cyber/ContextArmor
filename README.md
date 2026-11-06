@@ -260,22 +260,28 @@ When interpreting benchmark figures, the following operational and methodologica
 
 ## 10. VS Code Extension & Desktop UI
 
-ContextArmor includes an official VS Code extension providing real-time, in-editor protection for AI-assisted development and manual dependency changes.
+ContextArmor includes an official VS Code extension providing real-time, in-editor protection for AI-assisted development, automated project auditing, and deep penetration testing.
 
 ### Key Capabilities
 1. **Activity Bar Threat Radar**:
    - Resides directly in the left Activity Bar under the ContextArmor Shield (🛡️).
    - Displays real-time **Security Score** (0–100, color-coded Clean/Warning/Critical).
    - Interactive threat cards displaying target package, severity badge (`[BLOCK]` / `[ASK]`), and rationale.
-2. **1-Click Remediations**:
+2. **Autonomous Strix Pentest & Built-In Sandbox**:
+   - **🦅 Run Deep AI Pentest**: Primary high-priority action simulating autonomous exploit PoCs.
+   - **⚡ AI Brain Support**: Seamlessly connects to Google Gemini, Anthropic Claude, OpenAI / ChatGPT, OpenRouter, or 100% free offline Ollama.
+   - **Zero-Docker Portability**: Automatically starts Docker Desktop if idle, or falls back to the in-process AST & taint analysis sandbox engine emitting OASIS SARIF 2.1.0 reports.
+3. **Full Project Audit**:
+   - **🛡️ Run Full Project Audit**: Fast in-process static scan of npm manifests, PyPI requirements, AI hallucinations, model deserialization, and MCP configurations.
+4. **1-Click Remediations**:
    - `💡 Add weights_only=True`: Automatically patches unsafe `torch.load(...)` calls in Python code to safe deserialization.
    - `💡 Pin to <version>`: Pins 72h-cooldown warnings to the newest verified version older than 72 hours.
    - `🗑️ Remove Line`: Removes malicious or hallucinated dependency lines directly from your manifest.
-3. **In-Editor Diagnostics & Quick Fixes**:
+5. **In-Editor Diagnostics & Quick Fixes**:
    - Red squiggly lines on confirmed malware and 404 hallucinations in `package.json` and `requirements.txt`.
    - Yellow warning squigglies on unsafe pickle/model deserialization in Python files.
    - Standard VS Code Quick Fix lightbulb (<kbd>Cmd</kbd> + <kbd>.</kbd> or <kbd>Ctrl</kbd> + <kbd>.</kbd>).
-4. **Standalone Security Dashboard**:
+6. **Standalone Security Dashboard**:
    - Run `ContextArmor: Open Security Dashboard` from the Command Palette (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) or click the status bar item.
    - Full-page security audit overview, SVG risk gauge, and active threat table.
 
@@ -286,7 +292,7 @@ npm run build
 npx vsce package --no-dependencies --allow-missing-repository --skip-license
 
 # Install into VS Code
-code --install-extension contextarmor-0.1.0.vsix
+code --install-extension contextarmor-0.2.0.vsix --force
 ```
 
 ---
