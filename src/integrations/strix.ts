@@ -120,32 +120,39 @@ export async function promptLlmSetup(): Promise<boolean> {
 
   const items: ProviderItem[] = [
     {
-      label: '$(hubot) Google Gemini (Recommended - Free & Fast Tier)',
-      description: 'gemini-2.0-flash / gemini-1.5-pro',
-      detail: 'Highest reasoning speed. Get an instant free API key at aistudio.google.com',
-      modelPrefix: 'gemini/gemini-2.0-flash',
-      keyUrl: 'https://aistudio.google.com/apikey',
-    },
-    {
-      label: '$(globe) ChatGPT Subscription (OAuth Login via Browser)',
-      description: 'Codex OAuth / Plus / Team / Pro',
-      detail: 'Direct browser OAuth sign-in to your ChatGPT subscription (no API key needed).',
-      modelPrefix: 'chatgpt/gpt-4o',
+      label: '$(globe) ChatGPT Subscription (Luna 6 via Browser OAuth)',
+      description: 'gpt-5.6-luna · $0.00 on ChatGPT Subscription',
+      detail: 'Frontier AI reasoning. Direct browser OAuth sign-in to your ChatGPT subscription.',
+      modelPrefix: 'chatgpt/gpt-5.6-luna',
       isOAuth: true,
     },
     {
+      label: '$(hubot) Google Gemini (Recommended - Free & Fast Tier)',
+      description: 'gemini-3.7-flash / gemini-3.1-pro-preview',
+      detail: 'Ultra-fast multi-turn reasoning. Get an instant free API key at aistudio.google.com',
+      modelPrefix: 'gemini/gemini-3.7-flash',
+      keyUrl: 'https://aistudio.google.com/apikey',
+    },
+    {
       label: '$(sparkle) OpenAI / ChatGPT (API Key)',
-      description: 'gpt-4o / o1',
-      detail: 'Pay-as-you-go API key from platform.openai.com',
-      modelPrefix: 'openai/gpt-4o',
+      description: 'gpt-5.6-luna / gpt-5.6-sol',
+      detail: 'State-of-the-art vulnerability exploitation from platform.openai.com',
+      modelPrefix: 'openai/gpt-5.6-luna',
       keyUrl: 'https://platform.openai.com/api-keys',
     },
     {
       label: '$(shield) Anthropic Claude (API Key)',
-      description: 'claude-3-5-sonnet',
+      description: 'claude-sonnet-5 / claude-opus-5',
       detail: 'Best-in-class coding & exploitation accuracy from console.anthropic.com',
-      modelPrefix: 'anthropic/claude-3-5-sonnet-20241022',
+      modelPrefix: 'anthropic/claude-sonnet-5',
       keyUrl: 'https://console.anthropic.com/settings/keys',
+    },
+    {
+      label: '$(symbol-variable) DeepSeek (API Key)',
+      description: 'deepseek-v4-pro / deepseek-v4-flash',
+      detail: 'State-of-the-art open weight reasoning from platform.deepseek.com',
+      modelPrefix: 'deepseek/deepseek-v4-pro',
+      keyUrl: 'https://platform.deepseek.com/api_keys',
     },
     {
       label: '$(server) Ollama (100% Free & Local)',
@@ -177,7 +184,7 @@ export async function promptLlmSetup(): Promise<boolean> {
     const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
     term.show();
     term.sendText('strix auth login chatgpt');
-    saveLlmConfig('chatgpt/gpt-4o', 'oauth-subscription');
+    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
     vscode.window.showInformationMessage(
       'Opened terminal for ChatGPT OAuth Login. Follow the browser prompt to complete sign-in!'
     );
