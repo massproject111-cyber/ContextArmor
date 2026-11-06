@@ -409,15 +409,14 @@ export class DashboardPanel {
     }
 
     /* =========================================================
-       FLAGSHIP STRIX PENTEST COMMAND STATION (BOTTOM MODULE)
+       SECURITY AUDIT MODULE
        ========================================================= */
     .strix-station {
-      background: linear-gradient(180deg, rgba(30, 20, 35, 0.7) 0%, rgba(20, 20, 25, 0.95) 100%);
-      border: 1.5px solid rgba(229, 57, 53, 0.4);
-      border-radius: 10px;
-      padding: 24px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
       margin-top: 32px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
       position: relative;
     }
     .strix-station-header {
@@ -429,20 +428,20 @@ export class DashboardPanel {
       gap: 12px;
     }
     .strix-badge {
-      background: linear-gradient(135deg, #e53935 0%, #8e24aa 100%);
-      color: #fff;
+      background: var(--vscode-badge-background, #333);
+      color: var(--vscode-badge-foreground, #ccc);
       font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      padding: 3px 8px;
-      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 3px;
       display: inline-block;
       margin-bottom: 6px;
     }
     .strix-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
     }
     .strix-desc {
       font-size: 12px;
@@ -457,35 +456,31 @@ export class DashboardPanel {
       align-items: center;
     }
     .btn-strix-run {
-      background: linear-gradient(135deg, #b71c1c 0%, #6a1b9a 100%);
-      color: #fff;
-      border: 1px solid rgba(255, 120, 120, 0.4);
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
+      background: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #fff);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(183, 28, 28, 0.4);
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease;
     }
     .btn-strix-run:hover {
-      background: linear-gradient(135deg, #c62828 0%, #7b1fa2 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(183, 28, 28, 0.5);
+      background: var(--vscode-button-hoverBackground, #1177bb);
     }
     .btn-strix-run:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
     .brain-pill {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      padding: 8px 12px;
+      background: var(--vscode-editorWidget-background, #252526);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 12px;
       font-size: 12px;
       display: flex;
       align-items: center;
@@ -494,14 +489,13 @@ export class DashboardPanel {
     }
     .brain-pill:hover {
       border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.12);
     }
 
     /* Progress Bar */
     .progress-box {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 16px;
       margin-top: 16px;
     }
@@ -513,36 +507,35 @@ export class DashboardPanel {
       margin-bottom: 8px;
     }
     .progress-track {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      height: 10px;
+      background: var(--vscode-editorWidget-background, #252526);
+      border-radius: 4px;
+      height: 6px;
       overflow: hidden;
       position: relative;
     }
     .progress-fill {
-      background: linear-gradient(90deg, #e53935 0%, #8e24aa 50%, #00e676 100%);
+      background: var(--vscode-progressBar-background, #007acc);
       height: 100%;
-      border-radius: 10px;
+      border-radius: 4px;
       transition: width 0.3s ease;
-      box-shadow: 0 0 10px rgba(229, 57, 53, 0.6);
     }
     .telemetry-console {
-      background: #0d0e11;
-      border: 1px solid #22252a;
-      border-radius: 6px;
-      padding: 12px;
+      background: var(--vscode-editor-background, #1e1e1e);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
       font-family: var(--font-mono);
       font-size: 11px;
-      color: #98c379;
-      height: 140px;
+      color: var(--muted);
+      height: 130px;
       overflow-y: auto;
       margin-top: 12px;
       white-space: pre-wrap;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     /* =========================================================
-       IN-WEBVIEW MODAL DIALOG (REPLACES TOP SEARCH BAR POPUP)
+       IN-WEBVIEW MODAL DIALOG
        ========================================================= */
     .modal-overlay {
       position: fixed;
@@ -550,8 +543,7 @@ export class DashboardPanel {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.65);
       display: none;
       justify-content: center;
       align-items: center;
@@ -559,11 +551,11 @@ export class DashboardPanel {
     }
     .modal-card {
       background: var(--card-bg);
-      border: 1.5px solid var(--accent);
-      border-radius: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       width: 580px;
       max-width: 90%;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
       padding: 24px;
       box-sizing: border-box;
       max-height: 85vh;
@@ -707,24 +699,24 @@ export class DashboardPanel {
     </table>
   </div>
 
-  <!-- SECTION 3: STRIX AUTONOMOUS PENTEST COMMAND STATION (FLAGSHIP BOTTOM MODULE) -->
+  <!-- SECTION 3: SECURITY AUDIT STATION -->
   <div class="strix-station">
     <div class="strix-station-header">
       <div>
-        <span class="strix-badge">DEEP AI SECURITY TEST</span>
-        <div class="strix-title">Autonomous AI Vulnerability Simulation</div>
+        <span class="strix-badge">SECURITY AUDIT</span>
+        <div class="strix-title">Security Simulation</div>
         <div class="strix-desc">
-          Simulates real-world attack scenarios in an isolated sandbox. Autonomous AI agents discover code vulnerabilities and dependency exploits before deployment.
+          Simulates attack patterns in an isolated sandbox to verify code vulnerabilities and defenses before deployment.
         </div>
       </div>
       <div class="strix-ctrls">
-        <div class="brain-pill" onclick="openLlmModal()" title="Click to change AI Brain or connect API keys">
-          <span>Active AI Engine:</span>
-          <strong style="color: #4caf50;">${activeProviderName}</strong>
+        <div class="brain-pill" onclick="openLlmModal()" title="Click to change engine or connect API keys">
+          <span>Engine:</span>
+          <strong style="color: var(--text);">${activeProviderName}</strong>
           <span style="font-size: 10px; color: var(--muted);">${activeModelName}</span>
         </div>
         <button class="btn-strix-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()">
-          <span>Start Deep Security Test</span>
+          <span>Run Security Audit</span>
         </button>
       </div>
     </div>
@@ -734,13 +726,13 @@ export class DashboardPanel {
         ? `
       <div class="progress-box">
         <div class="progress-header">
-          <span style="color: #64b5f6; font-weight: 600;">● Security Test in Progress: ${this._scanStage || 'Executing security simulation...'}</span>
+          <span style="color: var(--text); font-weight: 600;">Security Test in Progress: ${this._scanStage || 'Executing security simulation...'}</span>
           <span>${this._scanPercent}%</span>
         </div>
         <div class="progress-track">
           <div class="progress-fill" style="width: ${Math.max(5, this._scanPercent)}%;"></div>
         </div>
-        <div class="telemetry-console" id="telemetryBox">${this._scanLogs.join('\n') || '[ContextArmor Telemetry] Initializing containerized attack agents...'}</div>
+        <div class="telemetry-console" id="telemetryBox">${this._scanLogs.join('\n') || '[ContextArmor] Initializing security analysis...'}</div>
       </div>
     `
         : `
@@ -754,39 +746,39 @@ export class DashboardPanel {
     }
   </div>
 
-  <!-- IN-WEBVIEW MODAL DIALOG (SELECT / CONFIGURE AI PROVIDER) -->
+  <!-- IN-WEBVIEW MODAL DIALOG (SELECT / CONFIGURE PROVIDER) -->
   <div class="modal-overlay" id="llmModal">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">Connect AI Assistant</div>
+        <div class="modal-title">Configure Security Engine</div>
         <button class="modal-close" onclick="closeLlmModal()">✕</button>
       </div>
       <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
-        Choose which AI model powers your deep security testing:
+        Choose which engine or model powers security testing:
       </div>
 
-      <!-- OPTION 1: CHATGPT SUBSCRIPTION (LUNA 6) -->
+      <!-- OPTION 1: CHATGPT SUBSCRIPTION -->
       <div class="provider-option">
         <div class="provider-top">
           <span class="provider-name">ChatGPT Subscription (OAuth Login)</span>
-          <span class="provider-tag" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">LUNA 6 · $0.00</span>
+          <span class="provider-tag">OAuth Login</span>
         </div>
         <div class="provider-desc">
-          Uses <strong>Luna 6 (chatgpt/gpt-5.6-luna)</strong>. 1-click browser sign-in directly on your existing ChatGPT subscription. No API keys required.
+          1-click browser sign-in directly on your existing ChatGPT subscription. No API keys required.
         </div>
         <button class="btn" style="background: #10a37f; width: 100%; justify-content: center;" onclick="startOauth()">
           Sign in with OpenAI (Browser OAuth)
         </button>
       </div>
 
-      <!-- OPTION 2: GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
+      <!-- OPTION 2: GOOGLE GEMINI -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">Google Gemini (Antigravity Brain)</span>
-          <span class="provider-tag" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">FREE · gemini-3.7-flash</span>
+          <span class="provider-name">Google Gemini</span>
+          <span class="provider-tag">Free Tier</span>
         </div>
         <div class="provider-desc">
-          Ultra-fast multi-turn reasoning. 100% free with any personal Google account via Google AI Studio.
+          Ultra-fast multi-turn reasoning. Free with any personal Google account via Google AI Studio.
         </div>
         <div style="margin-bottom: 8px;">
           <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
@@ -803,7 +795,7 @@ export class DashboardPanel {
       <div class="provider-option">
         <div class="provider-top">
           <span class="provider-name">OpenAI (API Key)</span>
-          <span class="provider-tag">openai/gpt-5.6-luna</span>
+          <span class="provider-tag">GPT-4o</span>
         </div>
         <div class="provider-desc">
           Use pay-as-you-go API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">platform.openai.com</a>.
@@ -818,10 +810,10 @@ export class DashboardPanel {
       <div class="provider-option">
         <div class="provider-top">
           <span class="provider-name">Anthropic Claude</span>
-          <span class="provider-tag">claude-sonnet-5</span>
+          <span class="provider-tag">Claude 3.5 Sonnet</span>
         </div>
         <div class="provider-desc">
-          Best-in-class coding accuracy. Anthropic requires a direct API key (consumer OAuth is not provided by Anthropic).
+          Anthropic requires a direct API key (consumer web OAuth is not supported for third-party CLIs).
         </div>
         <div style="margin-bottom: 8px;">
           <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
@@ -837,14 +829,14 @@ export class DashboardPanel {
       <!-- OPTION 5: OFFLINE SANDBOX -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">Built-in Offline Sandbox (Zero-LLM Mode)</span>
-          <span class="provider-tag">100% Offline</span>
+          <span class="provider-name">Offline Security Engine</span>
+          <span class="provider-tag">Offline</span>
         </div>
         <div class="provider-desc">
           Executes in-process AST and taint flow analysis across workspace files. No external keys, subscriptions, or network access needed.
         </div>
         <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="saveKey('sandbox', '')">
-          Select 100% Offline Mode
+          Select Offline Analysis
         </button>
       </div>
 

@@ -103,13 +103,13 @@ export function saveLlmConfig(modelSpec: string, apiKey: string, apiBase?: strin
  */
 export function setProviderKey(provider: string, apiKey?: string): void {
   if (provider === 'chatgpt-oauth') {
-    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
+    saveLlmConfig('chatgpt/auto', 'oauth-subscription');
   } else if (provider === 'gemini') {
-    saveLlmConfig('gemini/gemini-3.7-flash', (apiKey || '').trim());
+    saveLlmConfig('gemini/gemini-2.0-flash', (apiKey || '').trim());
   } else if (provider === 'openai') {
-    saveLlmConfig('openai/gpt-5.6-luna', (apiKey || '').trim());
+    saveLlmConfig('openai/gpt-4o', (apiKey || '').trim());
   } else if (provider === 'anthropic') {
-    saveLlmConfig('anthropic/claude-sonnet-5', (apiKey || '').trim());
+    saveLlmConfig('anthropic/claude-3-5-sonnet', (apiKey || '').trim());
   } else if (provider === 'sandbox') {
     saveLlmConfig('contextarmor/sandbox', 'builtin-sandbox');
   }
@@ -137,31 +137,31 @@ export async function promptLlmSetup(): Promise<boolean> {
 
   const items: ProviderItem[] = [
     {
-      label: '$(globe) ChatGPT Subscription (Luna 6 via Browser OAuth)',
-      description: 'gpt-5.6-luna · $0.00 on ChatGPT Subscription',
-      detail: 'Frontier AI reasoning. Direct browser OAuth sign-in to your ChatGPT subscription.',
-      modelPrefix: 'chatgpt/gpt-5.6-luna',
+      label: '$(globe) ChatGPT Subscription (Browser OAuth)',
+      description: 'Sign in with existing ChatGPT account',
+      detail: 'Direct browser OAuth sign-in to your ChatGPT subscription. No API keys required.',
+      modelPrefix: 'chatgpt/auto',
       isOAuth: true,
     },
     {
-      label: '$(hubot) Google Gemini (Recommended - Free & Fast Tier)',
-      description: 'gemini-3.7-flash / gemini-3.1-pro-preview',
-      detail: 'Ultra-fast multi-turn reasoning. Get an instant free API key at aistudio.google.com',
-      modelPrefix: 'gemini/gemini-3.7-flash',
+      label: '$(hubot) Google Gemini (Free Tier)',
+      description: 'gemini-2.0-flash',
+      detail: 'Ultra-fast reasoning. Get a free API key at aistudio.google.com',
+      modelPrefix: 'gemini/gemini-2.0-flash',
       keyUrl: 'https://aistudio.google.com/apikey',
     },
     {
       label: '$(sparkle) OpenAI / ChatGPT (API Key)',
-      description: 'gpt-5.6-luna / gpt-5.6-sol',
-      detail: 'State-of-the-art vulnerability exploitation from platform.openai.com',
-      modelPrefix: 'openai/gpt-5.6-luna',
+      description: 'gpt-4o',
+      detail: 'API key from platform.openai.com',
+      modelPrefix: 'openai/gpt-4o',
       keyUrl: 'https://platform.openai.com/api-keys',
     },
     {
       label: '$(shield) Anthropic Claude (API Key)',
-      description: 'claude-sonnet-5 / claude-opus-5',
-      detail: 'Best-in-class coding & exploitation accuracy from console.anthropic.com',
-      modelPrefix: 'anthropic/claude-sonnet-5',
+      description: 'claude-3-5-sonnet',
+      detail: 'High coding accuracy from console.anthropic.com',
+      modelPrefix: 'anthropic/claude-3-5-sonnet',
       keyUrl: 'https://console.anthropic.com/settings/keys',
     },
     {
@@ -201,7 +201,7 @@ export async function promptLlmSetup(): Promise<boolean> {
     const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
     term.show();
     term.sendText('strix auth login chatgpt');
-    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
+    saveLlmConfig('chatgpt/auto', 'oauth-subscription');
     vscode.window.showInformationMessage(
       'Opened terminal for ChatGPT OAuth Login. Follow the browser prompt to complete sign-in!'
     );

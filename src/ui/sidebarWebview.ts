@@ -177,12 +177,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     const llm = getLlmConfig();
     let activeProviderName = 'Not Connected';
     if (llm.isConfigured) {
-      if (llm.provider === 'ChatGPT (OAuth)') activeProviderName = 'ChatGPT (Luna 6)';
+      if (llm.provider === 'ChatGPT (OAuth)') activeProviderName = 'ChatGPT';
       else if (llm.provider === 'Google Gemini') activeProviderName = 'Google Gemini';
       else if (llm.provider === 'Anthropic Claude') activeProviderName = 'Anthropic Claude';
       else if (llm.provider === 'OpenAI') activeProviderName = 'OpenAI';
       else if (llm.provider === 'Built-in Sandbox') activeProviderName = 'Offline Mode';
-      else activeProviderName = llm.provider || 'Active AI';
+      else activeProviderName = llm.provider || 'Connected';
     }
 
     let contentHtml = '';
@@ -303,20 +303,18 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     /* TOP STATUS HERO BANNER */
     .hero-banner {
       background: var(--card-bg);
-      border: 1.5px solid ${statusColor}44;
-      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 12px 14px;
       margin-bottom: 10px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: border-color 0.15s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
     .hero-banner:hover {
       border-color: ${statusColor};
-      transform: translateY(-1px);
     }
     .hero-left {
       display: flex;
@@ -339,39 +337,36 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .hero-badge {
       font-size: 9px;
-      font-weight: 800;
-      padding: 3px 6px;
-      border-radius: 4px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
       background: ${statusColor}22;
       color: ${statusColor};
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
     }
 
     /* QUICK SECURITY CHECK BUTTON */
     .btn-quick-scan {
       width: 100%;
-      background: linear-gradient(135deg, #0288d1 0%, #0d47a1 100%);
-      color: #fff;
-      border: 1px solid rgba(120, 180, 255, 0.35);
-      border-radius: 6px;
-      padding: 10px 12px;
+      background: var(--vscode-button-background, #0e639c);
+      color: var(--vscode-button-foreground, #fff);
+      border: none;
+      border-radius: 4px;
+      padding: 9px 12px;
       margin-bottom: 6px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 8px rgba(2, 136, 209, 0.3);
-      transition: all 0.15s ease;
+      transition: background 0.15s ease;
       box-sizing: border-box;
     }
     .btn-quick-scan:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
+      background: var(--vscode-button-hoverBackground, #1177bb);
     }
     .btn-quick-scan:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
     .btn-content {
       display: flex;
@@ -441,7 +436,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       border-radius: 6px;
       padding: 10px;
       margin-bottom: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     }
     .action-mini {
       padding: 4px 8px;
@@ -474,22 +468,21 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     /* =========================================================
-       DEEP AI SECURITY TEST (STRIX) ANCHORED AT BOTTOM
+       SECURITY AUDIT ANCHORED AT BOTTOM
        ========================================================= */
     .deep-station {
-      background: linear-gradient(180deg, rgba(30, 25, 35, 0.8) 0%, rgba(18, 18, 22, 0.98) 100%);
-      border: 1.5px solid rgba(229, 57, 53, 0.45);
-      border-radius: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 12px;
       margin-top: auto;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
     .station-badge {
-      background: linear-gradient(135deg, #e53935 0%, #8e24aa 100%);
-      color: #fff;
+      background: var(--vscode-badge-background, #333);
+      color: var(--vscode-badge-foreground, #ccc);
       font-size: 9px;
-      font-weight: 800;
-      letter-spacing: 0.6px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
       padding: 2px 6px;
       border-radius: 3px;
       display: inline-block;
@@ -498,7 +491,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .station-title {
       font-size: 13px;
       font-weight: 700;
-      color: #fff;
+      color: var(--text);
     }
     .station-desc {
       font-size: 11px;
@@ -508,71 +501,57 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       margin-bottom: 10px;
     }
 
-    /* AI MODEL CHIP */
+    /* ENGINE CHIP */
     .ai-chip {
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
-      padding: 8px 10px;
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       cursor: pointer;
       font-size: 11px;
       margin-bottom: 10px;
-      transition: all 0.15s ease;
+      transition: border-color 0.15s ease;
     }
     .ai-chip:hover {
       border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.04);
     }
     .ai-chip-left {
       display: flex;
       align-items: center;
       gap: 7px;
     }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #888;
-    }
-    .status-dot.active {
-      background: #4caf50;
-      box-shadow: 0 0 8px #4caf50;
-    }
 
     /* MAIN RUN DEEP TEST BUTTON */
     .btn-deep-run {
       width: 100%;
-      background: linear-gradient(135deg, #c62828 0%, #6a1b9a 100%);
-      color: #fff;
-      border: 1px solid rgba(255, 120, 120, 0.4);
-      border-radius: 6px;
-      padding: 11px 12px;
+      background: var(--vscode-button-secondaryBackground, #3a3d41);
+      color: var(--vscode-button-secondaryForeground, #fff);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 9px 12px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 3px 10px rgba(198, 40, 40, 0.35);
-      transition: all 0.15s ease;
+      transition: background 0.15s ease;
       box-sizing: border-box;
     }
     .btn-deep-run:hover {
-      filter: brightness(1.12);
-      transform: translateY(-1px);
+      background: var(--vscode-button-secondaryHoverBackground, #45494e);
     }
     .btn-deep-run:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
     }
 
     /* LIVE PROGRESS INDICATOR */
     .progress-box {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 6px;
+      background: var(--vscode-editor-background);
+      border: 1px solid var(--border);
+      border-radius: 4px;
       padding: 10px;
       margin-top: 10px;
     }
@@ -584,21 +563,20 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       margin-bottom: 6px;
     }
     .progress-track {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 6px;
-      height: 8px;
+      background: var(--vscode-editorWidget-background, #252526);
+      border-radius: 3px;
+      height: 6px;
       overflow: hidden;
     }
     .progress-fill {
-      background: linear-gradient(90deg, #e53935 0%, #8e24aa 50%, #00e676 100%);
+      background: var(--vscode-progressBar-background, #007acc);
       height: 100%;
       transition: width 0.3s ease;
-      box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);
     }
     .telemetry-line {
       font-family: var(--font-mono);
       font-size: 10px;
-      color: #98c379;
+      color: var(--muted);
       margin-top: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -606,13 +584,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     /* =========================================================
-       IN-WEBVIEW MODAL DIALOG (REPLACES TOP SEARCH BAR POP-UP)
+       IN-WEBVIEW MODAL DIALOG
        ========================================================= */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.7);
       display: none;
       flex-direction: column;
       justify-content: center;
@@ -623,14 +600,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .modal-card {
       background: var(--card-bg);
-      border: 1.5px solid var(--accent);
-      border-radius: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
       padding: 14px;
       width: 100%;
       box-sizing: border-box;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     }
     .modal-hdr {
       display: flex;
@@ -679,7 +656,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           <div class="btn-desc">Instant 1-second check of packages & code</div>
         </div>
       </div>
-      <span class="badge-pill">FAST</span>
     </button>
 
     <!-- NAVIGATION UTILITY BUTTONS -->
@@ -702,35 +678,33 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     ${contentHtml}
   </div>
 
-  <!-- BOTTOM SECTION: DEEP AI SECURITY TEST (AUTONOMOUS PENTEST) -->
+  <!-- BOTTOM SECTION: SECURITY AUDIT -->
   <div class="deep-station">
-    <span class="station-badge">DEEP AI SECURITY TEST</span>
-    <div class="station-title">AI Vulnerability Simulation</div>
+    <span class="station-badge">SECURITY AUDIT</span>
+    <div class="station-title">Security Simulation</div>
     <div class="station-desc">
-      Simulates attack scenarios in an isolated sandbox to verify your code won't get exploited.
+      Simulates attack patterns in a sandbox to verify your code won't get exploited.
     </div>
 
-    <!-- AI ENGINE CONNECTION CHIP -->
-    <div class="ai-chip" onclick="openModal()" title="Click to connect or switch AI model">
+    <!-- ENGINE CONNECTION CHIP -->
+    <div class="ai-chip" onclick="openModal()" title="Click to connect or switch engine">
       <div class="ai-chip-left">
-        <span class="status-dot ${llm.isConfigured ? 'active' : ''}"></span>
-        <span style="font-size: 11px; font-weight: 600;">AI Engine:</span>
-        <span style="font-size: 11px; color: ${llm.isConfigured ? '#4caf50' : '#ff9800'}; font-weight: 700;">
+        <span style="font-size: 11px; font-weight: 600;">Engine:</span>
+        <span style="font-size: 11px; color: var(--text); font-weight: 600;">
           ${activeProviderName}
         </span>
       </div>
       <span style="font-size: 10px; color: var(--muted);">${llm.isConfigured ? 'Change' : 'Connect'}</span>
     </div>
 
-    <!-- MAIN START DEEP TEST BUTTON -->
-    <button class="btn-deep-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()" title="Run autonomous deep AI security test">
+    <!-- MAIN START AUDIT BUTTON -->
+    <button class="btn-deep-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()" title="Run automated security audit">
       <div class="btn-content">
         <div>
-          <div class="btn-title">Start Deep Security Test</div>
-          <div class="btn-desc">Simulate exploit scenarios in sandbox</div>
+          <div class="btn-title">Run Security Audit</div>
+          <div class="btn-desc">Sandbox verification of vulnerabilities</div>
         </div>
       </div>
-      <span class="badge-pill" style="background: rgba(255,255,255,0.25);">AI AGENT</span>
     </button>
 
     <!-- LIVE PROGRESS BAR WHEN SCANNING -->
@@ -739,7 +713,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         ? `
       <div class="progress-box">
         <div class="progress-hdr">
-          <span style="color: #64b5f6; font-weight: 600;">● ${this._statusMessage || 'Testing project security...'}</span>
+          <span style="color: var(--text); font-weight: 600;">${this._statusMessage || 'Testing project security...'}</span>
           <span>${this._scanPercent}%</span>
         </div>
         <div class="progress-track">
@@ -752,36 +726,36 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
   </div>
 
-  <!-- IN-WEBVIEW MODAL (CLEAN CONSUMER-FRIENDLY AI SELECTOR) -->
+  <!-- IN-WEBVIEW MODAL DIALOG -->
   <div class="modal-overlay" id="sidebarModal">
     <div class="modal-card">
       <div class="modal-hdr">
-        <strong style="font-size: 13px;">Connect AI Assistant</strong>
+        <strong style="font-size: 13px;">Configure Security Engine</strong>
         <button style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px;" onclick="closeModal()">✕</button>
       </div>
       <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">
-        Choose which AI model powers your deep security testing:
+        Choose which engine or model powers security testing:
       </div>
 
-      <!-- CHATGPT OAUTH (RECOMMENDED) -->
+      <!-- CHATGPT OAUTH -->
       <div class="provider-card">
         <div class="provider-hdr">
           <strong style="font-size: 11px;">ChatGPT Subscription</strong>
-          <span style="font-size: 9px; color: #4caf50; font-weight: 700;">LUNA 6 · $0</span>
+          <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Browser OAuth</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
-          1-click sign-in in your browser. Runs free on your existing plan.
+          1-click sign-in in your browser. Runs on your existing ChatGPT subscription.
         </div>
         <button style="width: 100%; background: #10a37f; color: #fff; border: none; padding: 7px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="startOauth()">
           Sign In with OpenAI (OAuth)
         </button>
       </div>
 
-      <!-- GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
+      <!-- GOOGLE GEMINI -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">Google Gemini (Antigravity Brain)</strong>
-          <span style="font-size: 9px; color: #4caf50; font-weight: 700;">FREE · gemini-3.7-flash</span>
+          <strong style="font-size: 11px;">Google Gemini</strong>
+          <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Free Tier</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Free tier with any Google account. No credit card required.
@@ -799,7 +773,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <div class="provider-card">
         <div class="provider-hdr">
           <strong style="font-size: 11px;">OpenAI (API Key)</strong>
-          <span style="font-size: 9px; color: var(--muted);">gpt-5.6-luna</span>
+          <span style="font-size: 9px; color: var(--muted);">GPT-4o</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Direct API key from platform.openai.com
@@ -814,7 +788,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <div class="provider-card">
         <div class="provider-hdr">
           <strong style="font-size: 11px;">Anthropic Claude</strong>
-          <span style="font-size: 9px; color: var(--muted);">claude-sonnet-5</span>
+          <span style="font-size: 9px; color: var(--muted);">Claude 3.5 Sonnet</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Anthropic does not offer consumer web OAuth for third-party CLIs. Requires an API key.
@@ -830,12 +804,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
       <!-- OFFLINE LOCAL MODE -->
       <div class="provider-card">
-        <strong style="font-size: 11px;">Built-in Offline Mode</strong>
+        <strong style="font-size: 11px;">Offline Security Engine</strong>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Runs local security analysis without external keys or internet.
         </div>
         <button style="width: 100%; background: var(--vscode-button-secondaryBackground); color: #fff; border: 1px solid var(--border); padding: 6px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('sandbox', '')">
-          Select 100% Offline Mode
+          Select Offline Analysis
         </button>
       </div>
     </div>

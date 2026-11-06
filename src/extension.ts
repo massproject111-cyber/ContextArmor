@@ -364,7 +364,7 @@ export function activate(context: vscode.ExtensionContext) {
           if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
             currentPct = 35;
             updateProgress(currentPct, 'Secure sandbox ready · Testing project code...', chunk);
-          } else if (chunk.includes('Waiting for the first model response') || chunk.includes('gpt-5.6-luna')) {
+          } else if (chunk.includes('Waiting for the first model response') || chunk.includes('model response')) {
             currentPct = 55;
             updateProgress(currentPct, 'AI assistant testing security defenses...', chunk);
           } else if (chunk.includes('ast') || chunk.includes('Analyzing') || chunk.includes('Scanning')) {
