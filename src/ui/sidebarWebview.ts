@@ -190,7 +190,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     if (totalIssues === 0) {
       contentHtml = `
         <div class="empty-state">
-          <div style="font-weight: 700; font-size: 13px; color: #4caf50;">Everything Looks Great</div>
+          <div style="font-family: var(--font-header); font-weight: 700; font-size: 13px; letter-spacing: -0.02em; color: #4caf50;">Everything Looks Great</div>
           <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px; line-height: 1.4;">
             No fake packages, malicious dependencies, or code vulnerabilities detected.
           </div>
@@ -275,6 +275,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
+      --font-header: "Geist", "Geist Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
       --bg: var(--vscode-editor-background);
@@ -325,10 +326,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       font-size: 24px;
     }
     .hero-title {
+      font-family: var(--font-header);
       font-size: 13px;
       font-weight: 700;
       color: ${statusColor};
-      letter-spacing: 0.2px;
+      letter-spacing: -0.02em;
     }
     .hero-desc {
       font-size: 11px;
@@ -375,8 +377,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       text-align: left;
     }
     .btn-title {
+      font-family: var(--font-header);
       font-size: 12px;
       font-weight: 700;
+      letter-spacing: -0.015em;
     }
     .btn-desc {
       font-size: 10px;
@@ -423,6 +427,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-family: var(--font-header);
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
@@ -489,8 +494,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       margin-bottom: 5px;
     }
     .station-title {
+      font-family: var(--font-header);
       font-size: 13px;
       font-weight: 700;
+      letter-spacing: -0.02em;
       color: var(--text);
     }
     .station-desc {
@@ -730,7 +737,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <div class="modal-overlay" id="sidebarModal">
     <div class="modal-card">
       <div class="modal-hdr">
-        <strong style="font-size: 13px;">Configure Security Engine</strong>
+        <strong style="font-family: var(--font-header); font-size: 13px; letter-spacing: -0.02em;">Configure Security Engine</strong>
         <button style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px;" onclick="closeModal()">✕</button>
       </div>
       <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">

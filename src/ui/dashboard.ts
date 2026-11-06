@@ -242,6 +242,7 @@ export class DashboardPanel {
   <title>ContextArmor Security Dashboard</title>
   <style>
     :root {
+      --font-header: "Geist", "Geist Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
       --bg: var(--vscode-editor-background);
@@ -277,9 +278,10 @@ export class DashboardPanel {
       gap: 12px;
     }
     .header-title {
+      font-family: var(--font-header);
       font-size: 20px;
       font-weight: 700;
-      letter-spacing: 0.3px;
+      letter-spacing: -0.03em;
     }
     .header-sub {
       font-size: 12px;
@@ -307,9 +309,10 @@ export class DashboardPanel {
       justify-content: space-between;
     }
     .card-title {
+      font-family: var(--font-header);
       font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.5px;
       color: var(--muted);
       font-weight: 600;
       margin-bottom: 6px;
@@ -327,8 +330,10 @@ export class DashboardPanel {
       line-height: 1.3;
     }
     .section-title {
+      font-family: var(--font-header);
       font-size: 15px;
       font-weight: 700;
+      letter-spacing: -0.02em;
       margin-top: 28px;
       margin-bottom: 10px;
       display: flex;
@@ -439,8 +444,10 @@ export class DashboardPanel {
       margin-bottom: 6px;
     }
     .strix-title {
+      font-family: var(--font-header);
       font-size: 16px;
       font-weight: 700;
+      letter-spacing: -0.025em;
       color: var(--text);
     }
     .strix-desc {
@@ -568,8 +575,10 @@ export class DashboardPanel {
       margin-bottom: 6px;
     }
     .modal-title {
+      font-family: var(--font-header);
       font-size: 17px;
       font-weight: 700;
+      letter-spacing: -0.025em;
     }
     .modal-close {
       background: transparent;
@@ -599,8 +608,10 @@ export class DashboardPanel {
       margin-bottom: 4px;
     }
     .provider-name {
+      font-family: var(--font-header);
       font-weight: 700;
       font-size: 13px;
+      letter-spacing: -0.015em;
       display: flex;
       align-items: center;
       gap: 6px;
