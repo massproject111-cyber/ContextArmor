@@ -4,6 +4,33 @@
   "description": "AI Supply Chain & Model Deserialization Security Circuit Breaker",
   "version": "0.2.0",
   "publisher": "contextarmor",
+  "author": {
+    "name": "ContextArmor Security Team"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/massproject111-cyber/ContextArmor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/massproject111-cyber/ContextArmor/issues"
+  },
+  "homepage": "https://github.com/massproject111-cyber/ContextArmor#readme",
+  "categories": [
+    "Security",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "security",
+    "ai",
+    "supply-chain",
+    "circuit-breaker",
+    "slopsquatting",
+    "hallucination",
+    "deserialization",
+    "pentest",
+    "audit"
+  ],
   "engines": {
     "node": ">=18.0.0",
     "vscode": "^1.90.0"
@@ -54,7 +81,7 @@
       },
       {
         "command": "contextarmor.runStrix",
-        "title": "ContextArmor: Run Strix Pentest",
+        "title": "ContextArmor: Run Deep Pentest",
         "icon": "$(bug)"
       },
       {

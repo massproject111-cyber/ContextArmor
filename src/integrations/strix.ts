@@ -103,7 +103,7 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
           : workspaceRoot;
 
         threats.push({
-          title: `[Strix Pentest] ${ruleId}`,
+          title: `[ContextArmor Pentest] ${ruleId}`,
           desc: message,
           severity: level,
           file: absoluteFile,

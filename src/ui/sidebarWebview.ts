@@ -151,7 +151,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
           // Determine category tag
           let tag = 'DEP';
-          if (t.title.startsWith('[Strix')) tag = 'STRIX';
+          if (t.title.includes('Pentest')) tag = 'PENTEST';
           else if (t.title.startsWith('[MCP')) tag = 'MCP';
           else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) tag = 'CODE';
 
@@ -318,8 +318,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   </button>
 
   <div class="btn-row">
-    <button class="btn-secondary" onclick="runStrix()" title="Run autonomous AI pentesting on workspace">
-      🦅 Strix Pentest
+    <button class="btn-secondary" onclick="runStrix()" title="Run autonomous deep security pentest on workspace">
+      🦅 Deep Pentest
     </button>
     <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & tamper protection">
       🩺 Doctor

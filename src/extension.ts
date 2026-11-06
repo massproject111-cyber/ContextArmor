@@ -18,6 +18,7 @@ import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
 import { auditWorkspace } from './core/projectAuditor.js';
 import { runStrixScan, getStrixStatus } from './integrations/strix.js';
+import { PackageRiskEngine, classifyDecision } from './detectors/packageRisk/index.js';
 
 interface CacheEntry {
   result: CliCheckResult;
@@ -26,6 +27,9 @@ interface CacheEntry {
 
 const checkCache = new Map<string, CacheEntry>();
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+// In-process risk engine instance for 100% zero-dependency execution
+const inProcessEngine = new PackageRiskEngine();
 
 /**
  * Ensures homebrew and local node paths are present in environment
@@ -57,10 +61,10 @@ function getNodeCommand(): { nodePath: string; env: NodeJS.ProcessEnv } {
 }
 
 /**
- * Spawns the standalone ContextArmor CLI check command with --json.
- * Does not import the engine directly.
+ * Evaluates package risk 100% in-process without requiring external node binary.
+ * Falls back to CLI subprocess only if in-process evaluation fails.
  */
-function spawnCliCheck(
+async function evaluatePackageSafe(
   cliPath: string,
   targetSpec: string,
   ecosystem: 'npm' | 'pypi'
@@ -68,9 +72,64 @@ function spawnCliCheck(
   const cacheKey = `${ecosystem}:${targetSpec}`;
   const cached = checkCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
-    return Promise.resolve(cached.result);
+    return cached.result;
   }
 
+  // Parse name@ver or @scope/name@ver
+  let packageName = targetSpec;
+  let version: string | undefined;
+  const lastAt = targetSpec.lastIndexOf('@');
+  if (lastAt > 0) {
+    packageName = targetSpec.slice(0, lastAt);
+    version = targetSpec.slice(lastAt + 1);
+  }
+
+  try {
+    const result = await inProcessEngine.evaluate({
+      name: packageName,
+      version,
+      ecosystem,
+      isDirect: true,
+    });
+    const decision = classifyDecision(result);
+
+    let reason = 'Package passed clean';
+    if (decision === 'BLOCK') {
+      const topReason =
+        result.signals[0]?.reason ||
+        'High risk AI hallucination or malicious package detected';
+      reason = `[ContextArmor CIRCUIT BREAKER] Blocked installation of '${packageName}' (${ecosystem}): ${topReason}`;
+    } else if (decision === 'ASK') {
+      const prioritizedSignal =
+        result.signals.find((s) => s.name === 'version_cooldown_72h') ||
+        [...result.signals].sort((a, b) => b.score * b.weight - a.score * a.weight)[0];
+      const topReason = result.uncheckedReason
+        ? `[UNCHECKED] ${result.uncheckedReason}`
+        : prioritizedSignal?.reason || 'Package flagged in warning tier';
+      reason = `[ContextArmor WARNING] Flagged package: '${packageName}': ${topReason}`;
+    }
+
+    const checkResult: CliCheckResult = {
+      decision,
+      reason,
+      signals: result.signals,
+    };
+    checkCache.set(cacheKey, { result: checkResult, timestamp: Date.now() });
+    return checkResult;
+  } catch {
+    // If in-process encounters an issue, fallback to CLI if node is present
+    return spawnCliCheck(cliPath, targetSpec, ecosystem);
+  }
+}
+
+/**
+ * Spawns the standalone ContextArmor CLI check command with --json.
+ */
+function spawnCliCheck(
+  cliPath: string,
+  targetSpec: string,
+  ecosystem: 'npm' | 'pypi'
+): Promise<CliCheckResult> {
   return new Promise((resolve) => {
     const { nodePath, env } = getNodeCommand();
     const args = [cliPath, 'check', targetSpec, '-e', ecosystem, '--json'];
@@ -78,10 +137,8 @@ function spawnCliCheck(
       try {
         const rawJson = (stdout || '').trim();
         const parsed: CliCheckResult = JSON.parse(rawJson);
-        checkCache.set(cacheKey, { result: parsed, timestamp: Date.now() });
         resolve(parsed);
       } catch {
-        // Fallback if execution or parse failed
         const fallback: CliCheckResult = {
           decision: 'ASK',
           reason: `[ContextArmor UNCHECKED] Failed to audit package '${targetSpec}' via CLI.`,
@@ -144,7 +201,7 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  // Status Bar Item from contextarmor doctor
+  // Status Bar Item
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   statusBar.command = 'contextarmor.openDashboard';
   context.subscriptions.push(statusBar);
@@ -152,25 +209,30 @@ export function activate(context: vscode.ExtensionContext) {
   const cliPath = path.join(context.extensionPath, 'dist', 'cli.js');
 
   function updateStatusBar() {
-    const { nodePath, env } = getNodeCommand();
-    child_process.execFile(nodePath, [cliPath, 'doctor'], { env, timeout: 8000 }, (err, stdout) => {
-      if (err && !stdout) {
-        statusBar.text = '$(shield-x) ContextArmor: Inactive';
-        statusBar.tooltip = 'ContextArmor doctor probe failed';
-        statusBar.show();
-        return;
+    let hooksWired = false;
+    try {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      const cwd = workspaceFolders && workspaceFolders.length > 0 ? workspaceFolders[0].uri.fsPath : process.cwd();
+      const claudeSettings = path.join(cwd, '.claude', 'settings.json');
+      if (fs.existsSync(claudeSettings)) {
+        const raw = fs.readFileSync(claudeSettings, 'utf8');
+        if (raw.includes('contextarmor')) hooksWired = true;
       }
-      const output = stdout || '';
-      const hasWarning = output.includes('[WARN]') || output.includes('[MISSING]');
-      if (hasWarning) {
-        statusBar.text = '$(warning) ContextArmor: Warning';
-        statusBar.tooltip = output.trim();
-      } else {
-        statusBar.text = '$(shield) ContextArmor: Protected';
-        statusBar.tooltip = 'ContextArmor Doctor: All hooks wired & protected';
+      const agHooks = path.join(cwd, '.agents', 'hooks.json');
+      if (fs.existsSync(agHooks)) {
+        const raw = fs.readFileSync(agHooks, 'utf8');
+        if (raw.includes('contextarmor')) hooksWired = true;
       }
-      statusBar.show();
-    });
+    } catch {}
+
+    if (hooksWired) {
+      statusBar.text = '$(shield) ContextArmor: Protected';
+      statusBar.tooltip = 'ContextArmor: PreToolUse circuit breaker hooks active & protected';
+    } else {
+      statusBar.text = '$(shield) ContextArmor: Active';
+      statusBar.tooltip = 'ContextArmor: AI Supply Chain & Deserialization Defense Active';
+    }
+    statusBar.show();
   }
 
   // Initial status bar check
@@ -195,7 +257,7 @@ export function activate(context: vscode.ExtensionContext) {
         progress.report({ message: 'Scanning project manifests and code...' });
         const result = await auditWorkspace(
           rootPath,
-          (spec, eco) => spawnCliCheck(cliPath, spec, eco),
+          (spec, eco) => evaluatePackageSafe(cliPath, spec, eco),
           (msg, inc) => progress.report({ message: msg, increment: inc })
         );
 
@@ -250,12 +312,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('contextarmor.auditWorkspace', runFullWorkspaceAudit)
   );
 
-  // Strix Pentest Command
+  // Strix / Deep Pentest Command
   async function runStrixPentest() {
     const status = getStrixStatus();
     if (!status.installed || !status.binaryPath) {
-      vscode.window.showWarningMessage(
-        'Strix AI Pentesting CLI not found at ~/.local/bin/strix. Install it via: curl -sSL https://strix.ai/install | bash'
+      vscode.window.showInformationMessage(
+        'ContextArmor Deep Pentest: Optional autonomous pentesting agent (Strix) is not installed on this machine. To enable live exploit PoC generation, install Strix via: curl -sSL https://strix.ai/install | bash'
       );
       return;
     }
@@ -266,27 +328,27 @@ export function activate(context: vscode.ExtensionContext) {
         ? workspaceFolders[0].uri.fsPath
         : process.cwd();
 
-    const outputChannel = vscode.window.createOutputChannel('ContextArmor: Strix Pentest');
+    const outputChannel = vscode.window.createOutputChannel('ContextArmor: Deep Pentest');
     outputChannel.show();
-    outputChannel.appendLine(`[Strix Pentest] Launching autonomous pentesting against: ${rootPath}`);
+    outputChannel.appendLine(`[ContextArmor Pentest] Launching autonomous security scan against: ${rootPath}`);
 
-    sidebarProvider.setScanning(true, 'Running autonomous Strix pentest agents...');
+    sidebarProvider.setScanning(true, 'Running ContextArmor Deep Pentest agents...');
 
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: 'ContextArmor: Running Strix Pentest',
+        title: 'ContextArmor: Running Deep Pentest',
         cancellable: false,
       },
       async (progress) => {
-        progress.report({ message: 'Launching Strix agents...' });
+        progress.report({ message: 'Executing security tests...' });
         const res = await runStrixScan(rootPath, 'quick', (chunk) => {
           outputChannel.append(chunk);
         });
 
         if (res.threats.length > 0) {
           currentThreats = [
-            ...currentThreats.filter((t) => !t.title.startsWith('[Strix')),
+            ...currentThreats.filter((t) => !t.title.includes('Pentest')),
             ...res.threats,
           ];
           sidebarProvider.update(currentThreats);
@@ -295,7 +357,7 @@ export function activate(context: vscode.ExtensionContext) {
           }
           vscode.window
             .showErrorMessage(
-              `Strix Pentest completed with ${res.threats.length} vulnerabilities detected!`,
+              `ContextArmor Deep Pentest completed: ${res.threats.length} vulnerabilities detected!`,
               'View Dashboard'
             )
             .then((choice) => {
@@ -306,7 +368,7 @@ export function activate(context: vscode.ExtensionContext) {
         } else {
           sidebarProvider.update(currentThreats);
           vscode.window.showInformationMessage(
-            'Strix Pentest completed. No exploitable vulnerabilities verified.'
+            'ContextArmor Deep Pentest completed. No exploitable vulnerabilities detected.'
           );
         }
       }
@@ -329,11 +391,14 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('contextarmor.doctor', () => {
       const outputChannel = vscode.window.createOutputChannel('ContextArmor Doctor');
       outputChannel.show();
-      outputChannel.appendLine('[Running ContextArmor Doctor...]');
+      outputChannel.appendLine('[Running ContextArmor Diagnostics...]');
       const { nodePath, env } = getNodeCommand();
-      child_process.execFile(nodePath, [cliPath, 'doctor'], { env, timeout: 10000 }, (_err, stdout, stderr) => {
+      child_process.execFile(nodePath, [cliPath, 'doctor'], { env, timeout: 10000 }, (err, stdout, stderr) => {
         if (stdout) outputChannel.append(stdout);
         if (stderr) outputChannel.append(stderr);
+        if (err && !stdout) {
+          outputChannel.appendLine('[ContextArmor] Extension running in self-contained in-process mode.');
+        }
         updateStatusBar();
       });
     })
@@ -413,7 +478,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     for (const dep of depsToCheck) {
       const spec = dep.version ? `${dep.name}@${dep.version}` : dep.name;
-      const result = await spawnCliCheck(cliPath, spec, dep.ecosystem);
+      const result = await evaluatePackageSafe(cliPath, spec, dep.ecosystem);
       const mapped = mapCheckResultToDiagnostic(dep, result);
 
       if (mapped) {

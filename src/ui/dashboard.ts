@@ -228,7 +228,7 @@ export class DashboardPanel {
     </div>
     <div class="header-actions">
       <button class="btn" onclick="vscode.postMessage({command: 'auditWorkspace'})">🛡️ Run Full Project Audit</button>
-      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runStrix'})">🦅 Strix Pentest</button>
+      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runStrix'})">🦅 Deep Pentest</button>
       <button class="btn-secondary" onclick="vscode.postMessage({command: 'runDoctor'})">🩺 Doctor</button>
     </div>
   </div>

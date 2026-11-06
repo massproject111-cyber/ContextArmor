@@ -108,12 +108,12 @@ test('parseStrixSarif: parses SARIF 2.1.0 findings into ThreatItem model', () =>
   const threats = parseStrixSarif(sarifFile, tmpDir);
   assert.equal(threats.length, 2);
 
-  assert.equal(threats[0].title, '[Strix Pentest] CWE-89');
+  assert.equal(threats[0].title, '[ContextArmor Pentest] CWE-89');
   assert.equal(threats[0].severity, 'CRITICAL');
   assert.equal(threats[0].line, 41);
   assert.ok(threats[0].desc.includes('SQL Injection'));
 
-  assert.equal(threats[1].title, '[Strix Pentest] CWE-79');
+  assert.equal(threats[1].title, '[ContextArmor Pentest] CWE-79');
   assert.equal(threats[1].severity, 'WARNING');
   assert.equal(threats[1].line, 14);
 
