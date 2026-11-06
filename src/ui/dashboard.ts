@@ -199,15 +199,15 @@ export class DashboardPanel {
               const isTorchFix = !!(t.file?.endsWith('.py') && (t.title.includes('torch.load') || t.desc.includes('weights_only')));
 
               return `
-          <tr style="border-bottom: 1px solid var(--vscode-editorWidget-border);">
+          <tr style="border-bottom: 1px solid var(--border);">
             <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all;">${t.title}</td>
             <td style="padding: 12px;">
-              <span style="background: ${isCrit ? '#f4433622' : '#ff980022'}; color: ${isCrit ? '#f44336' : '#ff9800'}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">
+              <span style="background: ${isCrit ? 'var(--crit-bg)' : 'var(--warn-bg)'}; color: ${isCrit ? 'var(--crit-text)' : 'var(--warn-text)'}; border: 1px solid ${isCrit ? 'var(--crit-border)' : 'var(--warn-border)'}; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 10px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.06em;">
                 ${isCrit ? 'CRITICAL RISK' : 'WARNING'}
               </span>
             </td>
-            <td style="padding: 12px; color: var(--vscode-foreground); font-size: 12px; line-height: 1.4;">${t.desc}</td>
-            <td style="padding: 12px; color: var(--vscode-descriptionForeground); font-size: 11px; font-family: var(--font-mono);">
+            <td style="padding: 12px; color: var(--text); font-size: 12px; line-height: 1.4;">${t.desc}</td>
+            <td style="padding: 12px; color: var(--muted); font-size: 11px; font-family: var(--font-mono);">
               ${t.file ? t.file.split('/').slice(-2).join('/') : 'Workspace'}${t.line !== undefined ? `:${t.line + 1}` : ''}
             </td>
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
@@ -245,12 +245,25 @@ export class DashboardPanel {
       --font-header: "Geist", "Geist Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
       --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
       --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
-      --bg: var(--vscode-editor-background);
-      --card-bg: var(--vscode-editorWidget-background, #1e1e1e);
-      --border: var(--vscode-editorWidget-border, #333333);
-      --text: var(--vscode-foreground);
-      --muted: var(--vscode-descriptionForeground, #888888);
-      --accent: var(--vscode-focusBorder, #007acc);
+      
+      /* Bespoke Obsidian Palette */
+      --bg: #090a0c;
+      --card-bg: #111315;
+      --border: #22252b;
+      --text: #f4f4f5;
+      --muted: #8b949e;
+      --accent: #f4f4f5;
+
+      /* Refined Severity Palette */
+      --crit-bg: rgba(244, 63, 94, 0.12);
+      --crit-text: #fb7185;
+      --crit-border: rgba(244, 63, 94, 0.28);
+      --warn-bg: rgba(245, 158, 11, 0.12);
+      --warn-text: #fbbf24;
+      --warn-border: rgba(245, 158, 11, 0.28);
+      --safe-bg: rgba(16, 185, 129, 0.12);
+      --safe-text: #34d399;
+      --safe-border: rgba(16, 185, 129, 0.28);
     }
     body {
       font-family: var(--font-ui);
@@ -279,9 +292,11 @@ export class DashboardPanel {
     }
     .header-title {
       font-family: var(--font-header);
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: -0.03em;
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text);
     }
     .header-sub {
       font-size: 12px;
@@ -310,11 +325,11 @@ export class DashboardPanel {
     }
     .card-title {
       font-family: var(--font-header);
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.08em;
       color: var(--muted);
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 6px;
     }
     .card-value {
@@ -331,14 +346,16 @@ export class DashboardPanel {
     }
     .section-title {
       font-family: var(--font-header);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       margin-top: 28px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      color: var(--text);
     }
     .table-container {
       background: var(--card-bg);
@@ -353,20 +370,44 @@ export class DashboardPanel {
       text-align: left;
     }
     th {
-      background: var(--vscode-editorGroupHeader-tabsBackground, #252526);
+      background: #0d0e11;
       padding: 10px 14px;
-      font-size: 11px;
+      font-family: var(--font-header);
+      font-size: 10px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.08em;
       color: var(--muted);
       border-bottom: 1px solid var(--border);
     }
     .btn {
-      background: var(--vscode-button-background, #0e639c);
-      color: var(--vscode-button-foreground, #fff);
-      border: none;
+      background: #f4f4f5;
+      color: #090a0c;
+      border: 1px solid #ffffff;
       padding: 8px 16px;
-      border-radius: 4px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 11.5px;
+      font-family: var(--font-header);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+    }
+    .btn-secondary {
+      background: #16181c;
+      color: #e4e4e7;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 5px;
       cursor: pointer;
       font-weight: 600;
       font-size: 12px;
@@ -375,29 +416,13 @@ export class DashboardPanel {
       gap: 6px;
       transition: all 0.15s ease;
     }
-    .btn:hover {
-      background: var(--vscode-button-hoverBackground, #1177bb);
-      transform: translateY(-1px);
-    }
-    .btn-secondary {
-      background: var(--vscode-button-secondaryBackground, #3a3d41);
-      color: var(--vscode-button-secondaryForeground, #fff);
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
     .btn-secondary:hover {
-      background: var(--vscode-button-secondaryHoverBackground, #45494e);
+      background: #1e2127;
+      border-color: #383d47;
     }
     .btn-sm {
       padding: 4px 8px;
-      border-radius: 3px;
+      border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
       font-weight: 600;
@@ -405,12 +430,24 @@ export class DashboardPanel {
       margin-left: 4px;
     }
     .btn-fix {
-      background: var(--vscode-button-background, #0e639c);
-      color: #fff;
+      background: rgba(59, 130, 246, 0.12);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.28);
+      transition: all 0.15s ease;
+    }
+    .btn-fix:hover {
+      background: rgba(59, 130, 246, 0.22);
+      border-color: rgba(59, 130, 246, 0.45);
     }
     .btn-del {
-      background: var(--vscode-button-secondaryBackground, #3a3d41);
-      color: #ccc;
+      background: rgba(244, 63, 94, 0.12);
+      color: #fb7185;
+      border: 1px solid rgba(244, 63, 94, 0.28);
+      transition: all 0.15s ease;
+    }
+    .btn-del:hover {
+      background: rgba(244, 63, 94, 0.22);
+      border-color: rgba(244, 63, 94, 0.45);
     }
 
     /* =========================================================
@@ -433,11 +470,14 @@ export class DashboardPanel {
       gap: 12px;
     }
     .strix-badge {
-      background: var(--vscode-badge-background, #333);
-      color: var(--vscode-badge-foreground, #ccc);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      background: #1c1e24;
+      color: #a1a1aa;
+      border: 1px solid #2b2f38;
+      font-family: var(--font-header);
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       padding: 2px 7px;
       border-radius: 3px;
       display: inline-block;
@@ -445,9 +485,10 @@ export class DashboardPanel {
     }
     .strix-title {
       font-family: var(--font-header);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: var(--text);
     }
     .strix-desc {
@@ -463,44 +504,51 @@ export class DashboardPanel {
       align-items: center;
     }
     .btn-strix-run {
-      background: var(--vscode-button-background, #0e639c);
-      color: var(--vscode-button-foreground, #fff);
-      border: none;
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
+      background: #f4f4f5;
+      color: #090a0c;
+      border: 1px solid #ffffff;
+      padding: 8px 18px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      font-family: var(--font-header);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
     }
     .btn-strix-run:hover {
-      background: var(--vscode-button-hoverBackground, #1177bb);
+      background: #ffffff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
     }
     .btn-strix-run:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
     .brain-pill {
-      background: var(--vscode-editorWidget-background, #252526);
+      background: #14161a;
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 5px;
       padding: 6px 12px;
       font-size: 12px;
       display: flex;
       align-items: center;
       gap: 8px;
       cursor: pointer;
+      transition: border-color 0.15s;
     }
     .brain-pill:hover {
-      border-color: var(--accent);
+      border-color: #383d47;
     }
 
     /* Progress Bar */
     .progress-box {
-      background: var(--vscode-editor-background);
+      background: #0d0e11;
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 16px;
@@ -514,20 +562,20 @@ export class DashboardPanel {
       margin-bottom: 8px;
     }
     .progress-track {
-      background: var(--vscode-editorWidget-background, #252526);
+      background: #1a1c22;
       border-radius: 4px;
       height: 6px;
       overflow: hidden;
       position: relative;
     }
     .progress-fill {
-      background: var(--vscode-progressBar-background, #007acc);
+      background: #f4f4f5;
       height: 100%;
       border-radius: 4px;
       transition: width 0.3s ease;
     }
     .telemetry-console {
-      background: var(--vscode-editor-background, #1e1e1e);
+      background: #090a0c;
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 10px 12px;
@@ -550,7 +598,7 @@ export class DashboardPanel {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.75);
       display: none;
       justify-content: center;
       align-items: center;
@@ -562,7 +610,7 @@ export class DashboardPanel {
       border-radius: 8px;
       width: 580px;
       max-width: 90%;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
       padding: 24px;
       box-sizing: border-box;
       max-height: 85vh;
@@ -576,9 +624,10 @@ export class DashboardPanel {
     }
     .modal-title {
       font-family: var(--font-header);
-      font-size: 17px;
-      font-weight: 700;
-      letter-spacing: -0.025em;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
     .modal-close {
       background: transparent;
