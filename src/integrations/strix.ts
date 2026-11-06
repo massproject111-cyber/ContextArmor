@@ -323,6 +323,7 @@ const COMMON_CWE_NAMES: Record<string, string> = {
 
 /**
  * Searches for any strix_runs directory in workspace and extracts SARIF findings.
+ * Only loads findings from the MOST RECENT run to avoid displaying obsolete historical issues.
  */
 export function loadExistingStrixFindings(workspaceRoot: string): ThreatItem[] {
   const threats: ThreatItem[] = [];
@@ -334,14 +335,25 @@ export function loadExistingStrixFindings(workspaceRoot: string): ThreatItem[] {
 
   try {
     const entries = fs.readdirSync(runsDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const runFolder = path.join(runsDir, entry.name);
-        const sarifPath = path.join(runFolder, 'findings.sarif');
-        if (fs.existsSync(sarifPath)) {
-          const parsed = parseStrixSarif(sarifPath, workspaceRoot);
-          threats.push(...parsed);
+    const runDirs = entries
+      .filter((e) => e.isDirectory())
+      .map((e) => {
+        const full = path.join(runsDir, e.name);
+        let mtime = 0;
+        try {
+          mtime = fs.statSync(full).mtimeMs;
+        } catch {
+          // ignore stat errors
         }
+        return { name: e.name, full, mtime };
+      })
+      .sort((a, b) => b.mtime - a.mtime);
+
+    // Read only the most recent run that contains a findings.sarif
+    for (const run of runDirs) {
+      const sarifPath = path.join(run.full, 'findings.sarif');
+      if (fs.existsSync(sarifPath)) {
+        return parseStrixSarif(sarifPath, workspaceRoot);
       }
     }
   } catch {
@@ -373,7 +385,7 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
 
       for (const res of results) {
         const ruleId = res.ruleId || 'VULN';
-        const message = res.message?.text || 'Vulnerability detected by Strix';
+        let rawMessage = res.message?.text || 'Vulnerability detected by Strix';
 
         // Filter out Strix internal coverage checklist items & non-issues
         if (ruleId.startsWith('strix-coverage')) {
@@ -382,7 +394,7 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
         if (res.level === 'none') {
           continue;
         }
-        const lowerMsg = message.toLowerCase();
+        const lowerMsg = rawMessage.toLowerCase();
         if (
           lowerMsg.includes('not applicable') ||
           lowerMsg.includes('no issue identified') ||
@@ -400,6 +412,22 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
           ? `[Pentest] ${ruleId}: ${cweFriendly}`
           : `[ContextArmor Pentest] ${ruleId}`;
 
+        // Clean duplicate title prefix from message
+        let cleanMessage = rawMessage;
+        if (ruleName && cleanMessage.startsWith(ruleName)) {
+          cleanMessage = cleanMessage.slice(ruleName.length).trim();
+        }
+
+        // Extract recommended fix version from advisory
+        const fixMatch =
+          cleanMessage.match(/`([0-9]+\.[0-9]+(?:\.[0-9]+[a-zA-Z0-9_\-\.]*)?)`\s*(?:contains the fix|fixes the behavior)/i) ||
+          cleanMessage.match(/identifies\s*`([0-9]+\.[0-9]+(?:\.[0-9]+[a-zA-Z0-9_\-\.]*)?)`\s*as the fixed version/i) ||
+          cleanMessage.match(/(?:Upgrade.*?to|fixed in)\s*`?([0-9]+\.[0-9]+(?:\.[0-9]+[a-zA-Z0-9_\-\.]*)?)`?/i);
+        const fixVersion = fixMatch ? fixMatch[1] : undefined;
+        if (fixVersion && !cleanMessage.includes('Suggested pin:')) {
+          cleanMessage += ` Suggested pin: '${fixVersion}'`;
+        }
+
         const level = res.level === 'error' ? 'CRITICAL' : 'WARNING';
 
         let relativeFile = '';
@@ -411,15 +439,41 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
           line = loc.region?.startLine ? loc.region.startLine - 1 : 0;
         }
 
-        const absoluteFile = relativeFile
+        // If location is generic (e.g. SECURITY.md or root) but message points to requirements.txt or package.json, locate actual line
+        let absoluteFile = relativeFile
           ? path.isAbsolute(relativeFile)
             ? relativeFile
             : path.join(workspaceRoot, relativeFile)
           : workspaceRoot;
 
+        if (relativeFile === 'SECURITY.md' || relativeFile === '') {
+          if (cleanMessage.includes('requirements.txt')) {
+            const reqPath = path.join(workspaceRoot, 'requirements.txt');
+            if (fs.existsSync(reqPath)) {
+              absoluteFile = reqPath;
+              try {
+                const reqLines = fs.readFileSync(reqPath, 'utf8').split('\n');
+                const pkgMatch = cleanMessage.match(/pins\s*\*\*`([a-zA-Z0-9_\-]+)==/i);
+                if (pkgMatch) {
+                  const pkgName = pkgMatch[1];
+                  const foundIdx = reqLines.findIndex((l) => l.toLowerCase().startsWith(pkgName.toLowerCase()));
+                  if (foundIdx >= 0) line = foundIdx;
+                }
+              } catch {
+                // ignore
+              }
+            }
+          } else if (cleanMessage.includes('package.json')) {
+            const pkgPath = path.join(workspaceRoot, 'package.json');
+            if (fs.existsSync(pkgPath)) {
+              absoluteFile = pkgPath;
+            }
+          }
+        }
+
         threats.push({
           title: displayTitle,
-          desc: message,
+          desc: cleanMessage,
           severity: level,
           file: absoluteFile,
           line,
