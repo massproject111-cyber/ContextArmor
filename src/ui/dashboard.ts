@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { ThreatItem } from './treeView.js';
+import { getLlmConfig } from '../integrations/strix.js';
 
 export class DashboardPanel {
   public static currentPanel: DashboardPanel | undefined;
@@ -48,6 +49,9 @@ export class DashboardPanel {
           case 'runStrix':
             vscode.commands.executeCommand('contextarmor.runStrix');
             return;
+          case 'configureLlm':
+            vscode.commands.executeCommand('contextarmor.configureLlm');
+            return;
           case 'scanWorkspace':
           case 'runDoctor':
             vscode.commands.executeCommand('contextarmor.doctor');
@@ -76,6 +80,7 @@ export class DashboardPanel {
   }
 
   private _getHtmlForWebview(): string {
+    const llm = getLlmConfig();
     const criticalCount = this._threats.filter((t) => t.severity === 'CRITICAL').length;
     const warningCount = this._threats.filter((t) => t.severity === 'WARNING').length;
     const score = criticalCount > 0 ? 65 : warningCount > 0 ? 82 : 100;
@@ -203,13 +208,23 @@ export class DashboardPanel {
       font-weight: 600;
       font-size: 13px;
     }
+    .btn-pentest {
+      background: linear-gradient(135deg, #b71c1c 0%, #7b1fa2 100%);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 8px rgba(183, 28, 28, 0.35);
+    }
+    .btn-pentest:hover {
+      background: linear-gradient(135deg, #c62828 0%, #8e24aa 100%);
+      transform: translateY(-1px);
+    }
     .btn:hover {
       background: var(--vscode-button-hoverBackground, #1177bb);
     }
     .btn-secondary {
       background: var(--vscode-button-secondaryBackground, #3a3d41);
       color: var(--vscode-button-secondaryForeground, #fff);
-      border: none;
+      border: 1px solid var(--vscode-editorWidget-border, #444);
       padding: 8px 14px;
       border-radius: 4px;
       cursor: pointer;
@@ -227,9 +242,10 @@ export class DashboardPanel {
       🛡️ ContextArmor AI Security Dashboard
     </div>
     <div class="header-actions">
-      <button class="btn" onclick="vscode.postMessage({command: 'auditWorkspace'})">🛡️ Run Full Project Audit</button>
-      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runStrix'})">🦅 Deep Pentest</button>
-      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runDoctor'})">🩺 Doctor</button>
+      <button class="btn btn-pentest" onclick="vscode.postMessage({command: 'runStrix'})" title="Simulate autonomous exploits, AST taint & sandbox PoCs">🦅 Run Deep AI Pentest</button>
+      <button class="btn" onclick="vscode.postMessage({command: 'auditWorkspace'})" title="Scan package manifests, AI hallucinations & deserialization">🛡️ Run Full Project Audit</button>
+      <button class="btn-secondary" onclick="vscode.postMessage({command: 'configureLlm'})" title="Configure AI Brain (Gemini / Claude / OpenAI / Ollama)">${llm.isConfigured ? '🤖 ' + llm.provider : '🔑 Connect AI Key'}</button>
+      <button class="btn-secondary" onclick="vscode.postMessage({command: 'runDoctor'})" title="Verify circuit breaker hooks">🩺 Doctor</button>
     </div>
   </div>
 

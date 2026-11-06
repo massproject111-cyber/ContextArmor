@@ -10,6 +10,7 @@ async function main() {
     format: 'cjs',
     sourcemap: true,
     logLevel: 'info',
+    external: ['vscode'],
   };
 
   // Build CLI tool

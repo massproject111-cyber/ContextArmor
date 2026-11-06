@@ -17,7 +17,7 @@ import { ThreatItem } from './ui/treeView.js';
 import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
 import { auditWorkspace } from './core/projectAuditor.js';
-import { runStrixScan, getStrixStatus } from './integrations/strix.js';
+import { runStrixScan, getStrixStatus, promptLlmSetup, getLlmConfig } from './integrations/strix.js';
 import { PackageRiskEngine, classifyDecision } from './detectors/packageRisk/index.js';
 
 interface CacheEntry {
@@ -314,12 +314,20 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Strix / Deep Pentest Command
   async function runStrixPentest() {
-    const status = getStrixStatus();
-    if (!status.installed || !status.binaryPath) {
-      vscode.window.showInformationMessage(
-        'ContextArmor Deep Pentest: Optional autonomous pentesting agent (Strix) is not installed on this machine. To enable live exploit PoC generation, install Strix via: curl -sSL https://strix.ai/install | bash'
+    const llm = getLlmConfig();
+    if (!llm.isConfigured) {
+      const choice = await vscode.window.showInformationMessage(
+        'ContextArmor Deep Pentest: AI LLM Brain is not configured yet. Would you like to connect an AI key (Gemini, Claude, OpenAI, OpenRouter, or local Ollama)?',
+        'Connect AI Key',
+        'Run Built-in Sandbox'
       );
-      return;
+      if (choice === 'Connect AI Key') {
+        const configured = await promptLlmSetup();
+        sidebarProvider.update(currentThreats);
+        if (DashboardPanel.currentPanel) {
+          DashboardPanel.currentPanel.update(currentThreats);
+        }
+      }
     }
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -377,6 +385,19 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('contextarmor.runStrix', runStrixPentest)
+  );
+
+  // Register AI Brain configuration command
+  context.subscriptions.push(
+    vscode.commands.registerCommand('contextarmor.configureLlm', async () => {
+      const configured = await promptLlmSetup();
+      if (configured) {
+        sidebarProvider.update(currentThreats);
+        if (DashboardPanel.currentPanel) {
+          DashboardPanel.currentPanel.update(currentThreats);
+        }
+      }
+    })
   );
 
   // Register dashboard command

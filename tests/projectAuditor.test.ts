@@ -152,3 +152,13 @@ def run_command(cmd):
   // Clean up
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
+
+test('getLlmConfig: returns valid config structure for AI Brain', () => {
+  const { getLlmConfig } = require('../src/integrations/strix.js');
+  const cfg = getLlmConfig();
+  assert.equal(typeof cfg.isConfigured, 'boolean');
+  if (cfg.isConfigured) {
+    assert.ok(cfg.provider);
+    assert.ok(cfg.model);
+  }
+});

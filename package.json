@@ -81,8 +81,13 @@
       },
       {
         "command": "contextarmor.runStrix",
-        "title": "ContextArmor: Run Deep Pentest",
+        "title": "ContextArmor: Run Deep AI Pentest",
         "icon": "$(bug)"
+      },
+      {
+        "command": "contextarmor.configureLlm",
+        "title": "ContextArmor: Configure AI Pentest Brain",
+        "icon": "$(key)"
       },
       {
         "command": "contextarmor.openDashboard",

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import type { ThreatItem } from './treeView.js';
+import { getLlmConfig } from '../integrations/strix.js';
 
 export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'contextarmorSidebarView';
@@ -32,6 +33,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         }
         case 'runStrix': {
           vscode.commands.executeCommand('contextarmor.runStrix');
+          break;
+        }
+        case 'configureLlm': {
+          vscode.commands.executeCommand('contextarmor.configureLlm');
           break;
         }
         case 'openDashboard': {
@@ -112,6 +117,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     const score = criticalCount > 0 ? 65 : warningCount > 0 ? 82 : 100;
     const scoreColor = score === 100 ? '#4caf50' : score >= 80 ? '#ff9800' : '#f44336';
     const scoreLabel = score === 100 ? 'Clean' : score >= 80 ? 'Warning' : 'Critical';
+
+    const llm = getLlmConfig();
+    const brainText = llm.isConfigured ? `🤖 ${llm.provider}` : '🔑 Connect AI Key';
 
     let contentHtml = '';
 
@@ -237,44 +245,114 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       font-size: 18px;
       font-weight: 700;
     }
-    .btn-primary {
-      width: 100%;
-      background: var(--vscode-button-background, #0e639c);
-      color: var(--vscode-button-foreground, #fff);
-      border: none;
-      padding: 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+    .deck-section {
       margin-top: 14px;
+      margin-bottom: 12px;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .action-btn {
+      width: 100%;
+      border-radius: 6px;
+      padding: 10px 12px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease-in-out;
+      border: 1px solid transparent;
+      box-sizing: border-box;
+    }
+    .action-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    .action-btn:active {
+      transform: translateY(0);
+    }
+    .action-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+    }
+    .btn-pentest-hero {
+      background: linear-gradient(135deg, #b71c1c 0%, #4a148c 100%);
+      color: #ffffff;
+      border-color: rgba(255, 120, 120, 0.35);
+      box-shadow: 0 4px 12px rgba(183, 28, 28, 0.35);
+    }
+    .btn-audit-hero {
+      background: linear-gradient(135deg, #0277bd 0%, #0d47a1 100%);
+      color: #ffffff;
+      border-color: rgba(120, 180, 255, 0.35);
+      box-shadow: 0 3px 8px rgba(2, 119, 189, 0.25);
+    }
+    .action-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+    .action-heading {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: flex;
       align-items: center;
       gap: 6px;
     }
-    .btn-primary:hover {
-      background: var(--vscode-button-hoverBackground, #1177bb);
+    .action-tag {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      letter-spacing: 0.5px;
     }
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .action-sub {
+      font-size: 10px;
+      opacity: 0.85;
+      line-height: 1.3;
+    }
+    .brain-strip {
+      background: var(--vscode-editorWidget-background, #252526);
+      border: 1px solid var(--vscode-editorWidget-border, #3c3c3c);
+      border-radius: 5px;
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-size: 11px;
+      transition: border-color 0.15s;
+    }
+    .brain-strip:hover {
+      border-color: var(--vscode-focusBorder, #007acc);
+    }
+    .brain-pill {
+      font-weight: 600;
+      color: ${llm.isConfigured ? '#4caf50' : '#ff9800'};
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .btn-row {
       display: flex;
       gap: 6px;
-      margin-top: 6px;
+      margin-top: 4px;
     }
     .btn-secondary {
       flex: 1;
       background: var(--vscode-button-secondaryBackground, #3a3d41);
       color: var(--vscode-button-secondaryForeground, #fff);
-      border: none;
-      padding: 6px;
+      border: 1px solid var(--vscode-editorWidget-border, #444);
+      padding: 7px;
       border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
       text-align: center;
+      font-weight: 600;
+      transition: background 0.15s;
     }
     .btn-secondary:hover {
       background: var(--vscode-button-secondaryHoverBackground, #45494e);
@@ -296,35 +374,60 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 <body>
   <div class="score-card" onclick="openDashboard()" title="Click to view full Security Dashboard">
     <div>
-      <div class="score-title">Security Score</div>
-      <div style="font-size: 11px; color: var(--vscode-descriptionForeground);">${scoreLabel}</div>
+      <div class="score-title">Security Posture</div>
+      <div style="font-size: 11px; color: var(--vscode-descriptionForeground); font-weight: 500;">Status: ${scoreLabel}</div>
     </div>
     <div class="score-val" style="color: ${scoreColor};">${score} / 100</div>
   </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-    <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--vscode-descriptionForeground);">
+  <div class="deck-section">
+    <!-- STRIX DEEP PENTEST MODULE (HERO) -->
+    <button class="action-btn btn-pentest-hero" ${this._isScanning ? 'disabled' : ''} onclick="runStrix()" title="Run autonomous deep AI pentest (Strix or Sandbox AST/SARIF)">
+      <div class="action-top">
+        <span class="action-heading">🦅 Run Deep AI Pentest</span>
+        <span class="action-tag">STRIX AI</span>
+      </div>
+      <div class="action-sub">Autonomous exploit PoCs • Sandbox AST • SARIF 2.1</div>
+    </button>
+
+    <!-- AI ENGINE STATUS STRIP -->
+    <div class="brain-strip" onclick="configureLlm()" title="Configure AI Provider (Google Gemini, OpenAI, Claude, Ollama)">
+      <div class="brain-pill">
+        <span>⚡ Brain:</span>
+        <span>${llm.isConfigured ? llm.provider : 'Not Configured'}</span>
+      </div>
+      <span style="font-size: 10px; color: var(--vscode-descriptionForeground);">${llm.isConfigured ? '⚙️ Change' : '🔑 Connect'}</span>
+    </div>
+
+    <!-- FULL WORKSPACE PROJECT AUDIT -->
+    <button class="action-btn btn-audit-hero" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()" title="Audit all package manifests, AI hallucinations & deserialization">
+      <div class="action-top">
+        <span class="action-heading">🛡️ Run Full Project Audit</span>
+        <span class="action-tag">NATIVE FAST</span>
+      </div>
+      <div class="action-sub">Manifests • Hallucinations • Deserialization • MCP</div>
+    </button>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="openDashboard()" title="Open comprehensive visual Security Dashboard">
+        📊 Dashboard
+      </button>
+      <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & tamper protection">
+        🩺 Doctor
+      </button>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; margin-bottom: 4px;">
+    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--vscode-descriptionForeground); letter-spacing: 0.5px;">
       Active Threat Radar
     </span>
-    <span style="font-size: 10px; color: var(--vscode-descriptionForeground); cursor: pointer;" onclick="openDashboard()">
-      📊 Full Dashboard
+    <span style="font-size: 10px; color: var(--vscode-descriptionForeground);">
+      ${this._threats.length} Active Findings
     </span>
   </div>
 
   ${contentHtml}
-
-  <button class="btn-primary" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()">
-    🛡️ Run Full Project Audit
-  </button>
-
-  <div class="btn-row">
-    <button class="btn-secondary" onclick="runStrix()" title="Run autonomous deep security pentest on workspace">
-      🦅 Deep Pentest
-    </button>
-    <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & tamper protection">
-      🩺 Doctor
-    </button>
-  </div>
 
   <script>
     const vscode = acquireVsCodeApi();
@@ -333,6 +436,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     function runStrix() {
       vscode.postMessage({ command: 'runStrix' });
+    }
+    function configureLlm() {
+      vscode.postMessage({ command: 'configureLlm' });
     }
     function openDashboard() {
       vscode.postMessage({ command: 'openDashboard' });

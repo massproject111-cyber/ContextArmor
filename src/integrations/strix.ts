@@ -4,11 +4,180 @@ import * as os from 'node:os';
 import * as child_process from 'node:child_process';
 import type { ThreatItem } from '../ui/treeView.js';
 
+function getVsCode(): any {
+  try {
+    return require('vscode');
+  } catch {
+    return undefined;
+  }
+}
+
 export interface StrixStatus {
   installed: boolean;
   binaryPath?: string;
   hasConfig: boolean;
   dockerRunning: boolean;
+}
+
+export interface LlmConfig {
+  provider?: string;
+  model?: string;
+  apiKey?: string;
+  apiBase?: string;
+  isConfigured: boolean;
+}
+
+/**
+ * Reads the configured AI brain from ~/.strix/cli-config.json
+ */
+export function getLlmConfig(): LlmConfig {
+  const configPath = path.join(os.homedir(), '.strix', 'cli-config.json');
+  if (!fs.existsSync(configPath)) {
+    return { isConfigured: false };
+  }
+  try {
+    const raw = fs.readFileSync(configPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    const env = parsed.env || {};
+    const model = env.STRIX_LLM || '';
+    const apiKey = env.LLM_API_KEY || '';
+    const apiBase = env.LLM_API_BASE || '';
+
+    let provider = 'Custom';
+    if (model.startsWith('gemini')) provider = 'Google Gemini';
+    else if (model.startsWith('openai')) provider = 'OpenAI';
+    else if (model.startsWith('anthropic')) provider = 'Anthropic Claude';
+    else if (model.startsWith('openrouter')) provider = 'OpenRouter';
+    else if (model.startsWith('ollama')) provider = 'Ollama (Local)';
+
+    const isConfigured = !!model && (!!apiKey || model.startsWith('ollama'));
+    return { provider, model, apiKey, apiBase, isConfigured };
+  } catch {
+    return { isConfigured: false };
+  }
+}
+
+/**
+ * Saves LLM credentials securely into ~/.strix/cli-config.json
+ */
+export function saveLlmConfig(modelSpec: string, apiKey: string, apiBase?: string): void {
+  const dir = path.join(os.homedir(), '.strix');
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
+  }
+
+  const configPath = path.join(dir, 'cli-config.json');
+  let currentEnv: Record<string, string> = {};
+  if (fs.existsSync(configPath)) {
+    try {
+      const raw = fs.readFileSync(configPath, 'utf8');
+      const parsed = JSON.parse(raw);
+      currentEnv = parsed.env || {};
+    } catch {}
+  }
+
+  currentEnv.STRIX_LLM = modelSpec;
+  currentEnv.LLM_API_KEY = apiKey;
+  if (apiBase) {
+    currentEnv.LLM_API_BASE = apiBase;
+  } else {
+    delete currentEnv.LLM_API_BASE;
+  }
+
+  fs.writeFileSync(configPath, JSON.stringify({ env: currentEnv }, null, 2), { mode: 0o600 });
+}
+
+/**
+ * Interactive provider auth setup dialog
+ */
+export async function promptLlmSetup(): Promise<boolean> {
+  const vscode = getVsCode();
+  if (!vscode) {
+    return false;
+  }
+
+  interface ProviderItem {
+    label: string;
+    description?: string;
+    detail?: string;
+    modelPrefix: string;
+    keyUrl: string;
+    isLocal?: boolean;
+  }
+
+  const items: ProviderItem[] = [
+    {
+      label: '$(hubot) Google Gemini (Recommended)',
+      description: 'gemini-1.5-pro / gemini-2.0-flash',
+      detail: 'Fastest multi-turn code reasoning. Get a free API key at aistudio.google.com',
+      modelPrefix: 'gemini/gemini-1.5-pro',
+      keyUrl: 'https://aistudio.google.com/apikey',
+    },
+    {
+      label: '$(sparkle) OpenAI / ChatGPT',
+      description: 'gpt-4o / o1',
+      detail: 'State-of-the-art vulnerability reasoning. Get your key at platform.openai.com',
+      modelPrefix: 'openai/gpt-4o',
+      keyUrl: 'https://platform.openai.com/api-keys',
+    },
+    {
+      label: '$(shield) Anthropic Claude',
+      description: 'claude-3-5-sonnet',
+      detail: 'Best-in-class coding & exploitation accuracy. Get key at console.anthropic.com',
+      modelPrefix: 'anthropic/claude-3-5-sonnet-20241022',
+      keyUrl: 'https://console.anthropic.com/settings/keys',
+    },
+    {
+      label: '$(globe) OpenRouter',
+      description: 'DeepSeek R1 / Llama 3.3',
+      detail: 'Flexible multi-model routing hub. Get key at openrouter.ai',
+      modelPrefix: 'openrouter/deepseek/deepseek-r1',
+      keyUrl: 'https://openrouter.ai/keys',
+    },
+    {
+      label: '$(server) Ollama (100% Free & Local)',
+      description: 'deepseek-r1 / llama3',
+      detail: 'Runs completely offline on your computer. Zero API cost, zero cloud data sent.',
+      modelPrefix: 'ollama/deepseek-r1',
+      keyUrl: 'http://localhost:11434',
+      isLocal: true,
+    },
+  ];
+
+  const selection = await vscode.window.showQuickPick(items, {
+    placeHolder: 'Select your AI LLM Brain provider for Deep Pentesting',
+    title: 'ContextArmor: AI Pentest Brain Setup',
+  });
+
+  if (!selection) {
+    return false;
+  }
+
+  if (selection.isLocal) {
+    saveLlmConfig(selection.modelPrefix, 'ollama-local-key', 'http://localhost:11434');
+    vscode.window.showInformationMessage(
+      'ContextArmor AI Brain configured with local Ollama! Deep Pentest will execute offline.'
+    );
+    return true;
+  }
+
+  const apiKey = await vscode.window.showInputBox({
+    prompt: `Paste your ${selection.label.replace(/\$\([^)]+\)\s*/, '')} API Key (Get it at: ${selection.keyUrl})`,
+    password: true,
+    placeHolder: 'Paste API key here (sk-..., AIzaSy...)',
+    ignoreFocusOut: true,
+    validateInput: (val) => (!val || val.trim().length < 8 ? 'Please enter a valid API key' : null),
+  });
+
+  if (!apiKey) {
+    return false;
+  }
+
+  saveLlmConfig(selection.modelPrefix, apiKey.trim());
+  vscode.window.showInformationMessage(
+    `ContextArmor AI Brain successfully configured with ${selection.label.replace(/\$\([^)]+\)\s*/, '')}!`
+  );
+  return true;
 }
 
 /**
