@@ -340,7 +340,14 @@ export function activate(context: vscode.ExtensionContext) {
     outputChannel.show();
     outputChannel.appendLine(`[ContextArmor Pentest] Launching autonomous security scan against: ${rootPath}`);
 
-    sidebarProvider.setScanning(true, 'Running ContextArmor Deep Pentest agents...');
+    const updateProgress = (pct: number, stage: string, log?: string) => {
+      sidebarProvider.updateProgress(pct, stage);
+      if (DashboardPanel.currentPanel) {
+        DashboardPanel.currentPanel.updateProgress(pct, stage, log);
+      }
+    };
+
+    updateProgress(10, 'Initializing pentest sandbox environment...', '[ContextArmor Sandbox] Starting environment...');
 
     await vscode.window.withProgress(
       {
@@ -350,8 +357,25 @@ export function activate(context: vscode.ExtensionContext) {
       },
       async (progress) => {
         progress.report({ message: 'Executing security tests...' });
+        let currentPct = 15;
         const res = await runStrixScan(rootPath, 'quick', (chunk) => {
           outputChannel.append(chunk);
+
+          if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
+            currentPct = 35;
+            updateProgress(currentPct, 'Sandbox ready · Dispatching attack agents...', chunk);
+          } else if (chunk.includes('Waiting for the first model response') || chunk.includes('gpt-5.6-luna')) {
+            currentPct = 55;
+            updateProgress(currentPct, 'Simulating exploits with Luna 6...', chunk);
+          } else if (chunk.includes('ast') || chunk.includes('Analyzing') || chunk.includes('Scanning')) {
+            currentPct = 75;
+            updateProgress(currentPct, 'Analyzing code taint & vulnerabilities...', chunk);
+          } else if (chunk.includes('findings.sarif') || chunk.includes('complete')) {
+            currentPct = 90;
+            updateProgress(currentPct, 'Synthesizing OASIS SARIF report...', chunk);
+          } else {
+            updateProgress(Math.min(85, currentPct + 1), 'Executing exploit tests...', chunk);
+          }
         });
 
         if (res.hasLlmError) {
@@ -375,7 +399,7 @@ export function activate(context: vscode.ExtensionContext) {
           ];
           sidebarProvider.update(currentThreats);
           if (DashboardPanel.currentPanel) {
-            DashboardPanel.currentPanel.update(currentThreats);
+            DashboardPanel.currentPanel.finishProgress(currentThreats);
           }
           vscode.window
             .showErrorMessage(
@@ -389,6 +413,9 @@ export function activate(context: vscode.ExtensionContext) {
             });
         } else {
           sidebarProvider.update(currentThreats);
+          if (DashboardPanel.currentPanel) {
+            DashboardPanel.currentPanel.finishProgress(currentThreats);
+          }
           vscode.window.showInformationMessage(
             'ContextArmor Deep Pentest completed. No exploitable vulnerabilities detected.'
           );

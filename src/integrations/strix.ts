@@ -99,6 +99,23 @@ export function saveLlmConfig(modelSpec: string, apiKey: string, apiBase?: strin
 }
 
 /**
+ * Sets provider credentials directly from the in-webview modal dialog.
+ */
+export function setProviderKey(provider: string, apiKey?: string): void {
+  if (provider === 'chatgpt-oauth') {
+    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
+  } else if (provider === 'gemini') {
+    saveLlmConfig('gemini/gemini-3.7-flash', (apiKey || '').trim());
+  } else if (provider === 'openai') {
+    saveLlmConfig('openai/gpt-5.6-luna', (apiKey || '').trim());
+  } else if (provider === 'anthropic') {
+    saveLlmConfig('anthropic/claude-sonnet-5', (apiKey || '').trim());
+  } else if (provider === 'sandbox') {
+    saveLlmConfig('contextarmor/sandbox', 'builtin-sandbox');
+  }
+}
+
+/**
  * Interactive provider auth setup dialog
  */
 export async function promptLlmSetup(): Promise<boolean> {

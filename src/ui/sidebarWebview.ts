@@ -1,12 +1,13 @@
 import * as vscode from 'vscode';
 import type { ThreatItem } from './treeView.js';
-import { getLlmConfig } from '../integrations/strix.js';
+import { getLlmConfig, setProviderKey } from '../integrations/strix.js';
 
 export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'contextarmorSidebarView';
   private _view?: vscode.WebviewView;
   private _threats: ThreatItem[] = [];
   private _isScanning: boolean = false;
+  private _scanPercent: number = 0;
   private _statusMessage?: string;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -37,6 +38,23 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         }
         case 'configureLlm': {
           vscode.commands.executeCommand('contextarmor.configureLlm');
+          break;
+        }
+        case 'startOauthLogin': {
+          const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
+          term.show();
+          term.sendText('strix auth login chatgpt');
+          setProviderKey('chatgpt-oauth');
+          vscode.window.showInformationMessage(
+            'Opened terminal for ChatGPT OAuth Login. Please follow the browser prompt to complete sign-in!'
+          );
+          this.update(this._threats);
+          break;
+        }
+        case 'saveApiKey': {
+          setProviderKey(data.provider, data.key);
+          vscode.window.showInformationMessage('ContextArmor AI Brain updated successfully!');
+          this.update(this._threats);
           break;
         }
         case 'openDashboard': {
@@ -97,6 +115,16 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public setScanning(isScanning: boolean, statusMessage?: string) {
     this._isScanning = isScanning;
     this._statusMessage = statusMessage;
+    this._scanPercent = isScanning ? 15 : 100;
+    if (this._view) {
+      this._view.webview.html = this._getHtmlForWebview();
+    }
+  }
+
+  public updateProgress(percent: number, stage: string) {
+    this._isScanning = true;
+    this._scanPercent = percent;
+    this._statusMessage = stage;
     if (this._view) {
       this._view.webview.html = this._getHtmlForWebview();
     }
@@ -105,6 +133,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public update(threats: ThreatItem[]) {
     this._threats = threats;
     this._isScanning = false;
+    this._scanPercent = 100;
     this._statusMessage = undefined;
     if (this._view) {
       this._view.webview.html = this._getHtmlForWebview();
@@ -125,11 +154,13 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
     if (this._isScanning) {
       contentHtml = `
-        <div style="padding: 20px 12px; text-align: center; border: 1px dashed var(--vscode-editorWidget-border); border-radius: 8px; margin-top: 12px; background: var(--vscode-editorWidget-background);">
-          <div class="spinner" style="margin: 0 auto 10px auto;"></div>
-          <div style="font-weight: 600; font-size: 13px; color: var(--vscode-focusBorder, #007acc);">Auditing Workspace...</div>
-          <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px;">
-            ${this._statusMessage || 'Checking dependencies, code deserialization & security risks...'}
+        <div style="padding: 16px 12px; border: 1px solid var(--vscode-editorWidget-border); border-radius: 8px; margin-top: 12px; background: var(--vscode-editorWidget-background);">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 8px;">
+            <span style="color: #e53935;">● ${this._statusMessage || 'Running test...'}</span>
+            <span>${this._scanPercent}%</span>
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.1); border-radius: 6px; height: 8px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, #e53935 0%, #8e24aa 50%, #00e676 100%); height: 100%; width: ${Math.max(5, this._scanPercent)}%; transition: width 0.3s ease;"></div>
           </div>
         </div>
       `;
@@ -151,13 +182,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           const badgeColor = isCrit ? '#f44336' : '#ff9800';
           const badgeText = isCrit ? 'BLOCK' : 'ASK';
 
-          // Extract suggested pin if available
           const pinMatch =
             t.desc.match(/Suggested pin:\s*['"`](?:npm\s+i\s+[^@]+@|pip\s+install\s+[^=]+=+|uv\s+add\s+[^=]+=*)([^'"`\s]+)['"`]/i) ||
             t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
           const pin = pinMatch ? pinMatch[1] : undefined;
 
-          // Determine category tag
           let tag = 'DEP';
           if (t.title.includes('Pentest')) tag = 'PENTEST';
           else if (t.title.startsWith('[MCP')) tag = 'MCP';
@@ -357,24 +386,45 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .btn-secondary:hover {
       background: var(--vscode-button-secondaryHoverBackground, #45494e);
     }
-    .spinner {
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      border-top: 2px solid var(--vscode-focusBorder, #007acc);
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      animation: spin 0.8s linear infinite;
+
+    /* Modal for Sidebar */
+    .sidebar-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      z-index: 9999;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .sidebar-modal-card {
+      background: var(--vscode-editorWidget-background, #252526);
+      border: 1px solid var(--vscode-focusBorder, #007acc);
+      border-radius: 8px;
+      padding: 14px;
+      width: 100%;
+      box-sizing: border-box;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .provider-card-sm {
+      border: 1px solid var(--vscode-editorWidget-border, #3c3c3c);
+      border-radius: 5px;
+      padding: 8px 10px;
+      margin-top: 8px;
+    }
+    .provider-card-sm:hover {
+      border-color: var(--vscode-focusBorder, #007acc);
     }
   </style>
 </head>
 <body>
   <div class="score-card" onclick="openDashboard()" title="Click to view full Security Dashboard">
     <div>
-      <div class="score-title">Security Posture</div>
+      <div class="score-title">Project Safety</div>
       <div style="font-size: 11px; color: var(--vscode-descriptionForeground); font-weight: 500;">Status: ${scoreLabel}</div>
     </div>
     <div class="score-val" style="color: ${scoreColor};">${score} / 100</div>
@@ -391,7 +441,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     </button>
 
     <!-- AI ENGINE STATUS STRIP -->
-    <div class="brain-strip" onclick="configureLlm()" title="Configure AI Provider (Google Gemini, OpenAI, Claude, Ollama)">
+    <div class="brain-strip" onclick="openModal()" title="Click to configure AI Provider directly">
       <div class="brain-pill">
         <span>⚡ Brain:</span>
         <span>${llm.isConfigured ? llm.provider : 'Not Configured'}</span>
@@ -403,7 +453,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     <button class="action-btn btn-audit-hero" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()" title="Audit all package manifests, AI hallucinations & deserialization">
       <div class="action-top">
         <span class="action-heading">🛡️ Run Full Project Audit</span>
-        <span class="action-tag">NATIVE FAST</span>
+        <span class="action-tag">FAST AUDIT</span>
       </div>
       <div class="action-sub">Manifests • Hallucinations • Deserialization • MCP</div>
     </button>
@@ -412,8 +462,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <button class="btn-secondary" onclick="openDashboard()" title="Open comprehensive visual Security Dashboard">
         📊 Dashboard
       </button>
-      <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & tamper protection">
-        🩺 Doctor
+      <button class="btn-secondary" onclick="runDoctor()" title="Inspect hooks & system health">
+        🩺 System Health
       </button>
     </div>
   </div>
@@ -429,16 +479,84 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
   ${contentHtml}
 
+  <!-- IN-WEBVIEW MODAL FOR SIDEBAR -->
+  <div class="sidebar-modal" id="sidebarModal">
+    <div class="sidebar-modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <strong style="font-size: 13px;">⚙️ Connect AI Brain</strong>
+        <button style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 14px;" onclick="closeModal()">✕</button>
+      </div>
+
+      <div class="provider-card-sm">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+          <strong style="font-size: 11px;">🌐 ChatGPT Subscription</strong>
+          <span style="font-size: 9px; color: #4caf50;">Luna 6 · $0</span>
+        </div>
+        <button style="width: 100%; background: #10a37f; color: #fff; border: none; padding: 6px; border-radius: 4px; font-size: 11px; cursor: pointer; margin-top: 4px;" onclick="startOauth()">
+          Sign In with OpenAI (OAuth)
+        </button>
+      </div>
+
+      <div class="provider-card-sm">
+        <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">✨ Google Gemini</div>
+        <div style="display: flex; gap: 4px;">
+          <input type="password" id="sideGemini" placeholder="Gemini API Key..." style="flex: 1; background: var(--vscode-editor-background); border: 1px solid var(--vscode-editorWidget-border); color: #fff; padding: 4px; font-size: 10px; border-radius: 3px;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;" onclick="saveKey('gemini', 'sideGemini')">Save</button>
+        </div>
+      </div>
+
+      <div class="provider-card-sm">
+        <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">🤖 OpenAI (API Key)</div>
+        <div style="display: flex; gap: 4px;">
+          <input type="password" id="sideOpenai" placeholder="OpenAI Key (sk-...)" style="flex: 1; background: var(--vscode-editor-background); border: 1px solid var(--vscode-editorWidget-border); color: #fff; padding: 4px; font-size: 10px; border-radius: 3px;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;" onclick="saveKey('openai', 'sideOpenai')">Save</button>
+        </div>
+      </div>
+
+      <div class="provider-card-sm">
+        <div style="font-size: 11px; font-weight: bold; margin-bottom: 4px;">🛡️ Anthropic Claude</div>
+        <div style="display: flex; gap: 4px;">
+          <input type="password" id="sideClaude" placeholder="Claude Key (sk-ant-...)" style="flex: 1; background: var(--vscode-editor-background); border: 1px solid var(--vscode-editorWidget-border); color: #fff; padding: 4px; font-size: 10px; border-radius: 3px;">
+          <button style="background: var(--vscode-button-background); color: #fff; border: none; padding: 4px 8px; border-radius: 3px; font-size: 10px; cursor: pointer;" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
+        </div>
+      </div>
+
+      <div class="provider-card-sm">
+        <div style="font-size: 11px; font-weight: bold; margin-bottom: 2px;">⚡ Built-in Offline Sandbox</div>
+        <button style="width: 100%; background: var(--vscode-button-secondaryBackground); color: #fff; border: 1px solid var(--vscode-editorWidget-border); padding: 5px; border-radius: 4px; font-size: 10px; cursor: pointer; margin-top: 4px;" onclick="saveKey('sandbox', '')">
+          Select Offline Sandbox
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const vscode = acquireVsCodeApi();
+
     function auditWorkspace() {
       vscode.postMessage({ command: 'auditWorkspace' });
     }
     function runStrix() {
       vscode.postMessage({ command: 'runStrix' });
     }
-    function configureLlm() {
-      vscode.postMessage({ command: 'configureLlm' });
+    function openModal() {
+      document.getElementById('sidebarModal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('sidebarModal').style.display = 'none';
+    }
+    function startOauth() {
+      closeModal();
+      vscode.postMessage({ command: 'startOauthLogin' });
+    }
+    function saveKey(provider, inputId) {
+      const key = inputId ? document.getElementById(inputId).value : '';
+      if (inputId && (!key || key.trim().length < 8)) {
+        alert('Please paste a valid API key.');
+        return;
+      }
+      closeModal();
+      vscode.postMessage({ command: 'saveApiKey', provider: provider, key: key });
     }
     function openDashboard() {
       vscode.postMessage({ command: 'openDashboard' });
