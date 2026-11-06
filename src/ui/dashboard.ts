@@ -200,14 +200,14 @@ export class DashboardPanel {
 
               return `
           <tr style="border-bottom: 1px solid var(--vscode-editorWidget-border);">
-            <td style="padding: 12px; font-weight: 600; font-family: monospace;">${t.title}</td>
+            <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all;">${t.title}</td>
             <td style="padding: 12px;">
               <span style="background: ${isCrit ? '#f4433622' : '#ff980022'}; color: ${isCrit ? '#f44336' : '#ff9800'}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 11px;">
                 ${isCrit ? 'CRITICAL RISK' : 'WARNING'}
               </span>
             </td>
             <td style="padding: 12px; color: var(--vscode-foreground); font-size: 12px; line-height: 1.4;">${t.desc}</td>
-            <td style="padding: 12px; color: var(--vscode-descriptionForeground); font-size: 11px;">
+            <td style="padding: 12px; color: var(--vscode-descriptionForeground); font-size: 11px; font-family: var(--font-mono);">
               ${t.file ? t.file.split('/').slice(-2).join('/') : 'Workspace'}${t.line !== undefined ? `:${t.line + 1}` : ''}
             </td>
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
@@ -242,6 +242,8 @@ export class DashboardPanel {
   <title>ContextArmor Security Dashboard</title>
   <style>
     :root {
+      --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
       --bg: var(--vscode-editor-background);
       --card-bg: var(--vscode-editorWidget-background, #1e1e1e);
       --border: var(--vscode-editorWidget-border, #333333);
@@ -250,7 +252,11 @@ export class DashboardPanel {
       --accent: var(--vscode-focusBorder, #007acc);
     }
     body {
-      font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      font-family: var(--font-ui);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+      font-variant-numeric: tabular-nums;
       padding: 24px 32px;
       color: var(--text);
       background-color: var(--bg);
@@ -309,6 +315,8 @@ export class DashboardPanel {
       margin-bottom: 6px;
     }
     .card-value {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
       font-size: 26px;
       font-weight: 700;
       margin-bottom: 4px;
@@ -523,7 +531,7 @@ export class DashboardPanel {
       border: 1px solid #22252a;
       border-radius: 6px;
       padding: 12px;
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 11px;
       color: #98c379;
       height: 140px;

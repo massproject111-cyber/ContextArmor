@@ -232,12 +232,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           return `
             <div class="threat-card" style="border-left: 3px solid ${badgeColor};">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px;">
-                <span style="font-weight: 700; font-size: 12px; font-family: monospace; word-break: break-all;">${t.title}</span>
+                <span style="font-weight: 700; font-size: 11.5px; font-family: var(--font-mono); word-break: break-all; letter-spacing: -0.2px;">${t.title}</span>
                 <div style="display: flex; gap: 4px; flex-shrink: 0;">
-                  <span style="background: var(--vscode-badge-background, #333); color: var(--vscode-badge-foreground, #ccc); padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700;">
+                  <span style="background: var(--vscode-badge-background, #333); color: var(--vscode-badge-foreground, #ccc); padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.4px;">
                     ${categoryLabel}
                   </span>
-                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 9px;">
+                  <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 9px; letter-spacing: 0.4px;">
                     ${badgeText}
                   </span>
                 </div>
@@ -275,6 +275,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
+      --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
       --bg: var(--vscode-editor-background);
       --card-bg: var(--vscode-editorWidget-background, #1e1e1e);
       --border: var(--vscode-editorWidget-border, #333333);
@@ -283,7 +285,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       --accent: var(--vscode-focusBorder, #007acc);
     }
     body {
-      font-family: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      font-family: var(--font-ui);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
+      font-variant-numeric: tabular-nums;
       padding: 10px;
       margin: 0;
       color: var(--text);
@@ -590,7 +596,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       box-shadow: 0 0 8px rgba(229, 57, 53, 0.6);
     }
     .telemetry-line {
-      font-family: monospace;
+      font-family: var(--font-mono);
       font-size: 10px;
       color: #98c379;
       margin-top: 6px;
