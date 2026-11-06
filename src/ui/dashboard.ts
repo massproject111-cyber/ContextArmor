@@ -184,7 +184,7 @@ export class DashboardPanel {
 
     const threatsHtml =
       this._threats.length === 0
-        ? `<tr><td colspan="5" style="text-align: center; color: var(--vscode-descriptionForeground); padding: 32px; font-size: 13px;">🛡️ All dependencies and code files are verified safe. No vulnerabilities or hallucinations found.</td></tr>`
+        ? `<tr><td colspan="5" style="text-align: center; color: var(--vscode-descriptionForeground); padding: 32px; font-size: 13px;">All dependencies and code files are verified safe. No vulnerabilities or hallucinations found.</td></tr>`
         : this._threats
             .map((t) => {
               const isCrit = t.severity === 'CRITICAL';
@@ -213,17 +213,17 @@ export class DashboardPanel {
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
               ${
                 pin
-                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${t.file}', ${t.line}, '${pin}')">✨ Auto-Fix to ${pin}</button>`
+                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${t.file}', ${t.line}, '${pin}')">Auto-Fix to ${pin}</button>`
                   : ''
               }
               ${
                 isTorchFix && t.file && t.line !== undefined
-                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Add weights_only=True</button>`
+                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${t.file}', ${t.line})">Add weights_only=True</button>`
                   : ''
               }
               ${
                 showRemove
-                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">🗑️ Remove Package</button>`
+                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">Remove Package</button>`
                   : ''
               }
             </td>
@@ -643,7 +643,6 @@ export class DashboardPanel {
   <!-- HEADER -->
   <div class="header">
     <div class="header-left">
-      <span style="font-size: 26px;">🛡️</span>
       <div>
         <div class="header-title">ContextArmor Security Operations</div>
         <div class="header-sub">Pre-Execution AI Supply Chain Defense & Pentest Operations</div>
@@ -651,10 +650,10 @@ export class DashboardPanel {
     </div>
     <div class="header-actions">
       <button class="btn" onclick="vscode.postMessage({command: 'auditWorkspace'})" title="Fast static scan of all manifests and code">
-        🛡️ Run Project Audit
+        Run Project Audit
       </button>
       <button class="btn-secondary" onclick="vscode.postMessage({command: 'runDoctor'})" title="Inspect system hooks">
-        🩺 System Health
+        System Health
       </button>
     </div>
   </div>
@@ -705,20 +704,19 @@ export class DashboardPanel {
     <div class="strix-station-header">
       <div>
         <span class="strix-badge">DEEP AI SECURITY TEST</span>
-        <div class="strix-title">🦅 Autonomous AI Vulnerability Simulation</div>
+        <div class="strix-title">Autonomous AI Vulnerability Simulation</div>
         <div class="strix-desc">
           Simulates real-world attack scenarios in an isolated sandbox. Autonomous AI agents discover code vulnerabilities and dependency exploits before deployment.
         </div>
       </div>
       <div class="strix-ctrls">
         <div class="brain-pill" onclick="openLlmModal()" title="Click to change AI Brain or connect API keys">
-          <span>⚡ Active AI Engine:</span>
+          <span>Active AI Engine:</span>
           <strong style="color: #4caf50;">${activeProviderName}</strong>
           <span style="font-size: 10px; color: var(--muted);">${activeModelName}</span>
-          <span style="font-size: 11px;">⚙️</span>
         </div>
         <button class="btn-strix-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()">
-          <span>🦅 Start Deep Security Test</span>
+          <span>Start Deep Security Test</span>
         </button>
       </div>
     </div>
@@ -752,7 +750,7 @@ export class DashboardPanel {
   <div class="modal-overlay" id="llmModal">
     <div class="modal-card">
       <div class="modal-header">
-        <div class="modal-title">⚙️ Connect AI Assistant</div>
+        <div class="modal-title">Connect AI Assistant</div>
         <button class="modal-close" onclick="closeLlmModal()">✕</button>
       </div>
       <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
@@ -762,21 +760,21 @@ export class DashboardPanel {
       <!-- OPTION 1: CHATGPT SUBSCRIPTION (LUNA 6) -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">🌐 ChatGPT Subscription (OAuth Login)</span>
+          <span class="provider-name">ChatGPT Subscription (OAuth Login)</span>
           <span class="provider-tag" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">LUNA 6 · $0.00</span>
         </div>
         <div class="provider-desc">
           Uses <strong>Luna 6 (chatgpt/gpt-5.6-luna)</strong>. 1-click browser sign-in directly on your existing ChatGPT subscription. No API keys required.
         </div>
         <button class="btn" style="background: #10a37f; width: 100%; justify-content: center;" onclick="startOauth()">
-          🌐 Sign in with OpenAI (Browser OAuth)
+          Sign in with OpenAI (Browser OAuth)
         </button>
       </div>
 
       <!-- OPTION 2: GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">✨ Google Gemini (Antigravity Brain)</span>
+          <span class="provider-name">Google Gemini (Antigravity Brain)</span>
           <span class="provider-tag" style="background: rgba(76, 175, 80, 0.2); color: #4caf50;">FREE · gemini-3.7-flash</span>
         </div>
         <div class="provider-desc">
@@ -784,7 +782,7 @@ export class DashboardPanel {
         </div>
         <div style="margin-bottom: 8px;">
           <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
-            🌐 1-Click: Open Google AI Studio (Copy Free Key)
+            1-Click: Open Google AI Studio (Copy Free Key)
           </button>
         </div>
         <div class="input-row">
@@ -796,7 +794,7 @@ export class DashboardPanel {
       <!-- OPTION 3: OPENAI API KEY -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">🤖 OpenAI (API Key)</span>
+          <span class="provider-name">OpenAI (API Key)</span>
           <span class="provider-tag">openai/gpt-5.6-luna</span>
         </div>
         <div class="provider-desc">
@@ -811,7 +809,7 @@ export class DashboardPanel {
       <!-- OPTION 4: ANTHROPIC CLAUDE -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">🛡️ Anthropic Claude</span>
+          <span class="provider-name">Anthropic Claude</span>
           <span class="provider-tag">claude-sonnet-5</span>
         </div>
         <div class="provider-desc">
@@ -819,7 +817,7 @@ export class DashboardPanel {
         </div>
         <div style="margin-bottom: 8px;">
           <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
-            🌐 1-Click: Open Anthropic Console (Copy Key)
+            1-Click: Open Anthropic Console (Copy Key)
           </button>
         </div>
         <div class="input-row">
@@ -831,14 +829,14 @@ export class DashboardPanel {
       <!-- OPTION 5: OFFLINE SANDBOX -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">⚡ Built-in Offline Sandbox (Zero-LLM Mode)</span>
+          <span class="provider-name">Built-in Offline Sandbox (Zero-LLM Mode)</span>
           <span class="provider-tag">100% Offline</span>
         </div>
         <div class="provider-desc">
           Executes in-process AST and taint flow analysis across workspace files. No external keys, subscriptions, or network access needed.
         </div>
         <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="saveKey('sandbox', '')">
-          ⚡ Select 100% Offline Mode
+          Select 100% Offline Mode
         </button>
       </div>
 

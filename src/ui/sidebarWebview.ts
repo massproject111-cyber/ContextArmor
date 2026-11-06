@@ -160,20 +160,17 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     let statusTitle = 'Your Project is Safe';
     let statusColor = '#4caf50';
     let statusDesc = 'All dependencies and code files are verified safe.';
-    let statusIcon = '🛡️';
     let statusBadge = 'PROTECTED';
 
     if (criticalCount > 0) {
       statusTitle = `${criticalCount} Security Risk${criticalCount > 1 ? 's' : ''} Found`;
       statusColor = '#f44336';
       statusDesc = 'Dangerous packages or vulnerabilities require immediate attention.';
-      statusIcon = '🚨';
       statusBadge = 'ACTION NEEDED';
     } else if (warningCount > 0) {
       statusTitle = `${warningCount} Item${warningCount > 1 ? 's' : ''} to Review`;
       statusColor = '#ff9800';
       statusDesc = 'Newly published or unverified packages detected.';
-      statusIcon = '⚠️';
       statusBadge = 'REVIEW';
     }
 
@@ -193,7 +190,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     if (totalIssues === 0) {
       contentHtml = `
         <div class="empty-state">
-          <div style="font-size: 24px; margin-bottom: 6px;">✨</div>
           <div style="font-weight: 700; font-size: 13px; color: #4caf50;">Everything Looks Great</div>
           <div style="font-size: 11px; color: var(--vscode-descriptionForeground); margin-top: 4px; line-height: 1.4;">
             No fake packages, malicious dependencies, or code vulnerabilities detected.
@@ -252,17 +248,17 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${
                   pin
-                    ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">✨ Auto-Fix to ${pin}</button>`
+                    ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">Auto-Fix to ${pin}</button>`
                     : ''
                 }
                 ${
                   isTorchFix && t.file && t.line !== undefined
-                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">✨ Add weights_only=True</button>`
+                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">Add weights_only=True</button>`
                     : ''
                 }
                 ${
                   showRemove
-                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">🗑️ Remove Package</button>`
+                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">Remove Package</button>`
                     : ''
                 }
               </div>
@@ -661,7 +657,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <div>
     <div class="hero-banner" onclick="openDashboard()" title="Click to view full Security Dashboard">
       <div class="hero-left">
-        <span class="hero-icon">${statusIcon}</span>
         <div>
           <div class="hero-title">${statusTitle}</div>
           <div class="hero-desc">${statusDesc}</div>
@@ -673,7 +668,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     <!-- MAIN QUICK SCAN BUTTON -->
     <button class="btn-quick-scan" ${this._isScanning ? 'disabled' : ''} onclick="auditWorkspace()" title="Fast 1-second check of dependencies and code">
       <div class="btn-content">
-        <span style="font-size: 18px;">⚡</span>
         <div>
           <div class="btn-title">Quick Security Check</div>
           <div class="btn-desc">Instant 1-second check of packages & code</div>
@@ -685,10 +679,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     <!-- NAVIGATION UTILITY BUTTONS -->
     <div class="util-row">
       <button class="btn-util" onclick="openDashboard()" title="Open comprehensive visual Security Dashboard">
-        📊 Full Dashboard
+        Full Dashboard
       </button>
       <button class="btn-util" onclick="runDoctor()" title="Inspect system health & security status">
-        🩺 System Health
+        System Health
       </button>
     </div>
   </div>
@@ -705,7 +699,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <!-- BOTTOM SECTION: DEEP AI SECURITY TEST (AUTONOMOUS PENTEST) -->
   <div class="deep-station">
     <span class="station-badge">DEEP AI SECURITY TEST</span>
-    <div class="station-title">🤖 AI Vulnerability Simulation</div>
+    <div class="station-title">AI Vulnerability Simulation</div>
     <div class="station-desc">
       Simulates attack scenarios in an isolated sandbox to verify your code won't get exploited.
     </div>
@@ -719,13 +713,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           ${activeProviderName}
         </span>
       </div>
-      <span style="font-size: 10px; color: var(--muted);">${llm.isConfigured ? 'Change ▾' : 'Connect ▾'}</span>
+      <span style="font-size: 10px; color: var(--muted);">${llm.isConfigured ? 'Change' : 'Connect'}</span>
     </div>
 
     <!-- MAIN START DEEP TEST BUTTON -->
     <button class="btn-deep-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()" title="Run autonomous deep AI security test">
       <div class="btn-content">
-        <span style="font-size: 18px;">▶</span>
         <div>
           <div class="btn-title">Start Deep Security Test</div>
           <div class="btn-desc">Simulate exploit scenarios in sandbox</div>
@@ -757,7 +750,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <div class="modal-overlay" id="sidebarModal">
     <div class="modal-card">
       <div class="modal-hdr">
-        <strong style="font-size: 13px;">⚙️ Connect AI Assistant</strong>
+        <strong style="font-size: 13px;">Connect AI Assistant</strong>
         <button style="background: none; border: none; color: #aaa; cursor: pointer; font-size: 16px;" onclick="closeModal()">✕</button>
       </div>
       <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">
@@ -767,7 +760,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <!-- CHATGPT OAUTH (RECOMMENDED) -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">🌐 ChatGPT Subscription</strong>
+          <strong style="font-size: 11px;">ChatGPT Subscription</strong>
           <span style="font-size: 9px; color: #4caf50; font-weight: 700;">LUNA 6 · $0</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
@@ -781,14 +774,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <!-- GOOGLE GEMINI (ANTIGRAVITY BRAIN) -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">✨ Google Gemini (Antigravity Brain)</strong>
+          <strong style="font-size: 11px;">Google Gemini (Antigravity Brain)</strong>
           <span style="font-size: 9px; color: #4caf50; font-weight: 700;">FREE · gemini-3.7-flash</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Free tier with any Google account. No credit card required.
         </div>
         <button style="width: 100%; background: rgba(66, 133, 244, 0.15); border: 1px solid #4285f4; color: #64b5f6; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
-          🌐 1-Click: Open Google AI Studio (Copy Free Key)
+          1-Click: Open Google AI Studio (Copy Free Key)
         </button>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideGemini" placeholder="Paste Gemini Key (AIza...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
@@ -799,7 +792,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <!-- OPENAI API KEY -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">🤖 OpenAI (API Key)</strong>
+          <strong style="font-size: 11px;">OpenAI (API Key)</strong>
           <span style="font-size: 9px; color: var(--muted);">gpt-5.6-luna</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
@@ -814,14 +807,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <!-- ANTHROPIC CLAUDE -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-size: 11px;">🛡️ Anthropic Claude</strong>
+          <strong style="font-size: 11px;">Anthropic Claude</strong>
           <span style="font-size: 9px; color: var(--muted);">claude-sonnet-5</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Anthropic does not offer consumer web OAuth for third-party CLIs. Requires an API key.
         </div>
         <button style="width: 100%; background: rgba(217, 119, 87, 0.15); border: 1px solid #d97757; color: #ffab91; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
-          🌐 1-Click: Open Anthropic Console (Copy Key)
+          1-Click: Open Anthropic Console (Copy Key)
         </button>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
@@ -831,7 +824,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
       <!-- OFFLINE LOCAL MODE -->
       <div class="provider-card">
-        <strong style="font-size: 11px;">⚡ Built-in Offline Mode</strong>
+        <strong style="font-size: 11px;">Built-in Offline Mode</strong>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Runs local security analysis without external keys or internet.
         </div>
