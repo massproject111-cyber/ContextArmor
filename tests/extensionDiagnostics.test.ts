@@ -9,6 +9,7 @@ import {
   type AddedDependency,
   type CliCheckResult,
 } from '../src/ui/diagnosticMapper.js';
+import { runWithConcurrency } from '../src/core/concurrency.js';
 
 test('extractAddedNpmDeps: detects new dependency vs HEAD', () => {
   const headJson = JSON.stringify({
@@ -187,4 +188,43 @@ test('extractPythonThreats: ignores secure torch.load with weights_only=True', (
   const threats = extractPythonThreats(code);
   assert.equal(threats.length, 0);
 });
+
+test('extractAddedPypiDeps: parses complex specs with comments and environment markers', () => {
+  const reqs = `
+# Comment at top
+requests == 2.31.0 # critical security pin
+urllib3>=2.0.0; python_version >= '3.8'
+flask
+`;
+  const added = extractAddedPypiDeps(reqs, undefined);
+  assert.equal(added.length, 3);
+  assert.equal(added[0].name, 'requests');
+  assert.equal(added[0].version, '2.31.0');
+  assert.equal(added[1].name, 'urllib3');
+  assert.equal(added[1].version, '2.0.0');
+  assert.equal(added[2].name, 'flask');
+  assert.equal(added[2].version, undefined);
+});
+
+test('runWithConcurrency: limits concurrent executions and preserves ordered results', async () => {
+  const items = [10, 20, 30, 40, 50, 60, 70, 80];
+  let activeWorkers = 0;
+  let maxConcurrent = 0;
+
+  const results = await runWithConcurrency(items, 3, async (val) => {
+    activeWorkers++;
+    if (activeWorkers > maxConcurrent) {
+      maxConcurrent = activeWorkers;
+    }
+    // Simulate async tick
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    activeWorkers--;
+    return val * 2;
+  });
+
+  assert.equal(results.length, 8);
+  assert.deepEqual(results, [20, 40, 60, 80, 100, 120, 140, 160]);
+  assert.ok(maxConcurrent <= 3, `Expected maxConcurrent <= 3, got ${maxConcurrent}`);
+});
+
 

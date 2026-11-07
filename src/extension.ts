@@ -17,6 +17,7 @@ import { ThreatItem } from './ui/treeView.js';
 import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
 import { auditWorkspace } from './core/projectAuditor.js';
+import { runWithConcurrency } from './core/concurrency.js';
 import { runStrixScan, getStrixStatus, promptLlmSetup, getLlmConfig } from './integrations/strix.js';
 import { PackageRiskEngine, classifyDecision } from './detectors/packageRisk/index.js';
 
@@ -75,13 +76,28 @@ async function evaluatePackageSafe(
     return cached.result;
   }
 
-  // Parse name@ver or @scope/name@ver
-  let packageName = targetSpec;
+  // Parse name@ver or @scope/name@ver (npm) or name==ver (pypi)
+  let packageName = targetSpec.trim();
   let version: string | undefined;
-  const lastAt = targetSpec.lastIndexOf('@');
-  if (lastAt > 0) {
-    packageName = targetSpec.slice(0, lastAt);
-    version = targetSpec.slice(lastAt + 1);
+
+  if (ecosystem === 'pypi') {
+    const eqIdx = packageName.indexOf('==');
+    if (eqIdx > 0) {
+      version = packageName.slice(eqIdx + 2).trim();
+      packageName = packageName.slice(0, eqIdx).trim();
+    } else {
+      const lastAt = packageName.lastIndexOf('@');
+      if (lastAt > 0) {
+        version = packageName.slice(lastAt + 1).trim();
+        packageName = packageName.slice(0, lastAt).trim();
+      }
+    }
+  } else {
+    const lastAt = packageName.lastIndexOf('@');
+    if (lastAt > 0) {
+      packageName = targetSpec.slice(0, lastAt).trim();
+      version = targetSpec.slice(lastAt + 1).trim();
+    }
   }
 
   try {
@@ -538,11 +554,18 @@ export function activate(context: vscode.ExtensionContext) {
     const diagnostics: vscode.Diagnostic[] = [];
     const newDocThreats: ThreatItem[] = [];
 
-    for (const dep of depsToCheck) {
-      const spec = dep.version ? `${dep.name}@${dep.version}` : dep.name;
+    const checkedDeps = await runWithConcurrency(depsToCheck, 6, async (dep) => {
+      const spec = dep.version
+        ? dep.ecosystem === 'npm'
+          ? `${dep.name}@${dep.version}`
+          : `${dep.name}==${dep.version}`
+        : dep.name;
       const result = await evaluatePackageSafe(cliPath, spec, dep.ecosystem);
       const mapped = mapCheckResultToDiagnostic(dep, result);
+      return { dep, mapped };
+    });
 
+    for (const { dep, mapped } of checkedDeps) {
       if (mapped) {
         const line = document.lineAt(mapped.line);
         const range = new vscode.Range(mapped.line, mapped.startCol, mapped.line, mapped.endCol || line.text.length);

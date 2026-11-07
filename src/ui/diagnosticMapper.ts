@@ -153,7 +153,10 @@ export function extractAddedPypiDeps(currentText: string, headText?: string): Ad
 
     if (!headText || !headLinesSet.has(cleaned)) {
       // Parse package name and version: e.g. requests==2.31.0, flask>=3.0
-      const specMatch = cleaned.match(/^([a-zA-Z0-9_\-\.]+)(?:[=><~!]=*([a-zA-Z0-9_\-\.]+))?/);
+      // Strips comments, environment markers, and handles flexible whitespace
+      const withoutComment = cleaned.split('#')[0].trim();
+      const withoutMarker = withoutComment.split(';')[0].trim();
+      const specMatch = withoutMarker.match(/^([a-zA-Z0-9_\-\.]+)\s*(?:[=><~!]=*\s*([a-zA-Z0-9_\-\.]+))?/);
       if (specMatch) {
         const name = specMatch[1];
         const version = specMatch[2];

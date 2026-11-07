@@ -2,6 +2,19 @@ import * as vscode from 'vscode';
 import type { ThreatItem } from './treeView.js';
 import { getLlmConfig, setProviderKey } from '../integrations/strix.js';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJsArg(str: string): string {
+  return encodeURIComponent(str).replace(/'/g, '%27');
+}
+
 export class DashboardPanel {
   public static currentPanel: DashboardPanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
@@ -198,32 +211,39 @@ export class DashboardPanel {
               const showRemove = isMaliciousPackage && t.file && t.line !== undefined;
               const isTorchFix = !!(t.file?.endsWith('.py') && (t.title.includes('torch.load') || t.desc.includes('weights_only')));
 
+              const safeTitle = escapeHtml(t.title);
+              const safeDesc = escapeHtml(t.desc);
+              const filePart = t.file ? t.file.split(/[/\\]/).slice(-2).join('/') : 'Workspace';
+              const safeFileDisplay = escapeHtml(filePart) + (t.line !== undefined ? `:${t.line + 1}` : '');
+              const safeFileArg = escapeJsArg(t.file || '');
+              const safePinArg = escapeJsArg(pin || '');
+
               return `
           <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--text);">${t.title}</td>
+            <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--text);">${safeTitle}</td>
             <td style="padding: 12px;">
               <span class="cyber-badge ${isCrit ? 'badge-crit' : 'badge-warn'}">
                 ${isCrit ? 'CRITICAL RISK' : 'WARNING'}
               </span>
             </td>
-            <td style="padding: 12px; color: var(--text-dim); font-size: 12px; line-height: 1.4;">${t.desc}</td>
+            <td style="padding: 12px; color: var(--text-dim); font-size: 12px; line-height: 1.4;">${safeDesc}</td>
             <td style="padding: 12px; color: var(--neon-cyan); font-size: 11px; font-family: var(--font-mono);">
-              ${t.file ? t.file.split('/').slice(-2).join('/') : 'Workspace'}${t.line !== undefined ? `:${t.line + 1}` : ''}
+              ${safeFileDisplay}
             </td>
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
               ${
                 pin
-                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${t.file}', ${t.line}, '${pin}')">Auto-Fix to ${pin}</button>`
+                  ? `<button class="btn-sm btn-fix" onclick="pinDep('${safeFileArg}', ${t.line}, '${safePinArg}')">Auto-Fix to ${escapeHtml(pin)}</button>`
                   : ''
               }
               ${
                 isTorchFix && t.file && t.line !== undefined
-                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${t.file}', ${t.line})">Add weights_only=True</button>`
+                  ? `<button class="btn-sm btn-fix" onclick="fixTorch('${safeFileArg}', ${t.line})">Add weights_only=True</button>`
                   : ''
               }
               ${
                 showRemove
-                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">Purge Package</button>`
+                  ? `<button class="btn-sm btn-del" onclick="removeDep('${safeFileArg}', ${t.line})">Purge Package</button>`
                   : ''
               }
             </td>
@@ -1033,15 +1053,19 @@ export class DashboardPanel {
       vscode.postMessage({ command: 'saveApiKey', provider: provider, key: key });
     }
 
-    function pinDep(file, line, pin) {
+    function pinDep(encFile, line, encPin) {
+      const file = decodeURIComponent(encFile);
+      const pin = decodeURIComponent(encPin);
       vscode.postMessage({ command: 'pinDep', file, line, pin });
     }
 
-    function removeDep(file, line) {
+    function removeDep(encFile, line) {
+      const file = decodeURIComponent(encFile);
       vscode.postMessage({ command: 'removeDep', file, line });
     }
 
-    function fixTorch(file, line) {
+    function fixTorch(encFile, line) {
+      const file = decodeURIComponent(encFile);
       vscode.postMessage({ command: 'fixTorch', file, line });
     }
 

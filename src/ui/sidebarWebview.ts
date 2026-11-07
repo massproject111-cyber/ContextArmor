@@ -2,6 +2,19 @@ import * as vscode from 'vscode';
 import type { ThreatItem } from './treeView.js';
 import { getLlmConfig, setProviderKey } from '../integrations/strix.js';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJsArg(str: string): string {
+  return encodeURIComponent(str).replace(/'/g, '%27');
+}
+
 export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = 'contextarmorSidebarView';
   private _view?: vscode.WebviewView;
@@ -225,10 +238,15 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
             .replace(/Blocked by ContextArmor circuit breaker\./i, 'Blocked to prevent potential malware execution.')
             .trim();
 
+          const safeTitle = escapeHtml(t.title);
+          const safeDesc = escapeHtml(humanDesc);
+          const safeFileArg = escapeJsArg(t.file || '');
+          const safePinArg = escapeJsArg(pin || '');
+
           return `
             <div class="threat-card" style="border-left: 3px solid ${isCrit ? 'var(--neon-pink)' : 'var(--neon-yellow)'};">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px;">
-                <span style="font-weight: 700; font-size: 11.5px; font-family: var(--font-mono); word-break: break-all; color: var(--text);">${t.title}</span>
+                <span style="font-weight: 700; font-size: 11.5px; font-family: var(--font-mono); word-break: break-all; color: var(--text);">${safeTitle}</span>
                 <div style="display: flex; gap: 4px; flex-shrink: 0;">
                   <span style="background: rgba(0, 240, 255, 0.08); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.25); padding: 1px 5px; font-size: 8.5px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.08em; clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));">
                     ${categoryLabel}
@@ -239,22 +257,22 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
                 </div>
               </div>
               <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px; line-height: 1.4;">
-                ${humanDesc}
+                ${safeDesc}
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 ${
                   pin
-                    ? `<button class="action-mini btn-fix" onclick="pin('${t.file}', ${t.line}, '${pin}')">Auto-Fix to ${pin}</button>`
+                    ? `<button class="action-mini btn-fix" onclick="pin('${safeFileArg}', ${t.line}, '${safePinArg}')">Auto-Fix to ${escapeHtml(pin)}</button>`
                     : ''
                 }
                 ${
                   isTorchFix && t.file && t.line !== undefined
-                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${t.file}', ${t.line})">Add weights_only=True</button>`
+                    ? `<button class="action-mini btn-fix" onclick="fixTorch('${safeFileArg}', ${t.line})">Add weights_only=True</button>`
                     : ''
                 }
                 ${
                   showRemove
-                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">Purge Package</button>`
+                    ? `<button class="action-mini btn-del" onclick="remove('${safeFileArg}', ${t.line})">Purge Package</button>`
                     : ''
                 }
               </div>
@@ -923,13 +941,17 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     function runDoctor() {
       vscode.postMessage({ command: 'runDoctor' });
     }
-    function remove(file, line) {
+    function remove(encFile, line) {
+      const file = decodeURIComponent(encFile);
       vscode.postMessage({ command: 'removeDep', file, line });
     }
-    function pin(file, line, pin) {
+    function pin(encFile, line, encPin) {
+      const file = decodeURIComponent(encFile);
+      const pin = decodeURIComponent(encPin);
       vscode.postMessage({ command: 'pinDep', file, line, pin });
     }
-    function fixTorch(file, line) {
+    function fixTorch(encFile, line) {
+      const file = decodeURIComponent(encFile);
       vscode.postMessage({ command: 'fixTorch', file, line });
     }
   </script>

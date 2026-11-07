@@ -11,6 +11,7 @@ import {
 import type { ThreatItem } from '../ui/treeView.js';
 import { McpLinter } from '../mcp/linter.js';
 import { loadExistingStrixFindings } from '../integrations/strix.js';
+import { runWithConcurrency } from './concurrency.js';
 
 export interface AuditStats {
   auditedFiles: number;
@@ -89,12 +90,16 @@ export async function auditWorkspace(
     // A. Package.json Audit
     if (fileName === 'package.json') {
       const deps = extractAllNpmDeps(fileContent);
-      for (const dep of deps) {
-        stats.totalDeps++;
+      stats.totalDeps += deps.length;
+
+      const checkedDeps = await runWithConcurrency(deps, 6, async (dep) => {
         const spec = dep.version ? `${dep.name}@${dep.version}` : dep.name;
         const result = await checkDep(spec, 'npm');
         const diag = mapCheckResultToDiagnostic(dep, result);
+        return { dep, diag };
+      });
 
+      for (const { dep, diag } of checkedDeps) {
         if (diag) {
           if (diag.severity === 'Error') stats.blockedDeps++;
           else stats.warningDeps++;
@@ -132,12 +137,16 @@ export async function auditWorkspace(
     // B. Requirements.txt Audit
     else if (fileName === 'requirements.txt') {
       const deps = extractAllPypiDeps(fileContent);
-      for (const dep of deps) {
-        stats.totalDeps++;
+      stats.totalDeps += deps.length;
+
+      const checkedDeps = await runWithConcurrency(deps, 6, async (dep) => {
         const spec = dep.version ? `${dep.name}==${dep.version}` : dep.name;
         const result = await checkDep(spec, 'pypi');
         const diag = mapCheckResultToDiagnostic(dep, result);
+        return { dep, diag };
+      });
 
+      for (const { dep, diag } of checkedDeps) {
         if (diag) {
           if (diag.severity === 'Error') stats.blockedDeps++;
           else stats.warningDeps++;
