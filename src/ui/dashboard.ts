@@ -174,17 +174,17 @@ export class DashboardPanel {
     const criticalCount = this._threats.filter((t) => t.severity === 'CRITICAL').length;
     const warningCount = this._threats.filter((t) => t.severity === 'WARNING').length;
     const score = criticalCount > 0 ? Math.max(35, 65 - (criticalCount - 1) * 5) : warningCount > 0 ? Math.max(70, 85 - (warningCount - 1) * 3) : 100;
-    const scoreColor = score === 100 ? '#4caf50' : score >= 80 ? '#ff9800' : '#f44336';
+    const scoreColor = score === 100 ? '#05ffa1' : score >= 80 ? '#fcee0a' : '#ff003c';
     const statusText =
       criticalCount > 0
-        ? 'Dangerous issues detected — Review below'
+        ? 'DANGEROUS ANOMALIES DETECTED — IMMEDIATE REVIEW REQUIRED'
         : warningCount > 0
-        ? 'Unverified packages detected — Review recommendations'
-        : 'All packages & code verified clean';
+        ? 'UNVERIFIED PACKAGES DETECTED — AUDIT RECOMMENDED'
+        : 'ALL PACKAGES & CODE VERIFIED SECURE';
 
     const threatsHtml =
       this._threats.length === 0
-        ? `<tr><td colspan="5" style="text-align: center; color: var(--vscode-descriptionForeground); padding: 32px; font-size: 13px;">All dependencies and code files are verified safe. No vulnerabilities or hallucinations found.</td></tr>`
+        ? `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 36px; font-size: 12px; font-family: var(--font-mono); letter-spacing: 0.05em;">[SYS://CLEAN] All dependencies and code files are verified safe. Zero vulnerabilities detected.</td></tr>`
         : this._threats
             .map((t) => {
               const isCrit = t.severity === 'CRITICAL';
@@ -200,14 +200,14 @@ export class DashboardPanel {
 
               return `
           <tr style="border-bottom: 1px solid var(--border);">
-            <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all;">${t.title}</td>
+            <td style="padding: 12px; font-weight: 600; font-family: var(--font-mono); font-size: 12px; word-break: break-all; color: var(--text);">${t.title}</td>
             <td style="padding: 12px;">
-              <span style="background: ${isCrit ? 'var(--crit-bg)' : 'var(--warn-bg)'}; color: ${isCrit ? 'var(--crit-text)' : 'var(--warn-text)'}; border: 1px solid ${isCrit ? 'var(--crit-border)' : 'var(--warn-border)'}; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 10px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.06em;">
+              <span class="cyber-badge ${isCrit ? 'badge-crit' : 'badge-warn'}">
                 ${isCrit ? 'CRITICAL RISK' : 'WARNING'}
               </span>
             </td>
-            <td style="padding: 12px; color: var(--text); font-size: 12px; line-height: 1.4;">${t.desc}</td>
-            <td style="padding: 12px; color: var(--muted); font-size: 11px; font-family: var(--font-mono);">
+            <td style="padding: 12px; color: var(--text-dim); font-size: 12px; line-height: 1.4;">${t.desc}</td>
+            <td style="padding: 12px; color: var(--neon-cyan); font-size: 11px; font-family: var(--font-mono);">
               ${t.file ? t.file.split('/').slice(-2).join('/') : 'Workspace'}${t.line !== undefined ? `:${t.line + 1}` : ''}
             </td>
             <td style="padding: 12px; text-align: right; white-space: nowrap;">
@@ -223,7 +223,7 @@ export class DashboardPanel {
               }
               ${
                 showRemove
-                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">Remove Package</button>`
+                  ? `<button class="btn-sm btn-del" onclick="removeDep('${t.file}', ${t.line})">Purge Package</button>`
                   : ''
               }
             </td>
@@ -241,41 +241,73 @@ export class DashboardPanel {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ContextArmor Security Dashboard</title>
   <style>
-    :root {
-      --font-header: "Geist", "Geist Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
-      
-      /* Bespoke Obsidian Palette */
-      --bg: #090a0c;
-      --card-bg: #111315;
-      --border: #22252b;
-      --text: #f4f4f5;
-      --muted: #8b949e;
-      --accent: #f4f4f5;
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap');
 
-      /* Refined Severity Palette */
-      --crit-bg: rgba(244, 63, 94, 0.12);
-      --crit-text: #fb7185;
-      --crit-border: rgba(244, 63, 94, 0.28);
-      --warn-bg: rgba(245, 158, 11, 0.12);
-      --warn-text: #fbbf24;
-      --warn-border: rgba(245, 158, 11, 0.28);
-      --safe-bg: rgba(16, 185, 129, 0.12);
-      --safe-text: #34d399;
-      --safe-border: rgba(16, 185, 129, 0.28);
+    :root {
+      --font-header: "Orbitron", "Chakra Petch", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-ui: "Chakra Petch", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Share Tech Mono", "JetBrains Mono", Monaco, Menlo, Consolas, monospace;
+      
+      /* Cyberpunk HUD Palette */
+      --cyber-bg: #06070a;
+      --cyber-surface: #0a0d14;
+      --cyber-card-bg: #0d111a;
+      --cyber-card-hover: #121824;
+      --border: #162032;
+      --border-accent: rgba(0, 240, 255, 0.35);
+      --text: #e3edf8;
+      --text-dim: #8fa0be;
+      --muted: #596c88;
+      
+      /* Neon Accent Channels */
+      --neon-cyan: #00f0ff;
+      --neon-yellow: #fcee0a;
+      --neon-pink: #ff003c;
+      --neon-green: #05ffa1;
+
+      /* Threat Badges */
+      --crit-bg: rgba(255, 0, 60, 0.12);
+      --crit-text: #ff3366;
+      --crit-border: rgba(255, 0, 60, 0.45);
+      --warn-bg: rgba(252, 238, 10, 0.12);
+      --warn-text: #fcee0a;
+      --warn-border: rgba(252, 238, 10, 0.45);
+      --safe-bg: rgba(5, 255, 161, 0.12);
+      --safe-text: #05ffa1;
+      --safe-border: rgba(5, 255, 161, 0.45);
     }
+
+    /* Custom Cyberpunk Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06070a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1a2336;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--neon-cyan);
+    }
+
     body {
       font-family: var(--font-ui);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
-      font-variant-numeric: tabular-nums;
       padding: 24px 32px;
       color: var(--text);
-      background-color: var(--bg);
+      background-color: var(--cyber-bg);
+      background-image: 
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 240, 255, 0.07), transparent 70%),
+        linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px, 28px 28px;
       margin: 0;
       box-sizing: border-box;
+      min-height: 100vh;
     }
     .header {
       display: flex;
@@ -284,6 +316,17 @@ export class DashboardPanel {
       border-bottom: 1px solid var(--border);
       padding-bottom: 16px;
       margin-bottom: 24px;
+      position: relative;
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 140px;
+      height: 2px;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 10px var(--neon-cyan);
     }
     .header-left {
       display: flex;
@@ -295,13 +338,15 @@ export class DashboardPanel {
       font-size: 16px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text);
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
     }
     .header-sub {
       font-size: 12px;
       color: var(--muted);
-      margin-top: 2px;
+      margin-top: 3px;
+      letter-spacing: 0.04em;
     }
     .header-actions {
       display: flex;
@@ -315,41 +360,50 @@ export class DashboardPanel {
       margin-bottom: 28px;
     }
     .card {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-left: 2px solid var(--border-accent);
       padding: 16px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .card:hover {
+      background: var(--cyber-card-hover);
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     }
     .card-title {
       font-family: var(--font-header);
       font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: var(--muted);
       font-weight: 700;
       margin-bottom: 6px;
     }
     .card-value {
-      font-family: var(--font-mono);
+      font-family: var(--font-header);
       font-variant-numeric: tabular-nums;
       font-size: 26px;
-      font-weight: 700;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       margin-bottom: 4px;
+      text-shadow: 0 0 12px currentColor;
     }
     .card-desc {
       font-size: 11px;
-      color: var(--muted);
-      line-height: 1.3;
+      color: var(--text-dim);
+      line-height: 1.35;
     }
     .section-title {
       font-family: var(--font-header);
       font-size: 12px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       margin-top: 28px;
       margin-bottom: 12px;
       display: flex;
@@ -358,11 +412,11 @@ export class DashboardPanel {
       color: var(--text);
     }
     .table-container {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
       overflow: hidden;
       margin-bottom: 28px;
+      position: relative;
     }
     table {
       width: 100%;
@@ -370,93 +424,136 @@ export class DashboardPanel {
       text-align: left;
     }
     th {
-      background: #0d0e11;
+      background: #080a10;
       padding: 10px 14px;
       font-family: var(--font-header);
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       color: var(--muted);
       border-bottom: 1px solid var(--border);
     }
+    .cyber-badge {
+      font-family: var(--font-header);
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 7px;
+      clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+      display: inline-block;
+    }
+    .badge-crit {
+      background: var(--crit-bg);
+      color: var(--crit-text);
+      border: 1px solid var(--crit-border);
+      box-shadow: 0 0 6px rgba(255, 0, 60, 0.25);
+    }
+    .badge-warn {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border: 1px solid var(--warn-border);
+      box-shadow: 0 0 6px rgba(252, 238, 10, 0.2);
+    }
+    .badge-safe {
+      background: var(--safe-bg);
+      color: var(--safe-text);
+      border: 1px solid var(--safe-border);
+      box-shadow: 0 0 6px rgba(5, 255, 161, 0.2);
+    }
+    /* Signature Cyberpunk Yellow Chamfered CTA */
     .btn {
-      background: #f4f4f5;
-      color: #090a0c;
-      border: 1px solid #ffffff;
-      padding: 8px 16px;
-      border-radius: 5px;
+      background: var(--neon-yellow);
+      color: #000000;
+      border: 1px solid var(--neon-yellow);
+      padding: 8px 18px;
       cursor: pointer;
-      font-weight: 700;
-      font-size: 11.5px;
+      font-weight: 800;
+      font-size: 11px;
       font-family: var(--font-header);
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
       transition: all 0.15s ease;
+      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
     }
     .btn:hover {
       background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
     }
+    .btn:active {
+      transform: translateY(1px);
+    }
+    /* Tactical Cyber Cyan Secondary */
     .btn-secondary {
-      background: #16181c;
-      color: #e4e4e7;
-      border: 1px solid var(--border);
-      padding: 7px 14px;
-      border-radius: 5px;
+      background: rgba(0, 240, 255, 0.05);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 7px 16px;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
+      font-weight: 700;
+      font-size: 11px;
+      font-family: var(--font-header);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
       transition: all 0.15s ease;
     }
     .btn-secondary:hover {
-      background: #1e2127;
-      border-color: #383d47;
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+      transform: translateY(-1px);
     }
     .btn-sm {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
+      padding: 4px 10px;
+      font-size: 10px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
+      font-family: var(--font-header);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       border: none;
       margin-left: 4px;
+      clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+      transition: all 0.15s ease;
     }
     .btn-fix {
-      background: rgba(59, 130, 246, 0.12);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.28);
-      transition: all 0.15s ease;
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.4);
     }
     .btn-fix:hover {
-      background: rgba(59, 130, 246, 0.22);
-      border-color: rgba(59, 130, 246, 0.45);
+      background: rgba(0, 240, 255, 0.25);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
     }
     .btn-del {
-      background: rgba(244, 63, 94, 0.12);
-      color: #fb7185;
-      border: 1px solid rgba(244, 63, 94, 0.28);
-      transition: all 0.15s ease;
+      background: rgba(255, 0, 60, 0.15);
+      color: #ff3366;
+      border: 1px solid rgba(255, 0, 60, 0.45);
     }
     .btn-del:hover {
-      background: rgba(244, 63, 94, 0.22);
-      border-color: rgba(244, 63, 94, 0.45);
+      background: rgba(255, 0, 60, 0.3);
+      box-shadow: 0 0 8px rgba(255, 0, 60, 0.5);
     }
 
     /* =========================================================
        SECURITY AUDIT MODULE
        ========================================================= */
     .strix-station {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-top: 2px solid var(--neon-cyan);
       padding: 20px 24px;
       margin-top: 32px;
       position: relative;
@@ -470,22 +567,21 @@ export class DashboardPanel {
       gap: 12px;
     }
     .strix-badge {
-      background: #1c1e24;
-      color: #a1a1aa;
-      border: 1px solid #2b2f38;
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.35);
       font-family: var(--font-header);
       font-size: 9px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       padding: 2px 7px;
-      border-radius: 3px;
       display: inline-block;
       margin-bottom: 6px;
     }
     .strix-title {
       font-family: var(--font-header);
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
@@ -493,10 +589,10 @@ export class DashboardPanel {
     }
     .strix-desc {
       font-size: 12px;
-      color: var(--muted);
+      color: var(--text-dim);
       margin-top: 4px;
       max-width: 600px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
     .strix-ctrls {
       display: flex;
@@ -504,89 +600,95 @@ export class DashboardPanel {
       align-items: center;
     }
     .btn-strix-run {
-      background: #f4f4f5;
-      color: #090a0c;
-      border: 1px solid #ffffff;
-      padding: 8px 18px;
-      border-radius: 5px;
-      font-size: 11.5px;
-      font-weight: 700;
+      background: var(--neon-yellow);
+      color: #000000;
+      border: 1px solid var(--neon-yellow);
+      padding: 8px 20px;
+      font-size: 11px;
+      font-weight: 800;
       font-family: var(--font-header);
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
       transition: all 0.15s ease;
+      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
     }
     .btn-strix-run:hover {
       background: #ffffff;
+      border-color: #ffffff;
+      color: #000;
+      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
     }
     .btn-strix-run:disabled {
-      opacity: 0.6;
+      opacity: 0.45;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
     .brain-pill {
-      background: #14161a;
+      background: #090c13;
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 6px 12px;
-      font-size: 12px;
+      padding: 6px 14px;
+      font-size: 11.5px;
       display: flex;
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      transition: border-color 0.15s;
+      transition: all 0.15s;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
     }
     .brain-pill:hover {
-      border-color: #383d47;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
     }
 
     /* Progress Bar */
     .progress-box {
-      background: #0d0e11;
+      background: #06080d;
       border: 1px solid var(--border);
-      border-radius: 6px;
       padding: 16px;
       margin-top: 16px;
     }
     .progress-header {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      font-weight: 600;
+      font-family: var(--font-header);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       margin-bottom: 8px;
     }
     .progress-track {
-      background: #1a1c22;
-      border-radius: 4px;
+      background: #111622;
       height: 6px;
       overflow: hidden;
       position: relative;
     }
     .progress-fill {
-      background: #f4f4f5;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
       height: 100%;
-      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
       transition: width 0.3s ease;
     }
     .telemetry-console {
-      background: #090a0c;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 10px 12px;
+      background: #030407;
+      border: 1px solid rgba(0, 240, 255, 0.25);
+      padding: 10px 14px;
       font-family: var(--font-mono);
       font-size: 11px;
-      color: var(--muted);
+      color: var(--neon-cyan);
       height: 130px;
       overflow-y: auto;
       margin-top: 12px;
       white-space: pre-wrap;
-      line-height: 1.45;
+      line-height: 1.5;
+      box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
     }
 
     /* =========================================================
@@ -598,36 +700,40 @@ export class DashboardPanel {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(3, 4, 7, 0.85);
+      backdrop-filter: blur(4px);
       display: none;
       justify-content: center;
       align-items: center;
       z-index: 9999;
     }
     .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: #0a0d15;
+      border: 1px solid rgba(0, 240, 255, 0.35);
       width: 580px;
       max-width: 90%;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.8);
       padding: 24px;
       box-sizing: border-box;
       max-height: 85vh;
       overflow-y: auto;
+      position: relative;
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
     }
     .modal-title {
       font-family: var(--font-header);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
+      color: var(--neon-cyan);
     }
     .modal-close {
       background: transparent;
@@ -635,20 +741,22 @@ export class DashboardPanel {
       color: var(--muted);
       font-size: 18px;
       cursor: pointer;
+      transition: color 0.15s;
     }
     .modal-close:hover {
-      color: #fff;
+      color: var(--neon-cyan);
     }
     .provider-option {
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 8px;
+      background: rgba(0, 240, 255, 0.02);
       padding: 14px;
       margin-top: 12px;
-      transition: border-color 0.15s;
+      transition: all 0.15s;
+      border-left: 2px solid rgba(0, 240, 255, 0.3);
     }
     .provider-option:hover {
-      border-color: var(--accent);
+      border-color: rgba(0, 240, 255, 0.5);
+      background: rgba(0, 240, 255, 0.04);
     }
     .provider-top {
       display: flex;
@@ -659,24 +767,29 @@ export class DashboardPanel {
     .provider-name {
       font-family: var(--font-header);
       font-weight: 700;
-      font-size: 13px;
-      letter-spacing: -0.015em;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       display: flex;
       align-items: center;
       gap: 6px;
+      color: var(--text);
     }
     .provider-tag {
+      font-family: var(--font-header);
       font-size: 9px;
       font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
       padding: 2px 6px;
-      border-radius: 3px;
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--muted);
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.25);
     }
     .provider-desc {
       font-size: 11px;
-      color: var(--muted);
-      line-height: 1.3;
+      color: var(--text-dim);
+      line-height: 1.35;
       margin-bottom: 10px;
     }
     .input-row {
@@ -685,16 +798,18 @@ export class DashboardPanel {
     }
     .input-field {
       flex: 1;
-      background: var(--bg);
+      background: #040508;
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 6px 10px;
-      color: var(--text);
-      font-size: 12px;
+      padding: 7px 10px;
+      color: var(--neon-cyan);
+      font-family: var(--font-mono);
+      font-size: 11.5px;
       outline: none;
+      transition: border-color 0.15s;
     }
     .input-field:focus {
-      border-color: var(--accent);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
     }
   </style>
 </head>
@@ -727,12 +842,12 @@ export class DashboardPanel {
     </div>
     <div class="card">
       <div class="card-title">Blocked Dangerous Packages</div>
-      <div class="card-value" style="color: ${criticalCount > 0 ? '#f44336' : '#4caf50'};">${criticalCount}</div>
+      <div class="card-value" style="color: ${criticalCount > 0 ? 'var(--neon-pink)' : 'var(--neon-green)'};">${criticalCount}</div>
       <div class="card-desc">Known malware and AI hallucination 404s blocked from execution</div>
     </div>
     <div class="card">
       <div class="card-title">Unvetted / New Packages</div>
-      <div class="card-value" style="color: ${warningCount > 0 ? '#ff9800' : '#4caf50'};">${warningCount}</div>
+      <div class="card-value" style="color: ${warningCount > 0 ? 'var(--neon-yellow)' : 'var(--neon-green)'};">${warningCount}</div>
       <div class="card-desc">Packages published less than 72 hours ago requiring verification</div>
     </div>
   </div>
@@ -796,11 +911,11 @@ export class DashboardPanel {
       </div>
     `
         : `
-      <div style="background: rgba(0, 0, 0, 0.25); border: 1px dashed rgba(255, 255, 255, 0.12); border-radius: 6px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 12px; color: var(--muted);">
+      <div style="background: rgba(0, 240, 255, 0.02); border: 1px dashed rgba(0, 240, 255, 0.2); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 12px; color: var(--muted); font-family: var(--font-ui);">
           Ready to test project. Simulates attack patterns in a safe sandbox to verify your defenses.
         </span>
-        <span style="font-size: 11px; color: #4caf50; font-weight: 600;">Sandbox Ready</span>
+        <span style="font-size: 11px; color: var(--neon-green); font-weight: 700; font-family: var(--font-header); letter-spacing: 0.06em;">[SANDBOX://READY]</span>
       </div>
     `
     }
@@ -826,7 +941,7 @@ export class DashboardPanel {
         <div class="provider-desc">
           1-click browser sign-in directly on your existing ChatGPT subscription. No API keys required.
         </div>
-        <button class="btn" style="background: #10a37f; width: 100%; justify-content: center;" onclick="startOauth()">
+        <button class="btn" style="background: #10a37f; border-color: #10a37f; color: #fff; width: 100%; justify-content: center;" onclick="startOauth()">
           Sign in with OpenAI (Browser OAuth)
         </button>
       </div>
@@ -858,7 +973,7 @@ export class DashboardPanel {
           <span class="provider-tag">GPT-4o</span>
         </div>
         <div class="provider-desc">
-          Use pay-as-you-go API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--accent);">platform.openai.com</a>.
+          Use pay-as-you-go API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: var(--neon-cyan);">platform.openai.com</a>.
         </div>
         <div class="input-row">
           <input type="password" class="input-field" id="openaiKey" placeholder="Paste OpenAI Key (sk-...)">

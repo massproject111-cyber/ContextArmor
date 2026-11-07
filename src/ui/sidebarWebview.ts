@@ -157,21 +157,21 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     const warningCount = this._threats.filter((t) => t.severity === 'WARNING').length;
     const totalIssues = this._threats.length;
 
-    let statusTitle = 'Your Project is Safe';
-    let statusColor = '#4caf50';
+    let statusTitle = 'PROJECT VERIFIED SECURE';
+    let statusColor = '#05ffa1';
     let statusDesc = 'All dependencies and code files are verified safe.';
-    let statusBadge = 'PROTECTED';
+    let statusBadge = '[SECURE]';
 
     if (criticalCount > 0) {
-      statusTitle = `${criticalCount} Security Risk${criticalCount > 1 ? 's' : ''} Found`;
-      statusColor = '#f44336';
-      statusDesc = 'Dangerous packages or vulnerabilities require immediate attention.';
-      statusBadge = 'ACTION NEEDED';
+      statusTitle = `${criticalCount} THREAT${criticalCount > 1 ? 'S' : ''} DETECTED`;
+      statusColor = '#ff003c';
+      statusDesc = 'Critical exploits or malicious packages detected.';
+      statusBadge = '[CRIT_ALERT]';
     } else if (warningCount > 0) {
-      statusTitle = `${warningCount} Item${warningCount > 1 ? 's' : ''} to Review`;
-      statusColor = '#ff9800';
-      statusDesc = 'Newly published or unverified packages detected.';
-      statusBadge = 'REVIEW';
+      statusTitle = `${warningCount} ITEM${warningCount > 1 ? 'S' : ''} TO AUDIT`;
+      statusColor = '#fcee0a';
+      statusDesc = 'Unverified or newly published packages detected.';
+      statusBadge = '[WARN_AUDIT]';
     }
 
     const llm = getLlmConfig();
@@ -190,9 +190,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     if (totalIssues === 0) {
       contentHtml = `
         <div class="empty-state">
-          <div style="font-family: var(--font-header); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--safe-text, #34d399);">EVERYTHING LOOKS GREAT</div>
-          <div style="font-size: 11px; color: var(--muted, #8b949e); margin-top: 4px; line-height: 1.4;">
-            No fake packages, malicious dependencies, or code vulnerabilities detected.
+          <div style="font-family: var(--font-header); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neon-green);">[SYS://ALL_CLEAR]</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;">
+            No malicious dependencies, hallucinations, or code vulnerabilities detected.
           </div>
         </div>
       `;
@@ -200,19 +200,15 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       contentHtml = this._threats
         .map((t) => {
           const isCrit = t.severity === 'CRITICAL';
-          const badgeBg = isCrit ? '#f4433622' : '#ff980022';
-          const badgeColor = isCrit ? '#f44336' : '#ff9800';
-          const badgeText = isCrit ? 'High Risk' : 'Review';
-
           const pinMatch =
             t.desc.match(/Suggested pin:\s*['"`](?:npm\s+i\s+[^@]+@|pip\s+install\s+[^=]+=+|uv\s+add\s+[^=]+=*)([^'"`\s]+)['"`]/i) ||
             t.desc.match(/Newest version older than 72h:\s*['"`]([^'"`]+)['"`]/i);
           const pin = pinMatch ? pinMatch[1] : undefined;
 
           let categoryLabel = 'Package';
-          if (t.title.includes('Pentest') || t.desc.includes('pentest')) categoryLabel = 'Security Finding';
-          else if (t.title.startsWith('[MCP')) categoryLabel = 'MCP Server';
-          else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) categoryLabel = 'Python Code';
+          if (t.title.includes('Pentest') || t.desc.includes('pentest')) categoryLabel = 'Finding';
+          else if (t.title.startsWith('[MCP')) categoryLabel = 'MCP';
+          else if (t.title.includes('torch.load') || t.file?.endsWith('.py')) categoryLabel = 'Python';
 
           // Safe removal is ONLY for malicious / hallucinated packages in manifests
           const isManifest = !!(t.file?.endsWith('package.json') || t.file?.endsWith('requirements.txt'));
@@ -230,19 +226,19 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
             .trim();
 
           return `
-            <div class="threat-card" style="border-left: 3px solid ${isCrit ? '#fb7185' : '#fbbf24'};">
+            <div class="threat-card" style="border-left: 3px solid ${isCrit ? 'var(--neon-pink)' : 'var(--neon-yellow)'};">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; gap: 4px;">
-                <span style="font-weight: 700; font-size: 11.5px; font-family: var(--font-mono); word-break: break-all; letter-spacing: -0.2px;">${t.title}</span>
+                <span style="font-weight: 700; font-size: 11.5px; font-family: var(--font-mono); word-break: break-all; color: var(--text);">${t.title}</span>
                 <div style="display: flex; gap: 4px; flex-shrink: 0;">
-                  <span style="background: #181a1f; color: var(--muted); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.06em;">
+                  <span style="background: rgba(0, 240, 255, 0.08); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.25); padding: 1px 5px; font-size: 8.5px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.08em; clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));">
                     ${categoryLabel}
                   </span>
-                  <span style="background: ${isCrit ? 'var(--crit-bg)' : 'var(--warn-bg)'}; color: ${isCrit ? 'var(--crit-text)' : 'var(--warn-text)'}; border: 1px solid ${isCrit ? 'var(--crit-border)' : 'var(--warn-border)'}; padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 9px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.06em;">
-                    ${isCrit ? 'HIGH RISK' : 'REVIEW'}
+                  <span style="background: ${isCrit ? 'var(--crit-bg)' : 'var(--warn-bg)'}; color: ${isCrit ? 'var(--crit-text)' : 'var(--warn-text)'}; border: 1px solid ${isCrit ? 'var(--crit-border)' : 'var(--warn-border)'}; padding: 1px 5px; font-weight: 800; font-size: 8.5px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.08em; clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));">
+                    ${isCrit ? '[CRIT]' : '[WARN]'}
                   </span>
                 </div>
               </div>
-              <div style="font-size: 11px; color: var(--text-muted, #8b949e); margin-bottom: 8px; line-height: 1.4;">
+              <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 8px; line-height: 1.4;">
                 ${humanDesc}
               </div>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
@@ -258,7 +254,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
                 }
                 ${
                   showRemove
-                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">Remove Package</button>`
+                    ? `<button class="action-mini btn-del" onclick="remove('${t.file}', ${t.line})">Purge Package</button>`
                     : ''
                 }
               </div>
@@ -274,36 +270,62 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root {
-      --font-header: "Geist", "Geist Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      --font-mono: var(--vscode-editor-font-family, "JetBrains Mono", "SF Mono", Monaco, Menlo, Consolas, monospace);
-      
-      /* Bespoke Obsidian Palette */
-      --bg: #090a0c;
-      --card-bg: #111315;
-      --border: #22252b;
-      --text: #f4f4f5;
-      --muted: #8b949e;
-      --accent: #f4f4f5;
+    @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Orbitron:wght@600;700;800;900&family=Share+Tech+Mono&display=swap');
 
-      /* Refined Severity Palette */
-      --crit-bg: rgba(244, 63, 94, 0.12);
-      --crit-text: #fb7185;
-      --crit-border: rgba(244, 63, 94, 0.28);
-      --warn-bg: rgba(245, 158, 11, 0.12);
-      --warn-text: #fbbf24;
-      --warn-border: rgba(245, 158, 11, 0.28);
-      --safe-bg: rgba(16, 185, 129, 0.12);
-      --safe-text: #34d399;
-      --safe-border: rgba(16, 185, 129, 0.28);
+    :root {
+      --font-header: "Orbitron", "Chakra Petch", -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-ui: "Chakra Petch", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "Share Tech Mono", "JetBrains Mono", Monaco, Menlo, Consolas, monospace;
+      
+      /* Cyberpunk HUD Palette */
+      --cyber-bg: #06070a;
+      --cyber-surface: #0a0d14;
+      --cyber-card-bg: #0d111a;
+      --cyber-card-hover: #121824;
+      --border: #162032;
+      --border-accent: rgba(0, 240, 255, 0.35);
+      --text: #e3edf8;
+      --text-dim: #8fa0be;
+      --muted: #596c88;
+      
+      /* Neon Accent Channels */
+      --neon-cyan: #00f0ff;
+      --neon-yellow: #fcee0a;
+      --neon-pink: #ff003c;
+      --neon-green: #05ffa1;
+
+      /* Threat Badges */
+      --crit-bg: rgba(255, 0, 60, 0.12);
+      --crit-text: #ff3366;
+      --crit-border: rgba(255, 0, 60, 0.45);
+      --warn-bg: rgba(252, 238, 10, 0.12);
+      --warn-text: #fcee0a;
+      --warn-border: rgba(252, 238, 10, 0.45);
+      --safe-bg: rgba(5, 255, 161, 0.12);
+      --safe-text: #05ffa1;
+      --safe-border: rgba(5, 255, 161, 0.45);
     }
+
+    /* Custom Cyberpunk Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06070a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1a2336;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--neon-cyan);
+    }
+
     body {
       font-family: var(--font-ui);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
-      font-variant-numeric: tabular-nums;
       padding: 10px;
       margin: 0;
       color: var(--text);
@@ -316,60 +338,59 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
     /* TOP STATUS HERO BANNER */
     .hero-banner {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-left: 3px solid ${statusColor};
       padding: 12px 14px;
       margin-bottom: 10px;
       cursor: pointer;
-      transition: border-color 0.15s ease;
+      transition: all 0.2s ease;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .hero-banner:hover {
       border-color: ${statusColor};
+      box-shadow: 0 0 14px ${statusColor}33;
     }
     .hero-left {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .hero-icon {
-      font-size: 24px;
-    }
     .hero-title {
       font-family: var(--font-header);
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: ${statusColor};
+      text-shadow: 0 0 8px ${statusColor}55;
     }
     .hero-desc {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--muted);
       margin-top: 2px;
     }
     .hero-badge {
       font-family: var(--font-header);
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       padding: 2px 6px;
-      border-radius: 3px;
-      background: ${statusColor}22;
+      background: ${statusColor}18;
       color: ${statusColor};
+      border: 1px solid ${statusColor}44;
+      clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));
     }
 
     /* QUICK SECURITY CHECK BUTTON */
     .btn-quick-scan {
       width: 100%;
-      background: #f4f4f5;
-      color: #090a0c;
-      border: 1px solid #ffffff;
-      border-radius: 5px;
+      background: var(--neon-yellow);
+      color: #000000;
+      border: 1px solid var(--neon-yellow);
       padding: 9px 12px;
       margin-bottom: 6px;
       cursor: pointer;
@@ -378,15 +399,23 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       align-items: center;
       transition: all 0.15s ease;
       box-sizing: border-box;
+      clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
     }
     .btn-quick-scan:hover {
       background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+    }
+    .btn-quick-scan:active {
+      transform: translateY(1px);
     }
     .btn-quick-scan:disabled {
-      opacity: 0.6;
+      opacity: 0.45;
       cursor: not-allowed;
+      box-shadow: none;
     }
     .btn-content {
       display: flex;
@@ -396,22 +425,16 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .btn-title {
       font-family: var(--font-header);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.07em;
+      letter-spacing: 0.08em;
     }
     .btn-desc {
-      font-size: 10px;
+      font-size: 9.5px;
       opacity: 0.85;
       margin-top: 2px;
-    }
-    .badge-pill {
-      font-size: 9px;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 3px;
-      background: rgba(255, 255, 255, 0.2);
+      font-family: var(--font-ui);
     }
 
     /* UTILITY NAVIGATION ROW */
@@ -422,20 +445,25 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .btn-util {
       flex: 1;
-      background: #16181c;
-      color: #e4e4e7;
-      border: 1px solid var(--border);
+      background: rgba(0, 240, 255, 0.05);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
       padding: 6px;
-      border-radius: 4px;
-      font-size: 11px;
+      font-size: 10.5px;
       cursor: pointer;
       text-align: center;
-      font-weight: 600;
+      font-family: var(--font-header);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
       transition: all 0.15s ease;
     }
     .btn-util:hover {
-      background: #1e2127;
-      border-color: #383d47;
+      background: rgba(0, 240, 255, 0.15);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+      transform: translateY(-1px);
     }
 
     /* FINDINGS / THREAT RADAR LIST */
@@ -452,83 +480,87 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       font-weight: 800;
       text-transform: uppercase;
       color: var(--muted);
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       margin-bottom: 8px;
     }
     .threat-card {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
       padding: 10px;
       margin-bottom: 8px;
+      transition: all 0.15s ease;
+    }
+    .threat-card:hover {
+      border-color: rgba(0, 240, 255, 0.35);
     }
     .action-mini {
       padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 9.5px;
+      font-weight: 700;
+      font-family: var(--font-header);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       cursor: pointer;
       border: none;
+      clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
       transition: filter 0.15s;
     }
     .action-mini:hover {
-      filter: brightness(1.15);
+      filter: brightness(1.2);
     }
     .btn-fix {
-      background: rgba(59, 130, 246, 0.12);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.28);
+      background: rgba(0, 240, 255, 0.12);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.4);
     }
     .btn-del {
-      background: rgba(244, 63, 94, 0.12);
-      color: #fb7185;
-      border: 1px solid rgba(244, 63, 94, 0.28);
+      background: rgba(255, 0, 60, 0.15);
+      color: #ff3366;
+      border: 1px solid rgba(255, 0, 60, 0.45);
     }
 
     /* EMPTY SAFE STATE */
     .empty-state {
       padding: 22px 14px;
       text-align: center;
-      border: 1px dashed #22252b;
-      border-radius: 8px;
-      background: rgba(16, 185, 129, 0.05);
+      border: 1px dashed rgba(5, 255, 161, 0.3);
+      background: rgba(5, 255, 161, 0.04);
     }
 
     /* =========================================================
        SECURITY AUDIT ANCHORED AT BOTTOM
        ========================================================= */
     .deep-station {
-      background: var(--card-bg);
+      background: var(--cyber-card-bg);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-top: 2px solid var(--neon-cyan);
       padding: 12px;
       margin-top: auto;
     }
     .station-badge {
-      background: #1c1e24;
-      color: #a1a1aa;
-      border: 1px solid #2b2f38;
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.35);
       font-family: var(--font-header);
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.1em;
       padding: 2px 6px;
-      border-radius: 3px;
       display: inline-block;
       margin-bottom: 5px;
     }
     .station-title {
       font-family: var(--font-header);
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text);
     }
     .station-desc {
-      font-size: 11px;
-      color: var(--muted);
+      font-size: 10.5px;
+      color: var(--text-dim);
       margin-top: 3px;
       line-height: 1.35;
       margin-bottom: 10px;
@@ -536,9 +568,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
 
     /* ENGINE CHIP */
     .ai-chip {
-      background: #14161a;
+      background: #090c13;
       border: 1px solid var(--border);
-      border-radius: 4px;
       padding: 7px 10px;
       display: flex;
       justify-content: space-between;
@@ -546,10 +577,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       cursor: pointer;
       font-size: 11px;
       margin-bottom: 10px;
-      transition: border-color 0.15s ease;
+      clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+      transition: all 0.15s ease;
     }
     .ai-chip:hover {
-      border-color: #383d47;
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
     }
     .ai-chip-left {
       display: flex;
@@ -560,10 +593,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     /* MAIN RUN DEEP TEST BUTTON */
     .btn-deep-run {
       width: 100%;
-      background: #181a1e;
-      color: #f4f4f5;
-      border: 1px solid var(--border);
-      border-radius: 5px;
+      background: rgba(0, 240, 255, 0.08);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.4);
       padding: 9px 12px;
       cursor: pointer;
       display: flex;
@@ -571,46 +603,54 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       align-items: center;
       transition: all 0.15s ease;
       box-sizing: border-box;
+      clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
     }
     .btn-deep-run:hover {
-      background: #202328;
-      border-color: #383d47;
+      background: rgba(0, 240, 255, 0.18);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+      transform: translateY(-1px);
     }
     .btn-deep-run:disabled {
-      opacity: 0.6;
+      opacity: 0.45;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
 
     /* LIVE PROGRESS INDICATOR */
     .progress-box {
-      background: #0d0e11;
+      background: #06080d;
       border: 1px solid var(--border);
-      border-radius: 4px;
       padding: 10px;
       margin-top: 10px;
     }
     .progress-hdr {
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
-      font-weight: 600;
+      font-family: var(--font-header);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       margin-bottom: 6px;
     }
     .progress-track {
-      background: #1a1c22;
-      border-radius: 3px;
-      height: 6px;
+      background: #111622;
+      height: 5px;
       overflow: hidden;
+      position: relative;
     }
     .progress-fill {
-      background: #f4f4f5;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
       height: 100%;
+      box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
       transition: width 0.3s ease;
     }
     .telemetry-line {
       font-family: var(--font-mono);
       font-size: 10px;
-      color: var(--muted);
+      color: var(--neon-cyan);
       margin-top: 6px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -623,7 +663,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(3, 4, 7, 0.85);
+      backdrop-filter: blur(4px);
       display: none;
       flex-direction: column;
       justify-content: center;
@@ -633,32 +674,34 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       box-sizing: border-box;
     }
     .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 6px;
+      background: #0a0d15;
+      border: 1px solid rgba(0, 240, 255, 0.35);
       padding: 14px;
       width: 100%;
       box-sizing: border-box;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.8);
     }
     .modal-hdr {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
     }
     .provider-card {
       border: 1px solid var(--border);
-      border-radius: 6px;
       padding: 9px 10px;
       margin-top: 8px;
-      background: rgba(255, 255, 255, 0.02);
-      transition: border-color 0.15s;
+      background: rgba(0, 240, 255, 0.02);
+      border-left: 2px solid rgba(0, 240, 255, 0.3);
+      transition: all 0.15s;
     }
     .provider-card:hover {
-      border-color: var(--accent);
+      border-color: rgba(0, 240, 255, 0.5);
+      background: rgba(0, 240, 255, 0.04);
     }
     .provider-hdr {
       display: flex;
@@ -780,7 +823,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           1-click sign-in in your browser. Runs on your existing ChatGPT subscription.
         </div>
-        <button style="width: 100%; background: #10a37f; color: #fff; border: none; padding: 7px; border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer;" onclick="startOauth()">
+        <button style="width: 100%; background: #10a37f; color: #fff; border: 1px solid #10a37f; padding: 7px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));" onclick="startOauth()">
           Sign In with OpenAI (OAuth)
         </button>
       </div>
@@ -794,12 +837,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Free tier with any Google account. No credit card required.
         </div>
-        <button style="width: 100%; background: rgba(66, 133, 244, 0.15); border: 1px solid #4285f4; color: #64b5f6; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">
+        <button style="width: 100%; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.35); color: var(--neon-cyan); padding: 5px; font-size: 10px; font-weight: 700; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; margin-bottom: 6px; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="openExternal('https://aistudio.google.com/app/apikey')">
           1-Click: Open Google AI Studio (Copy Free Key)
         </button>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideGemini" placeholder="Paste Gemini Key (AIza...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: #f4f4f5; color: #090a0c; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; cursor: pointer;" onclick="saveKey('gemini', 'sideGemini')">Save</button>
+          <input type="password" id="sideGemini" placeholder="Paste Gemini Key (AIza...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
+          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('gemini', 'sideGemini')">Save</button>
         </div>
       </div>
 
@@ -813,8 +856,8 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           Direct API key from platform.openai.com
         </div>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideOpenai" placeholder="Paste OpenAI Key (sk-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: #f4f4f5; color: #090a0c; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; cursor: pointer;" onclick="saveKey('openai', 'sideOpenai')">Save</button>
+          <input type="password" id="sideOpenai" placeholder="Paste OpenAI Key (sk-...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
+          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('openai', 'sideOpenai')">Save</button>
         </div>
       </div>
 
@@ -827,12 +870,12 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Anthropic does not offer consumer web OAuth for third-party CLIs. Requires an API key.
         </div>
-        <button style="width: 100%; background: rgba(217, 119, 87, 0.15); border: 1px solid #d97757; color: #ffab91; padding: 5px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer; margin-bottom: 6px;" onclick="openExternal('https://console.anthropic.com/settings/keys')">
+        <button style="width: 100%; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.35); color: var(--neon-cyan); padding: 5px; font-size: 10px; font-weight: 700; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; margin-bottom: 6px; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="openExternal('https://console.anthropic.com/settings/keys')">
           1-Click: Open Anthropic Console (Copy Key)
         </button>
         <div style="display: flex; gap: 4px;">
-          <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: var(--bg); border: 1px solid var(--border); color: #fff; padding: 5px 6px; font-size: 10px; border-radius: 3px; outline: none;">
-          <button style="background: #f4f4f5; color: #090a0c; border: none; padding: 5px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; cursor: pointer;" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
+          <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
+          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
         </div>
       </div>
 
@@ -842,7 +885,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
           Runs local security analysis without external keys or internet.
         </div>
-        <button style="width: 100%; background: #16181c; color: #fff; border: 1px solid var(--border); padding: 6px; border-radius: 4px; font-size: 10px; font-weight: 600; cursor: pointer;" onclick="saveKey('sandbox', '')">
+        <button style="width: 100%; background: rgba(0, 240, 255, 0.06); color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.3); padding: 6px; font-size: 10px; font-weight: 700; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('sandbox', '')">
           Select Offline Analysis
         </button>
       </div>
