@@ -184,7 +184,7 @@ export class DashboardPanel {
 
     const threatsHtml =
       this._threats.length === 0
-        ? `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 36px; font-size: 12px; font-family: var(--font-mono); letter-spacing: 0.05em;">[SYS://CLEAN] All dependencies and code files are verified safe. Zero vulnerabilities detected.</td></tr>`
+        ? `<tr><td colspan="5" style="text-align: center; color: var(--muted); padding: 36px; font-size: 12px; font-family: var(--font-mono); letter-spacing: 0.05em;">All dependencies and code files are verified safe. Zero vulnerabilities detected.</td></tr>`
         : this._threats
             .map((t) => {
               const isCrit = t.severity === 'CRITICAL';
@@ -891,7 +891,7 @@ export class DashboardPanel {
         <span style="font-size: 12px; color: var(--muted); font-family: var(--font-ui);">
           Ready to test project. Simulates attack patterns in a safe sandbox to verify your defenses.
         </span>
-        <span style="font-size: 11px; color: var(--neon-green); font-weight: 700; font-family: var(--font-header); letter-spacing: 0.06em;">[SANDBOX://READY]</span>
+        <span style="font-size: 11px; color: var(--neon-green); font-weight: 700; font-family: var(--font-header); letter-spacing: 0.06em;">SANDBOX READY</span>
       </div>
     `
     }

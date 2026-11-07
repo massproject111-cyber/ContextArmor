@@ -160,18 +160,18 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     let statusTitle = 'PROJECT VERIFIED SECURE';
     let statusColor = '#05ffa1';
     let statusDesc = 'All dependencies and code files are verified safe.';
-    let statusBadge = '[SECURE]';
+    let statusBadge = 'SECURE';
 
     if (criticalCount > 0) {
       statusTitle = `${criticalCount} THREAT${criticalCount > 1 ? 'S' : ''} DETECTED`;
       statusColor = '#ff003c';
       statusDesc = 'Critical exploits or malicious packages detected.';
-      statusBadge = '[CRIT_ALERT]';
+      statusBadge = 'CRITICAL';
     } else if (warningCount > 0) {
       statusTitle = `${warningCount} ITEM${warningCount > 1 ? 'S' : ''} TO AUDIT`;
       statusColor = '#fcee0a';
       statusDesc = 'Unverified or newly published packages detected.';
-      statusBadge = '[WARN_AUDIT]';
+      statusBadge = 'REVIEW';
     }
 
     const llm = getLlmConfig();
@@ -190,7 +190,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     if (totalIssues === 0) {
       contentHtml = `
         <div class="empty-state">
-          <div style="font-family: var(--font-header); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neon-green);">[SYS://ALL_CLEAR]</div>
+          <div style="font-family: var(--font-header); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--neon-green);">ALL CLEAR</div>
           <div style="font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4;">
             No malicious dependencies, hallucinations, or code vulnerabilities detected.
           </div>
@@ -234,7 +234,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
                     ${categoryLabel}
                   </span>
                   <span style="background: ${isCrit ? 'var(--crit-bg)' : 'var(--warn-bg)'}; color: ${isCrit ? 'var(--crit-text)' : 'var(--warn-text)'}; border: 1px solid ${isCrit ? 'var(--crit-border)' : 'var(--warn-border)'}; padding: 1px 5px; font-weight: 800; font-size: 8.5px; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.08em; clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 3px, 100% 100%, 3px 100%, 0 calc(100% - 3px));">
-                    ${isCrit ? '[CRIT]' : '[WARN]'}
+                    ${isCrit ? 'CRITICAL' : 'REVIEW'}
                   </span>
                 </div>
               </div>
