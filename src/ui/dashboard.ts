@@ -450,11 +450,11 @@ export class DashboardPanel {
       color: var(--safe-text);
       border: 1px solid var(--safe-border);
     }
-    /* Signature Cyberpunk Yellow Chamfered CTA */
+    /* Primary Tactical Dark HUD Button */
     .btn {
-      background: var(--neon-yellow);
-      color: #000000;
-      border: 1px solid var(--neon-yellow);
+      background: #121824;
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.45);
       padding: 8px 18px;
       cursor: pointer;
       font-weight: 800;
@@ -466,22 +466,22 @@ export class DashboardPanel {
       align-items: center;
       gap: 6px;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
     .btn:hover {
-      background: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
+      background: rgba(0, 240, 255, 0.15);
+      color: #ffffff;
+      border-color: #00f0ff;
       transform: translateY(-1px);
     }
     .btn:active {
       transform: translateY(1px);
     }
-    /* Tactical Cyber Cyan Secondary */
+    /* Secondary Tactical Dark Button */
     .btn-secondary {
-      background: rgba(0, 240, 255, 0.05);
-      color: var(--neon-cyan);
-      border: 1px solid rgba(0, 240, 255, 0.35);
+      background: #0d121c;
+      color: #9ab0cf;
+      border: 1px solid var(--border);
       padding: 7px 16px;
       cursor: pointer;
       font-weight: 700;
@@ -493,11 +493,12 @@ export class DashboardPanel {
       align-items: center;
       gap: 6px;
       clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
     .btn-secondary:hover {
-      background: rgba(0, 240, 255, 0.15);
-      border-color: var(--neon-cyan);
+      background: #151d2d;
+      border-color: rgba(0, 240, 255, 0.35);
+      color: #ffffff;
       transform: translateY(-1px);
     }
     .btn-sm {
@@ -583,9 +584,9 @@ export class DashboardPanel {
       align-items: center;
     }
     .btn-strix-run {
-      background: var(--neon-yellow);
-      color: #000000;
-      border: 1px solid var(--neon-yellow);
+      background: #121824;
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.45);
       padding: 8px 20px;
       font-size: 11px;
       font-weight: 800;
@@ -597,12 +598,12 @@ export class DashboardPanel {
       align-items: center;
       gap: 8px;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
     .btn-strix-run:hover {
-      background: #ffffff;
-      border-color: #ffffff;
-      color: #000;
+      background: rgba(0, 240, 255, 0.15);
+      border-color: #00f0ff;
+      color: #ffffff;
       transform: translateY(-1px);
     }
     .btn-strix-run:disabled {

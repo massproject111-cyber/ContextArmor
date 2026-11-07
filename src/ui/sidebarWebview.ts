@@ -386,23 +386,23 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     /* QUICK SECURITY CHECK BUTTON */
     .btn-quick-scan {
       width: 100%;
-      background: var(--neon-yellow);
-      color: #000000;
-      border: 1px solid var(--neon-yellow);
+      background: #121824;
+      color: #00f0ff;
+      border: 1px solid rgba(0, 240, 255, 0.45);
       padding: 9px 12px;
       margin-bottom: 6px;
       cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: background 0.15s ease, border-color 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
       box-sizing: border-box;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
     }
     .btn-quick-scan:hover {
-      background: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
+      background: rgba(0, 240, 255, 0.15);
+      color: #ffffff;
+      border-color: #00f0ff;
       transform: translateY(-1px);
     }
     .btn-quick-scan:active {
@@ -427,7 +427,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .btn-desc {
       font-size: 9.5px;
-      opacity: 0.85;
+      color: var(--text-dim);
       margin-top: 2px;
       font-family: var(--font-ui);
     }
@@ -831,7 +831,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         </button>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideGemini" placeholder="Paste Gemini Key (AIza...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
-          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('gemini', 'sideGemini')">Save</button>
+          <button style="background: #121824; color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.45); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('gemini', 'sideGemini')">Save</button>
         </div>
       </div>
 
@@ -846,7 +846,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         </div>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideOpenai" placeholder="Paste OpenAI Key (sk-...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
-          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('openai', 'sideOpenai')">Save</button>
+          <button style="background: #121824; color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.45); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('openai', 'sideOpenai')">Save</button>
         </div>
       </div>
 
@@ -864,7 +864,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         </button>
         <div style="display: flex; gap: 4px;">
           <input type="password" id="sideClaude" placeholder="Paste Claude Key (sk-ant-...)" style="flex: 1; background: #040508; border: 1px solid var(--border); color: var(--neon-cyan); font-family: var(--font-mono); padding: 5px 6px; font-size: 10px; outline: none;">
-          <button style="background: var(--neon-yellow); color: #000; border: 1px solid var(--neon-yellow); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
+          <button style="background: #121824; color: var(--neon-cyan); border: 1px solid rgba(0, 240, 255, 0.45); padding: 5px 10px; font-size: 10px; font-weight: 800; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="saveKey('anthropic', 'sideClaude')">Save</button>
         </div>
       </div>
 
