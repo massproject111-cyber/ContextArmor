@@ -351,7 +351,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .hero-banner:hover {
       border-color: ${statusColor};
-      box-shadow: 0 0 14px ${statusColor}33;
     }
     .hero-left {
       display: flex;
@@ -365,7 +364,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: ${statusColor};
-      text-shadow: 0 0 8px ${statusColor}55;
     }
     .hero-desc {
       font-size: 10.5px;
@@ -397,16 +395,14 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
       box-sizing: border-box;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
     }
     .btn-quick-scan:hover {
       background: #ffffff;
       color: #000000;
       border-color: #ffffff;
-      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
     }
     .btn-quick-scan:active {
@@ -415,7 +411,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .btn-quick-scan:disabled {
       opacity: 0.45;
       cursor: not-allowed;
-      box-shadow: none;
     }
     .btn-content {
       display: flex;
@@ -457,12 +452,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       text-transform: uppercase;
       letter-spacing: 0.06em;
       clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn-util:hover {
       background: rgba(0, 240, 255, 0.15);
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
       transform: translateY(-1px);
     }
 
@@ -488,7 +482,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       border: 1px solid var(--border);
       padding: 10px;
       margin-bottom: 8px;
-      transition: all 0.15s ease;
+      transition: border-color 0.15s ease;
     }
     .threat-card:hover {
       border-color: rgba(0, 240, 255, 0.35);
@@ -503,10 +497,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       cursor: pointer;
       border: none;
       clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
-      transition: filter 0.15s;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .action-mini:hover {
-      filter: brightness(1.2);
+      opacity: 0.85;
     }
     .btn-fix {
       background: rgba(0, 240, 255, 0.12);
@@ -578,11 +572,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       font-size: 11px;
       margin-bottom: 10px;
       clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-      transition: all 0.15s ease;
+      transition: border-color 0.15s ease;
     }
     .ai-chip:hover {
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
     }
     .ai-chip-left {
       display: flex;
@@ -601,21 +594,19 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
       box-sizing: border-box;
       clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
     }
     .btn-deep-run:hover {
       background: rgba(0, 240, 255, 0.18);
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
       transform: translateY(-1px);
     }
     .btn-deep-run:disabled {
       opacity: 0.45;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
 
     /* LIVE PROGRESS INDICATOR */
@@ -644,7 +635,6 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .progress-fill {
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
       height: 100%;
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
       transition: width 0.3s ease;
     }
     .telemetry-line {
@@ -663,8 +653,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(3, 4, 7, 0.85);
-      backdrop-filter: blur(4px);
+      background: rgba(3, 4, 7, 0.88);
       display: none;
       flex-direction: column;
       justify-content: center;
@@ -675,13 +664,13 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
     }
     .modal-card {
       background: #0a0d15;
-      border: 1px solid rgba(0, 240, 255, 0.35);
+      border: 1px solid rgba(0, 240, 255, 0.4);
       padding: 14px;
       width: 100%;
       box-sizing: border-box;
       max-height: 90vh;
       overflow-y: auto;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85);
     }
     .modal-hdr {
       display: flex;

@@ -300,11 +300,6 @@ export class DashboardPanel {
       padding: 24px 32px;
       color: var(--text);
       background-color: var(--cyber-bg);
-      background-image: 
-        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 240, 255, 0.07), transparent 70%),
-        linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 28px 28px, 28px 28px;
       margin: 0;
       box-sizing: border-box;
       min-height: 100vh;
@@ -326,7 +321,6 @@ export class DashboardPanel {
       width: 140px;
       height: 2px;
       background: var(--neon-cyan);
-      box-shadow: 0 0 10px var(--neon-cyan);
     }
     .header-left {
       display: flex;
@@ -340,7 +334,6 @@ export class DashboardPanel {
       text-transform: uppercase;
       letter-spacing: 0.1em;
       color: #ffffff;
-      text-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
     }
     .header-sub {
       font-size: 12px;
@@ -367,13 +360,12 @@ export class DashboardPanel {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.2s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
       position: relative;
     }
     .card:hover {
       background: var(--cyber-card-hover);
-      border-color: rgba(0, 240, 255, 0.4);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      border-color: rgba(0, 240, 255, 0.45);
     }
     .card-title {
       font-family: var(--font-header);
@@ -391,7 +383,6 @@ export class DashboardPanel {
       font-weight: 800;
       letter-spacing: 0.04em;
       margin-bottom: 4px;
-      text-shadow: 0 0 12px currentColor;
     }
     .card-desc {
       font-size: 11px;
@@ -448,19 +439,16 @@ export class DashboardPanel {
       background: var(--crit-bg);
       color: var(--crit-text);
       border: 1px solid var(--crit-border);
-      box-shadow: 0 0 6px rgba(255, 0, 60, 0.25);
     }
     .badge-warn {
       background: var(--warn-bg);
       color: var(--warn-text);
       border: 1px solid var(--warn-border);
-      box-shadow: 0 0 6px rgba(252, 238, 10, 0.2);
     }
     .badge-safe {
       background: var(--safe-bg);
       color: var(--safe-text);
       border: 1px solid var(--safe-border);
-      box-shadow: 0 0 6px rgba(5, 255, 161, 0.2);
     }
     /* Signature Cyberpunk Yellow Chamfered CTA */
     .btn {
@@ -478,14 +466,12 @@ export class DashboardPanel {
       align-items: center;
       gap: 6px;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-      transition: all 0.15s ease;
-      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn:hover {
       background: #ffffff;
       color: #000000;
       border-color: #ffffff;
-      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
     }
     .btn:active {
@@ -507,12 +493,11 @@ export class DashboardPanel {
       align-items: center;
       gap: 6px;
       clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn-secondary:hover {
       background: rgba(0, 240, 255, 0.15);
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
       transform: translateY(-1px);
     }
     .btn-sm {
@@ -526,7 +511,7 @@ export class DashboardPanel {
       border: none;
       margin-left: 4px;
       clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
-      transition: all 0.15s ease;
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn-fix {
       background: rgba(0, 240, 255, 0.12);
@@ -535,7 +520,6 @@ export class DashboardPanel {
     }
     .btn-fix:hover {
       background: rgba(0, 240, 255, 0.25);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
     }
     .btn-del {
       background: rgba(255, 0, 60, 0.15);
@@ -544,7 +528,6 @@ export class DashboardPanel {
     }
     .btn-del:hover {
       background: rgba(255, 0, 60, 0.3);
-      box-shadow: 0 0 8px rgba(255, 0, 60, 0.5);
     }
 
     /* =========================================================
@@ -614,21 +597,18 @@ export class DashboardPanel {
       align-items: center;
       gap: 8px;
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-      transition: all 0.15s ease;
-      box-shadow: 0 0 10px rgba(252, 238, 10, 0.3);
+      transition: background 0.15s ease, border-color 0.15s ease;
     }
     .btn-strix-run:hover {
       background: #ffffff;
       border-color: #ffffff;
       color: #000;
-      box-shadow: 0 0 16px rgba(252, 238, 10, 0.65);
       transform: translateY(-1px);
     }
     .btn-strix-run:disabled {
       opacity: 0.45;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
     .brain-pill {
       background: #090c13;
@@ -639,12 +619,11 @@ export class DashboardPanel {
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 0.15s;
+      transition: border-color 0.15s;
       clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
     }
     .brain-pill:hover {
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
     }
 
     /* Progress Bar */
@@ -673,7 +652,6 @@ export class DashboardPanel {
     .progress-fill {
       background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
       height: 100%;
-      box-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
       transition: width 0.3s ease;
     }
     .telemetry-console {
@@ -688,7 +666,6 @@ export class DashboardPanel {
       margin-top: 12px;
       white-space: pre-wrap;
       line-height: 1.5;
-      box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
     }
 
     /* =========================================================
@@ -700,8 +677,7 @@ export class DashboardPanel {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(3, 4, 7, 0.85);
-      backdrop-filter: blur(4px);
+      background: rgba(3, 4, 7, 0.88);
       display: none;
       justify-content: center;
       align-items: center;
@@ -709,10 +685,10 @@ export class DashboardPanel {
     }
     .modal-card {
       background: #0a0d15;
-      border: 1px solid rgba(0, 240, 255, 0.35);
+      border: 1px solid rgba(0, 240, 255, 0.4);
       width: 580px;
       max-width: 90%;
-      box-shadow: 0 0 30px rgba(0, 240, 255, 0.15), 0 8px 32px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.85);
       padding: 24px;
       box-sizing: border-box;
       max-height: 85vh;
@@ -809,7 +785,6 @@ export class DashboardPanel {
     }
     .input-field:focus {
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
     }
   </style>
 </head>
