@@ -825,10 +825,10 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <div class="provider-card">
         <div class="provider-hdr">
           <strong style="font-family: var(--font-header); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;">ChatGPT Subscription</strong>
-          <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Browser OAuth</span>
+          <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Plus / Pro Required</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
-          1-click sign-in in your browser. Runs on your existing ChatGPT subscription.
+          1-click sign-in. Requires ChatGPT Plus or Pro. Free accounts do not support agent streaming (HTTP 429).
         </div>
         <button style="width: 100%; background: #10a37f; color: #fff; border: 1px solid #10a37f; padding: 7px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));" onclick="startOauth()">
           Sign In with OpenAI (OAuth)
@@ -838,11 +838,11 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
       <!-- GOOGLE GEMINI -->
       <div class="provider-card">
         <div class="provider-hdr">
-          <strong style="font-family: var(--font-header); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;">Google Gemini</strong>
-          <span style="font-size: 9px; color: var(--muted); font-weight: 600;">Free Tier</span>
+          <strong style="font-family: var(--font-header); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;">Google Gemini (Recommended)</strong>
+          <span style="font-size: 9px; color: var(--neon-cyan); font-weight: 600;">100% Free · High Limits</span>
         </div>
         <div style="font-size: 10px; color: var(--muted); margin-bottom: 5px;">
-          Free tier with any Google account. No credit card required.
+          Free tier with any Google account. No credit card required. Works without usage limits.
         </div>
         <button style="width: 100%; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.35); color: var(--neon-cyan); padding: 5px; font-size: 10px; font-weight: 700; font-family: var(--font-header); text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; margin-bottom: 6px; clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));" onclick="openExternal('https://aistudio.google.com/app/apikey')">
           1-Click: Open Google AI Studio (Copy Free Key)

@@ -647,7 +647,13 @@ export async function runStrixScan(
   targetDir: string,
   mode: 'quick' | 'standard' | 'deep' = 'quick',
   onLog?: (line: string) => void
-): Promise<{ success: boolean; output: string; threats: ThreatItem[]; hasLlmError?: boolean }> {
+): Promise<{
+  success: boolean;
+  output: string;
+  threats: ThreatItem[];
+  hasLlmError?: boolean;
+  isRateLimitError?: boolean;
+}> {
   const llm = getLlmConfig();
   if (llm.model === 'contextarmor/sandbox') {
     if (onLog) {
@@ -680,20 +686,81 @@ export async function runStrixScan(
       const proc = child_process.spawn(status.binaryPath!, args, { env, cwd: targetDir });
       let stdoutData = '';
       let stderrData = '';
+      let resolved = false;
+
+      // Watchdog: If the containerized scan hangs without progress for > 40 seconds, fallback automatically
+      const watchdog = setTimeout(() => {
+        if (!resolved) {
+          triggerImmediateFallback('Scan timed out waiting for AI model responses', false);
+        }
+      }, 40000);
+
+      const triggerImmediateFallback = (reason: string, isRateLimitError = false) => {
+        if (resolved) return;
+        resolved = true;
+        clearTimeout(watchdog);
+
+        try {
+          proc.kill('SIGTERM');
+          setTimeout(() => {
+            try { proc.kill('SIGKILL'); } catch {}
+          }, 1000);
+        } catch {}
+
+        if (onLog) {
+          onLog(`\n[ContextArmor Recovery] LLM issue detected: ${reason}`);
+          onLog('[ContextArmor Recovery] Immediately engaging ContextArmor Built-In Sandbox Pentest Engine...');
+        }
+
+        const fallbackThreats = runLocalSandboxAnalysis(targetDir, onLog);
+        resolve({
+          success: true,
+          output: stdoutData + '\n' + stderrData + `\n[ContextArmor Sandbox Fallback: ${reason}]`,
+          threats: fallbackThreats,
+          hasLlmError: true,
+          isRateLimitError,
+        });
+      };
+
+      const inspectChunkForFatalErrors = (text: string) => {
+        if (resolved) return;
+        if (
+          text.includes('usage_limit_reached') ||
+          text.includes('RateLimitError') ||
+          text.includes('The usage limit has been reached') ||
+          text.includes('status=429')
+        ) {
+          triggerImmediateFallback('OpenAI ChatGPT Free tier limit reached (HTTP 429)', true);
+        } else if (
+          text.includes('Error streaming response') ||
+          text.includes('Error getting response') ||
+          text.includes('LLM CONNECTION FAILED') ||
+          text.includes('not supported when using Codex') ||
+          text.includes('MODEL NOT AVAILABLE')
+        ) {
+          triggerImmediateFallback('AI Model connection or streaming error', false);
+        }
+      };
 
       proc.stdout.on('data', (d) => {
         const text = d.toString();
         stdoutData += text;
         if (onLog) onLog(text);
+        inspectChunkForFatalErrors(text);
       });
 
       proc.stderr.on('data', (d) => {
         const text = d.toString();
         stderrData += text;
         if (onLog) onLog(text);
+        inspectChunkForFatalErrors(text);
       });
 
       proc.on('close', (code) => {
+        clearTimeout(watchdog);
+        if (resolved) return;
+        resolved = true;
+
         const combined = stdoutData + '\n' + stderrData;
         const threats = loadExistingStrixFindings(targetDir);
 
@@ -702,11 +769,22 @@ export async function runStrixScan(
           combined.includes('Connection error') ||
           combined.includes('MODEL NOT AVAILABLE') ||
           combined.includes('not supported when using Codex') ||
-          combined.includes('not authenticated');
+          combined.includes('not authenticated') ||
+          combined.includes('usage_limit_reached') ||
+          combined.includes('RateLimitError') ||
+          combined.includes('Error streaming response') ||
+          combined.includes('Error getting response') ||
+          combined.includes('status=429');
+
+        const isRateLimit =
+          combined.includes('usage_limit_reached') ||
+          combined.includes('RateLimitError') ||
+          combined.includes('The usage limit has been reached') ||
+          combined.includes('status=429');
 
         if ((code !== 0 || hasLlmFailure) && threats.length === 0) {
           if (onLog) {
-            onLog('\n[ContextArmor Recovery] Strix LLM connection issue detected.');
+            onLog('\n[ContextArmor Recovery] Strix LLM issue detected.');
             onLog('[ContextArmor Recovery] Automatically falling back to ContextArmor AST Sandbox Pentester...');
           }
 
@@ -728,6 +806,7 @@ export async function runStrixScan(
             output: combined + '\n[ContextArmor Sandbox Fallback executed successfully]',
             threats: fallbackThreats,
             hasLlmError: true,
+            isRateLimitError: isRateLimit,
           });
           return;
         }
@@ -740,6 +819,10 @@ export async function runStrixScan(
       });
 
       proc.on('error', (err) => {
+        clearTimeout(watchdog);
+        if (resolved) return;
+        resolved = true;
+
         if (onLog) onLog(`[ContextArmor Sandbox] Container spawn error: ${err.message}. Falling back to in-process sandbox.`);
         const fallbackThreats = runLocalSandboxAnalysis(targetDir, onLog);
         resolve({

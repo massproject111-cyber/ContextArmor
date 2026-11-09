@@ -932,10 +932,10 @@ export class DashboardPanel {
       <div class="provider-option">
         <div class="provider-top">
           <span class="provider-name">ChatGPT Subscription (OAuth Login)</span>
-          <span class="provider-tag">OAuth Login</span>
+          <span class="provider-tag">Plus / Pro Required</span>
         </div>
         <div class="provider-desc">
-          1-click browser sign-in directly on your existing ChatGPT subscription. No API keys required.
+          1-click browser sign-in. Requires ChatGPT Plus or Pro (OpenAI Free tier accounts do not support agent streaming, causing HTTP 429 usage limits).
         </div>
         <button class="btn" style="background: #10a37f; border-color: #10a37f; color: #fff; width: 100%; justify-content: center;" onclick="startOauth()">
           Sign in with OpenAI (Browser OAuth)
@@ -945,11 +945,11 @@ export class DashboardPanel {
       <!-- OPTION 2: GOOGLE GEMINI -->
       <div class="provider-option">
         <div class="provider-top">
-          <span class="provider-name">Google Gemini</span>
-          <span class="provider-tag">Free Tier</span>
+          <span class="provider-name">Google Gemini (Recommended)</span>
+          <span class="provider-tag" style="color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.4);">100% Free · High Limits</span>
         </div>
         <div class="provider-desc">
-          Ultra-fast multi-turn reasoning. Free with any personal Google account via Google AI Studio.
+          Ultra-fast multi-turn reasoning. 100% Free with any Google account. No credit card required.
         </div>
         <div style="margin-bottom: 8px;">
           <button class="btn-secondary" style="width: 100%; justify-content: center; font-size: 11px;" onclick="openExternal('https://aistudio.google.com/app/apikey')">

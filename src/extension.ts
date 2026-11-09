@@ -18,7 +18,7 @@ import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
 import { auditWorkspace } from './core/projectAuditor.js';
 import { runWithConcurrency } from './core/concurrency.js';
-import { runStrixScan, getStrixStatus, promptLlmSetup, getLlmConfig } from './integrations/strix.js';
+import { runStrixScan, getStrixStatus, promptLlmSetup, getLlmConfig, setProviderKey } from './integrations/strix.js';
 import { PackageRiskEngine, classifyDecision } from './detectors/packageRisk/index.js';
 
 interface CacheEntry {
@@ -395,15 +395,28 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         if (res.hasLlmError) {
+          const isRateLimit = res.isRateLimitError;
+          const msg = isRateLimit
+            ? 'OpenAI ChatGPT Free tier limit reached (HTTP 429). Strix requires a paid Plus/Pro subscription or API key. ContextArmor completed the scan using the built-in Sandbox engine.'
+            : 'Strix LLM connection issue detected. ContextArmor completed the scan using the built-in Sandbox engine.';
+
           vscode.window
             .showWarningMessage(
-              'Strix LLM connection issue detected. ContextArmor completed the scan using the built-in Sandbox engine. Would you like to log in to your AI provider?',
-              'Log In / Connect AI Brain',
+              msg,
+              'Switch AI Engine / Key',
+              'Use Offline Sandbox',
               'Dismiss'
             )
             .then((choice) => {
-              if (choice === 'Log In / Connect AI Brain') {
+              if (choice === 'Switch AI Engine / Key') {
                 vscode.commands.executeCommand('contextarmor.configureLlm');
+              } else if (choice === 'Use Offline Sandbox') {
+                setProviderKey('sandbox');
+                sidebarProvider.update(currentThreats);
+                if (DashboardPanel.currentPanel) {
+                  DashboardPanel.currentPanel.update(currentThreats);
+                }
+                vscode.window.showInformationMessage('ContextArmor switched to Built-In Offline Sandbox engine.');
               }
             });
         }

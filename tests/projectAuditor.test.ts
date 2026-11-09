@@ -162,3 +162,24 @@ test('getLlmConfig: returns valid config structure for AI Brain', () => {
     assert.ok(cfg.model);
   }
 });
+
+test('runStrixScan: fallback handles zero-docker and sandbox analysis seamlessly', async () => {
+  const { runStrixScan } = require('../src/integrations/strix.js');
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strix-fallback-test-'));
+  fs.writeFileSync(
+    path.join(tmpDir, 'vuln.py'),
+    `
+import sqlite3
+def get_user(id):
+    cursor.execute(f"SELECT * FROM users WHERE id = {id}")
+`
+  );
+
+  const res = await runStrixScan(tmpDir, 'quick');
+  assert.equal(res.success, true);
+  assert.ok(res.threats.length > 0);
+  assert.ok(res.threats.some((t: any) => t.title.includes('CWE-89')));
+
+  // Clean up
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
