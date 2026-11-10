@@ -377,26 +377,30 @@ export function activate(context: vscode.ExtensionContext) {
         const res = await runStrixScan(rootPath, 'quick', (chunk) => {
           outputChannel.append(chunk);
 
-          if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
+          const turnMatch = chunk.match(/Turn\s+(\d+)/i) || chunk.match(/Starting turn\s+(\d+)/i);
+          if (turnMatch) {
+            const turnNum = parseInt(turnMatch[1], 10);
+            const calculated = Math.min(88, 30 + Math.round(turnNum * 4));
+            currentPct = Math.max(currentPct, calculated);
+            updateProgress(currentPct, `AI security agents analyzing attack surfaces (Turn ${turnNum})...`, chunk);
+          } else if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
             currentPct = Math.max(currentPct, 30);
-            updateProgress(currentPct, 'Secure sandbox ready · Testing project code...', chunk);
+            updateProgress(currentPct, 'Secure sandbox ready · Spawning Strix agents...', chunk);
+          } else if (chunk.includes('coverage') || chunk.includes('coverage.json') || chunk.includes('Attack surface coverage')) {
+            currentPct = Math.max(currentPct, 78);
+            updateProgress(currentPct, 'Analyzing code safety & attack surface coverage...', chunk);
           } else if (
-            chunk.includes('Starting turn') ||
-            chunk.includes('Calling LLM') ||
-            chunk.includes('Penetration test in progress') ||
-            chunk.includes('model response')
+            chunk.includes('Multi-agent penetration test concluded') ||
+            chunk.includes('Penetration test completed') ||
+            chunk.includes('Penetration test summary') ||
+            chunk.includes('finish_scan') ||
+            chunk.includes('Emitted findings.sarif')
           ) {
-            currentPct = Math.min(85, currentPct + 6);
-            updateProgress(currentPct, 'AI security agents analyzing attack surfaces...', chunk);
-          } else if (chunk.includes('coverage') || chunk.includes('coverage.json') || chunk.includes('AST')) {
-            currentPct = Math.max(currentPct, 80);
-            updateProgress(currentPct, 'Analyzing code safety and dependencies...', chunk);
-          } else if (chunk.includes('findings.sarif') || chunk.includes('report.sarif') || chunk.includes('complete')) {
-            currentPct = Math.max(currentPct, 92);
+            currentPct = Math.max(currentPct, 95);
             updateProgress(currentPct, 'Finalizing project security report...', chunk);
           } else {
             currentPct = Math.min(85, currentPct + 1);
-            updateProgress(currentPct, 'Running security simulation...', chunk);
+            updateProgress(currentPct, 'Running AI security simulation...', chunk);
           }
         });
 

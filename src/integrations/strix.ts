@@ -680,6 +680,8 @@ export async function runStrixScan(
       const args = ['--target', targetDir, '-n', '-m', mode];
       const env = {
         ...process.env,
+        STRIX_DEBUG: '1',
+        PYTHONUNBUFFERED: '1',
         PATH: `${os.homedir()}/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${process.env.PATH || ''}`,
       };
 
@@ -688,35 +690,44 @@ export async function runStrixScan(
       let stderrData = '';
       let resolved = false;
 
-      // Activity-based idle watchdog: Only triggers if completely silent with zero output for > 90 seconds
+      let activeRunDir: string | undefined;
+      let logPollTimer: NodeJS.Timeout | undefined;
+      let lastLogSize = 0;
+
+      // Activity-based idle watchdog: Only triggers if completely silent across stdout, stderr, AND strix.log for > 120 seconds
       let idleTimer: NodeJS.Timeout | undefined;
-      const IDLE_TIMEOUT_MS = 90000;
+      const IDLE_TIMEOUT_MS = 120000;
 
       const resetIdleTimer = () => {
         if (idleTimer) clearTimeout(idleTimer);
         if (!resolved) {
           idleTimer = setTimeout(() => {
             if (!resolved) {
-              triggerImmediateFallback('Pentest scan hung with no output for over 90 seconds', false);
+              triggerImmediateFallback('Pentest scan hung with no output or log activity for over 120 seconds', false);
             }
           }, IDLE_TIMEOUT_MS);
         }
       };
 
-      // Maximum overall scan duration watchdog (8 minutes)
+      // Maximum overall scan duration watchdog (15 minutes)
       const maxDurationTimer = setTimeout(() => {
         if (!resolved) {
-          triggerImmediateFallback('Scan reached maximum duration limit (8 minutes)', false);
+          triggerImmediateFallback('Scan reached maximum duration limit (15 minutes)', false);
         }
-      }, 480000);
+      }, 900000);
 
       resetIdleTimer();
+
+      const cleanupTimers = () => {
+        if (idleTimer) clearTimeout(idleTimer);
+        clearTimeout(maxDurationTimer);
+        if (logPollTimer) clearInterval(logPollTimer);
+      };
 
       const triggerImmediateFallback = (reason: string, isRateLimitError = false) => {
         if (resolved) return;
         resolved = true;
-        if (idleTimer) clearTimeout(idleTimer);
-        clearTimeout(maxDurationTimer);
+        cleanupTimers();
 
         try {
           proc.kill('SIGTERM');
@@ -762,6 +773,79 @@ export async function runStrixScan(
         }
       };
 
+      // Monitor strix.log on disk directly in real time as the primary activity heartbeat
+      const scanStartTime = Date.now();
+      const pollStrixLog = () => {
+        if (resolved) return;
+        try {
+          if (!activeRunDir) {
+            const match = stdoutData.match(/Output\s+(?:strix_runs\/)?([^\s\x1b]+)/);
+            if (match && match[1]) {
+              const candidate = path.join(targetDir, 'strix_runs', match[1].trim());
+              if (fs.existsSync(candidate)) {
+                activeRunDir = candidate;
+              }
+            }
+            if (!activeRunDir) {
+              const runsRoot = path.join(targetDir, 'strix_runs');
+              if (fs.existsSync(runsRoot)) {
+                const entries = fs.readdirSync(runsRoot, { withFileTypes: true });
+                for (const entry of entries) {
+                  if (entry.isDirectory() && entry.name !== 'contextarmor_sandbox') {
+                    const full = path.join(runsRoot, entry.name);
+                    const stat = fs.statSync(full);
+                    if (stat.mtimeMs >= scanStartTime - 5000) {
+                      activeRunDir = full;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          if (activeRunDir) {
+            const logPath = path.join(activeRunDir, 'strix.log');
+            if (fs.existsSync(logPath)) {
+              const stat = fs.statSync(logPath);
+              if (stat.size > lastLogSize) {
+                const fd = fs.openSync(logPath, 'r');
+                const buf = Buffer.alloc(stat.size - lastLogSize);
+                fs.readSync(fd, buf, 0, buf.length, lastLogSize);
+                fs.closeSync(fd);
+                lastLogSize = stat.size;
+
+                resetIdleTimer();
+
+                const newChunk = buf.toString('utf8');
+                inspectChunkForFatalErrors(newChunk);
+
+                const lines = newChunk.split('\n');
+                for (const line of lines) {
+                  const trimmed = line.trim();
+                  if (!trimmed) continue;
+                  if (trimmed.includes('Starting turn')) {
+                    const m = trimmed.match(/Starting turn (\d+)(?:,\s*current_agent=([^,\s]+))?/);
+                    if (m) {
+                      if (onLog) onLog(`[ContextArmor Pentest] Turn ${m[1]}: Agent "${m[2] || 'Security Agent'}" analyzing attack surface...`);
+                    }
+                  } else if (trimmed.includes('Saved coverage record')) {
+                    const m = trimmed.match(/\((\d+\s*surface.*?)\)/);
+                    if (onLog) onLog(`[ContextArmor Pentest] Attack surface coverage: ${m ? m[1] : 'updated'}`);
+                  } else if (trimmed.includes('Saved final penetration test report') || trimmed.includes('finish_scan')) {
+                    if (onLog) onLog('[ContextArmor Pentest] Multi-agent penetration test concluded. Compiling final findings...');
+                  }
+                }
+              }
+            }
+          }
+        } catch {
+          // Ignore polling errors
+        }
+      };
+
+      logPollTimer = setInterval(pollStrixLog, 1200);
+
       proc.stdout.on('data', (d) => {
         if (resolved) return;
         const text = d.toString();
@@ -781,17 +865,18 @@ export async function runStrixScan(
       });
 
       proc.on('close', (code) => {
-        if (idleTimer) clearTimeout(idleTimer);
-        clearTimeout(maxDurationTimer);
+        cleanupTimers();
         if (resolved) return;
         resolved = true;
 
         const combined = stdoutData + '\n' + stderrData;
-        const threats = loadExistingStrixFindings(targetDir);
+        const specificSarif = activeRunDir ? path.join(activeRunDir, 'findings.sarif') : undefined;
+        const threats = (specificSarif && fs.existsSync(specificSarif))
+          ? parseStrixSarif(specificSarif, targetDir)
+          : loadExistingStrixFindings(targetDir);
 
         const hasLlmFailure =
           combined.includes('LLM CONNECTION FAILED') ||
-          combined.includes('Connection error') ||
           combined.includes('MODEL NOT AVAILABLE') ||
           combined.includes('not supported when using Codex') ||
           combined.includes('not authenticated') ||
@@ -844,7 +929,7 @@ export async function runStrixScan(
       });
 
       proc.on('error', (err) => {
-        clearTimeout(watchdog);
+        cleanupTimers();
         if (resolved) return;
         resolved = true;
 
