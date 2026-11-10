@@ -10,7 +10,7 @@ import {
 } from '../ui/diagnosticMapper.js';
 import type { ThreatItem } from '../ui/treeView.js';
 import { McpLinter } from '../mcp/linter.js';
-import { loadExistingStrixFindings } from '../integrations/strix.js';
+import { loadExistingPentestFindings } from '../integrations/strix.js';
 import { runWithConcurrency } from './concurrency.js';
 
 export interface AuditStats {
@@ -21,6 +21,8 @@ export interface AuditStats {
   blockedDeps: number;
   pythonThreats: number;
   mcpThreats: number;
+  pentestThreats: number;
+  /** @deprecated Backward-compatible alias for pentestThreats */
   strixThreats: number;
 }
 
@@ -56,6 +58,7 @@ export async function auditWorkspace(
     blockedDeps: 0,
     pythonThreats: 0,
     mcpThreats: 0,
+    pentestThreats: 0,
     strixThreats: 0,
   };
 
@@ -232,12 +235,13 @@ export async function auditWorkspace(
     }
   }
 
-  // 3. Strix Pentest Findings
-  if (progressCallback) progressCallback('Checking Strix Pentest results and SARIF reports...');
-  const strixThreats = loadExistingStrixFindings(workspaceRoot);
-  for (const st of strixThreats) {
+  // 3. ContextArmor Pentest Findings
+  if (progressCallback) progressCallback('Checking ContextArmor Pentest results and SARIF reports...');
+  const pentestThreats = loadExistingPentestFindings(workspaceRoot);
+  for (const pt of pentestThreats) {
+    stats.pentestThreats++;
     stats.strixThreats++;
-    threats.push(st);
+    threats.push(pt);
   }
 
   // Calculate overall security posture score

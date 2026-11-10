@@ -46,8 +46,9 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           vscode.commands.executeCommand('contextarmor.auditWorkspace');
           break;
         }
+        case 'runDeepPentest':
         case 'runStrix': {
-          vscode.commands.executeCommand('contextarmor.runStrix');
+          vscode.commands.executeCommand('contextarmor.runDeepPentest');
           break;
         }
         case 'configureLlm': {
@@ -55,7 +56,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
           break;
         }
         case 'startOauthLogin': {
-          const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
+          const term = vscode.window.createTerminal('ContextArmor ChatGPT OAuth Login');
           term.show();
           term.sendText('strix auth login chatgpt');
           setProviderKey('chatgpt-oauth');
@@ -911,7 +912,7 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         openModal();
         return;
       }
-      vscode.postMessage({ command: 'runStrix' });
+      vscode.postMessage({ command: 'runDeepPentest' });
     }
     function openModal() {
       document.getElementById('sidebarModal').style.display = 'flex';

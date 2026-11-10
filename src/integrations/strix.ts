@@ -12,12 +12,15 @@ function getVsCode(): any {
   }
 }
 
-export interface StrixStatus {
+export interface PentestEngineStatus {
   installed: boolean;
   binaryPath?: string;
   hasConfig: boolean;
   dockerRunning: boolean;
 }
+
+/** @deprecated Alias for backward compatibility */
+export type StrixStatus = PentestEngineStatus;
 
 export interface LlmConfig {
   provider?: string;
@@ -198,7 +201,7 @@ export async function promptLlmSetup(): Promise<boolean> {
   }
 
   if (selection.isOAuth) {
-    const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
+    const term = vscode.window.createTerminal('ContextArmor ChatGPT OAuth Login');
     term.show();
     term.sendText('strix auth login chatgpt');
     saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
@@ -280,13 +283,19 @@ export async function tryStartDocker(onLog?: (msg: string) => void): Promise<boo
 }
 
 /**
- * Probes environment for local Strix penetration testing tool.
+ * Probes environment for local ContextArmor penetration testing tool.
  */
-export function getStrixStatus(): StrixStatus {
+export function getPentestEngineStatus(): PentestEngineStatus {
   const home = os.homedir();
   const candidates = [
+    path.join(home, '.local', 'bin', 'contextarmor'),
+    path.join(home, '.local', 'bin', 'contextarmor-pentest'),
     path.join(home, '.local', 'bin', 'strix'),
+    '/usr/local/bin/contextarmor',
+    '/usr/local/bin/contextarmor-pentest',
     '/usr/local/bin/strix',
+    '/opt/homebrew/bin/contextarmor',
+    '/opt/homebrew/bin/contextarmor-pentest',
     '/opt/homebrew/bin/strix',
   ];
 
@@ -309,6 +318,9 @@ export function getStrixStatus(): StrixStatus {
   };
 }
 
+/** @deprecated Alias for backward compatibility */
+export const getStrixStatus = getPentestEngineStatus;
+
 const COMMON_CWE_NAMES: Record<string, string> = {
   'CWE-89': 'SQL Injection in Database Query',
   'CWE-502': 'Insecure AI Model Loading (torch.load / pickle)',
@@ -322,10 +334,10 @@ const COMMON_CWE_NAMES: Record<string, string> = {
 };
 
 /**
- * Searches for any strix_runs directory in workspace and extracts SARIF findings.
+ * Searches for any pentest runs directory in workspace and extracts SARIF findings.
  * Only loads findings from the MOST RECENT run to avoid displaying obsolete historical issues.
  */
-export function loadExistingStrixFindings(workspaceRoot: string): ThreatItem[] {
+export function loadExistingPentestFindings(workspaceRoot: string): ThreatItem[] {
   const threats: ThreatItem[] = [];
   const runsDir = path.join(workspaceRoot, 'strix_runs');
 
@@ -353,7 +365,7 @@ export function loadExistingStrixFindings(workspaceRoot: string): ThreatItem[] {
     for (const run of runDirs) {
       const sarifPath = path.join(run.full, 'findings.sarif');
       if (fs.existsSync(sarifPath)) {
-        return parseStrixSarif(sarifPath, workspaceRoot);
+        return parsePentestSarif(sarifPath, workspaceRoot);
       }
     }
   } catch {
@@ -363,10 +375,13 @@ export function loadExistingStrixFindings(workspaceRoot: string): ThreatItem[] {
   return threats;
 }
 
+/** @deprecated Alias for backward compatibility */
+export const loadExistingStrixFindings = loadExistingPentestFindings;
+
 /**
- * Parses a SARIF 2.1.0 document produced by Strix and returns ThreatItems.
+ * Parses a SARIF 2.1.0 document produced by ContextArmor Pentest and returns ThreatItems.
  */
-export function parseStrixSarif(sarifPath: string, workspaceRoot: string): ThreatItem[] {
+export function parsePentestSarif(sarifPath: string, workspaceRoot: string): ThreatItem[] {
   const threats: ThreatItem[] = [];
   try {
     const raw = fs.readFileSync(sarifPath, 'utf8');
@@ -385,10 +400,10 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
 
       for (const res of results) {
         const ruleId = res.ruleId || 'VULN';
-        let rawMessage = res.message?.text || 'Vulnerability detected by Strix';
+        let rawMessage = res.message?.text || 'Vulnerability detected by ContextArmor Pentest';
 
-        // Filter out Strix internal coverage checklist items & non-issues
-        if (ruleId.startsWith('strix-coverage')) {
+        // Filter out internal coverage checklist items & non-issues
+        if (ruleId.startsWith('strix-coverage') || ruleId.startsWith('contextarmor-coverage')) {
           continue;
         }
         if (res.level === 'none') {
@@ -486,6 +501,9 @@ export function parseStrixSarif(sarifPath: string, workspaceRoot: string): Threa
 
   return threats;
 }
+
+/** @deprecated Alias for backward compatibility */
+export const parseStrixSarif = parsePentestSarif;
 
 /**
  * ContextArmor Built-In Sandbox Pentest Engine.
@@ -641,9 +659,9 @@ export function runLocalSandboxAnalysis(
 }
 
 /**
- * Spawns Strix CLI in non-interactive mode or runs built-in sandbox if Docker is unavailable.
+ * Spawns ContextArmor containerized pentest agents in non-interactive mode or runs built-in sandbox if Docker is unavailable.
  */
-export async function runStrixScan(
+export async function runContextArmorPentest(
   targetDir: string,
   mode: 'quick' | 'standard' | 'deep' = 'quick',
   onLog?: (line: string) => void
@@ -667,15 +685,15 @@ export async function runStrixScan(
     };
   }
 
-  const status = getStrixStatus();
+  const status = getPentestEngineStatus();
 
   // Step 1: Check Docker and attempt auto-launch if Docker Desktop is installed
   if (onLog) onLog('[ContextArmor Sandbox] Initializing pentest sandbox environment...');
   const dockerReady = await tryStartDocker(onLog);
 
-  // Step 2: If Docker is active and Strix CLI is present, run containerized Strix
+  // Step 2: If Docker is active and pentest CLI is present, run containerized agents
   if (dockerReady && status.installed && status.binaryPath) {
-    if (onLog) onLog('[ContextArmor Sandbox] Docker daemon active. Spawning containerized Strix agents...');
+    if (onLog) onLog('[ContextArmor Sandbox] Docker daemon active. Spawning containerized ContextArmor agents...');
     return new Promise((resolve) => {
       const args = ['--target', targetDir, '-n', '-m', mode];
       const env = {
@@ -872,8 +890,8 @@ export async function runStrixScan(
         const combined = stdoutData + '\n' + stderrData;
         const specificSarif = activeRunDir ? path.join(activeRunDir, 'findings.sarif') : undefined;
         const threats = (specificSarif && fs.existsSync(specificSarif))
-          ? parseStrixSarif(specificSarif, targetDir)
-          : loadExistingStrixFindings(targetDir);
+          ? parsePentestSarif(specificSarif, targetDir)
+          : loadExistingPentestFindings(targetDir);
 
         const hasLlmFailure =
           combined.includes('LLM CONNECTION FAILED') ||
@@ -894,7 +912,7 @@ export async function runStrixScan(
 
         if ((code !== 0 || hasLlmFailure) && threats.length === 0) {
           if (onLog) {
-            onLog('\n[ContextArmor Recovery] Strix LLM issue detected.');
+            onLog('\n[ContextArmor Recovery] ContextArmor AI Model issue detected.');
             onLog('[ContextArmor Recovery] Automatically falling back to ContextArmor AST Sandbox Pentester...');
           }
 
@@ -957,3 +975,6 @@ export async function runStrixScan(
     threats,
   };
 }
+
+/** @deprecated Alias for backward compatibility */
+export const runStrixScan = runContextArmorPentest;

@@ -18,7 +18,7 @@ import { SidebarWebviewProvider } from './ui/sidebarWebview.js';
 import { DashboardPanel } from './ui/dashboard.js';
 import { auditWorkspace } from './core/projectAuditor.js';
 import { runWithConcurrency } from './core/concurrency.js';
-import { runStrixScan, getStrixStatus, promptLlmSetup, getLlmConfig, setProviderKey } from './integrations/strix.js';
+import { runContextArmorPentest, getPentestEngineStatus, promptLlmSetup, getLlmConfig, setProviderKey } from './integrations/strix.js';
 import { PackageRiskEngine, classifyDecision } from './detectors/packageRisk/index.js';
 
 interface CacheEntry {
@@ -328,8 +328,8 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('contextarmor.auditWorkspace', runFullWorkspaceAudit)
   );
 
-  // Strix / Deep Pentest Command
-  async function runStrixPentest() {
+  // Autonomous Deep Pentest Command
+  async function runContextArmorPentest() {
     const llm = getLlmConfig();
     if (!llm.isConfigured) {
       const choice = await vscode.window.showInformationMessage(
@@ -374,7 +374,7 @@ export function activate(context: vscode.ExtensionContext) {
       async (progress) => {
         progress.report({ message: 'Executing security tests...' });
         let currentPct = 15;
-        const res = await runStrixScan(rootPath, 'quick', (chunk) => {
+        const res = await runContextArmorPentest(rootPath, 'quick', (chunk) => {
           outputChannel.append(chunk);
 
           const turnMatch = chunk.match(/Turn\s+(\d+)/i) || chunk.match(/Starting turn\s+(\d+)/i);
@@ -385,7 +385,7 @@ export function activate(context: vscode.ExtensionContext) {
             updateProgress(currentPct, `AI security agents analyzing attack surfaces (Turn ${turnNum})...`, chunk);
           } else if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
             currentPct = Math.max(currentPct, 30);
-            updateProgress(currentPct, 'Secure sandbox ready · Spawning Strix agents...', chunk);
+            updateProgress(currentPct, 'Secure sandbox ready · Spawning ContextArmor agents...', chunk);
           } else if (chunk.includes('coverage') || chunk.includes('coverage.json') || chunk.includes('Attack surface coverage')) {
             currentPct = Math.max(currentPct, 78);
             updateProgress(currentPct, 'Analyzing code safety & attack surface coverage...', chunk);
@@ -407,8 +407,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (res.hasLlmError) {
           const isRateLimit = res.isRateLimitError;
           const msg = isRateLimit
-            ? 'OpenAI ChatGPT Free tier limit reached (HTTP 429). Strix requires a paid Plus/Pro subscription or API key. ContextArmor completed the scan using the built-in Sandbox engine.'
-            : 'Strix LLM connection issue detected. ContextArmor completed the scan using the built-in Sandbox engine.';
+            ? 'OpenAI ChatGPT Free tier limit reached (HTTP 429). ContextArmor AI requires a paid Plus/Pro subscription or API key. ContextArmor completed the scan using the built-in Sandbox engine.'
+            : 'ContextArmor AI connection issue detected. ContextArmor completed the scan using the built-in Sandbox engine.';
 
           vscode.window
             .showWarningMessage(
@@ -464,7 +464,8 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('contextarmor.runStrix', runStrixPentest)
+    vscode.commands.registerCommand('contextarmor.runDeepPentest', runContextArmorPentest),
+    vscode.commands.registerCommand('contextarmor.runStrix', runContextArmorPentest)
   );
 
   // Register AI Brain configuration command

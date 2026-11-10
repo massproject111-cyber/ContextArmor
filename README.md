@@ -264,19 +264,19 @@ ContextArmor includes an official VS Code extension providing real-time, in-edit
 
 ### Key Capabilities
 1. **Activity Bar Threat Radar**:
-   - Resides directly in the left Activity Bar under the ContextArmor Shield (🛡️).
+   - Resides directly in the left Activity Bar under the ContextArmor Shield.
    - Displays real-time **Security Score** (0–100, color-coded Clean/Warning/Critical).
    - Interactive threat cards displaying target package, severity badge (`[BLOCK]` / `[ASK]`), and rationale.
-2. **Autonomous Strix Pentest & Built-In Sandbox**:
-   - **🦅 Run Deep AI Pentest**: Primary high-priority action simulating autonomous exploit PoCs.
-   - **⚡ AI Brain Support**: Seamlessly connects to Google Gemini, Anthropic Claude, OpenAI / ChatGPT, OpenRouter, or 100% free offline Ollama.
+2. **Autonomous AI Pentest & Built-In Sandbox**:
+   - **Run Deep AI Pentest**: Primary high-priority action simulating autonomous exploit PoCs.
+   - **AI Brain Support**: Seamlessly connects to Google Gemini, Anthropic Claude, OpenAI / ChatGPT, OpenRouter, or 100% free offline Ollama.
    - **Zero-Docker Portability**: Automatically starts Docker Desktop if idle, or falls back to the in-process AST & taint analysis sandbox engine emitting OASIS SARIF 2.1.0 reports.
 3. **Full Project Audit**:
-   - **🛡️ Run Full Project Audit**: Fast in-process static scan of npm manifests, PyPI requirements, AI hallucinations, model deserialization, and MCP configurations.
+   - **Run Full Project Audit**: Fast in-process static scan of npm manifests, PyPI requirements, AI hallucinations, model deserialization, and MCP configurations.
 4. **1-Click Remediations**:
-   - `💡 Add weights_only=True`: Automatically patches unsafe `torch.load(...)` calls in Python code to safe deserialization.
-   - `💡 Pin to <version>`: Pins 72h-cooldown warnings to the newest verified version older than 72 hours.
-   - `🗑️ Remove Line`: Removes malicious or hallucinated dependency lines directly from your manifest.
+   - `Add weights_only=True`: Automatically patches unsafe `torch.load(...)` calls in Python code to safe deserialization.
+   - `Pin to <version>`: Pins 72h-cooldown warnings to the newest verified version older than 72 hours.
+   - `Remove Line`: Removes malicious or hallucinated dependency lines directly from your manifest.
 5. **In-Editor Diagnostics & Quick Fixes**:
    - Red squiggly lines on confirmed malware and 404 hallucinations in `package.json` and `requirements.txt`.
    - Yellow warning squigglies on unsafe pickle/model deserialization in Python files.

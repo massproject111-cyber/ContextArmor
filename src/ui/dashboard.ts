@@ -63,14 +63,15 @@ export class DashboardPanel {
           case 'auditWorkspace':
             vscode.commands.executeCommand('contextarmor.auditWorkspace');
             return;
+          case 'runDeepPentest':
           case 'runStrix':
-            vscode.commands.executeCommand('contextarmor.runStrix');
+            vscode.commands.executeCommand('contextarmor.runDeepPentest');
             return;
           case 'configureLlm':
             vscode.commands.executeCommand('contextarmor.configureLlm');
             return;
           case 'startOauthLogin': {
-            const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
+            const term = vscode.window.createTerminal('ContextArmor ChatGPT OAuth Login');
             term.show();
             term.sendText('strix auth login chatgpt');
             setProviderKey('chatgpt-oauth');
@@ -552,9 +553,9 @@ export class DashboardPanel {
     }
 
     /* =========================================================
-       SECURITY AUDIT MODULE
+       CONTEXTARMOR PENTEST STATION
        ========================================================= */
-    .strix-station {
+    .ca-station, .strix-station {
       background: var(--cyber-card-bg);
       border: 1px solid var(--border);
       border-top: 2px solid var(--neon-cyan);
@@ -562,7 +563,7 @@ export class DashboardPanel {
       margin-top: 32px;
       position: relative;
     }
-    .strix-station-header {
+    .ca-station-header, .strix-station-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -570,7 +571,7 @@ export class DashboardPanel {
       flex-wrap: wrap;
       gap: 12px;
     }
-    .strix-badge {
+    .ca-badge, .strix-badge {
       background: rgba(0, 240, 255, 0.1);
       color: var(--neon-cyan);
       border: 1px solid rgba(0, 240, 255, 0.35);
@@ -583,7 +584,7 @@ export class DashboardPanel {
       display: inline-block;
       margin-bottom: 6px;
     }
-    .strix-title {
+    .ca-title, .strix-title {
       font-family: var(--font-header);
       font-size: 14px;
       font-weight: 800;
@@ -591,19 +592,19 @@ export class DashboardPanel {
       letter-spacing: 0.08em;
       color: var(--text);
     }
-    .strix-desc {
+    .ca-desc, .strix-desc {
       font-size: 12px;
       color: var(--text-dim);
       margin-top: 4px;
       max-width: 600px;
       line-height: 1.45;
     }
-    .strix-ctrls {
+    .ca-ctrls, .strix-ctrls {
       display: flex;
       gap: 10px;
       align-items: center;
     }
-    .btn-strix-run {
+    .btn-ca-run, .btn-strix-run {
       background: #121824;
       color: #00f0ff;
       border: 1px solid rgba(0, 240, 255, 0.45);
@@ -620,13 +621,13 @@ export class DashboardPanel {
       clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
       transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
     }
-    .btn-strix-run:hover {
+    .btn-ca-run:hover, .btn-strix-run:hover {
       background: rgba(0, 240, 255, 0.15);
       border-color: #00f0ff;
       color: #ffffff;
       transform: translateY(-1px);
     }
-    .btn-strix-run:disabled {
+    .btn-ca-run:disabled, .btn-strix-run:disabled {
       opacity: 0.45;
       cursor: not-allowed;
       transform: none;
@@ -870,24 +871,24 @@ export class DashboardPanel {
     </table>
   </div>
 
-  <!-- SECTION 3: SECURITY AUDIT STATION -->
-  <div class="strix-station">
-    <div class="strix-station-header">
+  <!-- SECTION 3: CONTEXTARMOR PENTEST STATION -->
+  <div class="ca-station strix-station">
+    <div class="ca-station-header strix-station-header">
       <div>
-        <span class="strix-badge">SECURITY AUDIT</span>
-        <div class="strix-title">Security Simulation</div>
-        <div class="strix-desc">
-          Simulates attack patterns in an isolated sandbox to verify code vulnerabilities and defenses before deployment.
+        <span class="ca-badge strix-badge">CONTEXTARMOR AI PENTEST</span>
+        <div class="ca-title strix-title">Autonomous Security Simulation</div>
+        <div class="ca-desc strix-desc">
+          Spawns multi-agent security researchers in an isolated sandbox to verify vulnerabilities, taint flows, and defense boundaries.
         </div>
       </div>
-      <div class="strix-ctrls">
+      <div class="ca-ctrls strix-ctrls">
         <div class="brain-pill" onclick="openLlmModal()" title="Click to change engine or connect API keys">
           <span>Engine:</span>
           <strong style="color: var(--text);">${activeProviderName}</strong>
           <span style="font-size: 10px; color: var(--muted);">${activeModelName}</span>
         </div>
-        <button class="btn-strix-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()">
-          <span>Run Security Audit</span>
+        <button class="btn-ca-run btn-strix-run" ${this._isScanning ? 'disabled' : ''} onclick="runPentest()">
+          <span>Run AI Pentest</span>
         </button>
       </div>
     </div>
@@ -1023,7 +1024,7 @@ export class DashboardPanel {
         openLlmModal();
         return;
       }
-      vscode.postMessage({ command: 'runStrix' });
+      vscode.postMessage({ command: 'runDeepPentest' });
     }
 
     function openLlmModal() {

@@ -80,8 +80,13 @@
         "icon": "$(shield)"
       },
       {
-        "command": "contextarmor.runStrix",
+        "command": "contextarmor.runDeepPentest",
         "title": "ContextArmor: Run Deep AI Pentest",
+        "icon": "$(bug)"
+      },
+      {
+        "command": "contextarmor.runStrix",
+        "title": "ContextArmor: Run Deep AI Pentest (Legacy Alias)",
         "icon": "$(bug)"
       },
       {
