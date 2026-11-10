@@ -103,7 +103,7 @@ export function saveLlmConfig(modelSpec: string, apiKey: string, apiBase?: strin
  */
 export function setProviderKey(provider: string, apiKey?: string): void {
   if (provider === 'chatgpt-oauth') {
-    saveLlmConfig('chatgpt/auto', 'oauth-subscription');
+    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
   } else if (provider === 'gemini') {
     saveLlmConfig('gemini/gemini-2.0-flash', (apiKey || '').trim());
   } else if (provider === 'openai') {
@@ -140,7 +140,7 @@ export async function promptLlmSetup(): Promise<boolean> {
       label: '$(globe) ChatGPT Subscription (Browser OAuth)',
       description: 'Sign in with existing ChatGPT account',
       detail: 'Direct browser OAuth sign-in to your ChatGPT subscription. No API keys required.',
-      modelPrefix: 'chatgpt/auto',
+      modelPrefix: 'chatgpt/gpt-5.6-luna',
       isOAuth: true,
     },
     {
@@ -201,7 +201,7 @@ export async function promptLlmSetup(): Promise<boolean> {
     const term = vscode.window.createTerminal('Strix ChatGPT OAuth Login');
     term.show();
     term.sendText('strix auth login chatgpt');
-    saveLlmConfig('chatgpt/auto', 'oauth-subscription');
+    saveLlmConfig('chatgpt/gpt-5.6-luna', 'oauth-subscription');
     vscode.window.showInformationMessage(
       'Opened terminal for ChatGPT OAuth Login. Follow the browser prompt to complete sign-in!'
     );
@@ -736,9 +736,11 @@ export async function runStrixScan(
           text.includes('Error getting response') ||
           text.includes('LLM CONNECTION FAILED') ||
           text.includes('not supported when using Codex') ||
-          text.includes('MODEL NOT AVAILABLE')
+          text.includes('MODEL NOT AVAILABLE') ||
+          text.includes('model_not_found') ||
+          text.includes('is unavailable for this request')
         ) {
-          triggerImmediateFallback('AI Model connection or streaming error', false);
+          triggerImmediateFallback('AI Model connection or configuration error', false);
         }
       };
 
