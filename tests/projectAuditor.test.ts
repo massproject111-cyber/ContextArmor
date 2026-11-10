@@ -163,8 +163,11 @@ test('getLlmConfig: returns valid config structure for AI Brain', () => {
   }
 });
 
-test('runStrixScan: fallback handles zero-docker and sandbox analysis seamlessly', async () => {
-  const { runStrixScan } = require('../src/integrations/strix.js');
+test('runStrixScan: handles built-in sandbox mode cleanly without external dependencies', async () => {
+  const { runStrixScan, saveLlmConfig, getLlmConfig } = require('../src/integrations/strix.js');
+  const prevConfig = getLlmConfig();
+
+  saveLlmConfig('contextarmor/sandbox', 'builtin-sandbox');
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'strix-fallback-test-'));
   fs.writeFileSync(
     path.join(tmpDir, 'vuln.py'),
@@ -180,6 +183,9 @@ def get_user(id):
   assert.ok(res.threats.length > 0);
   assert.ok(res.threats.some((t: any) => t.title.includes('CWE-89')));
 
-  // Clean up
+  // Clean up and restore previous config
   fs.rmSync(tmpDir, { recursive: true, force: true });
+  if (prevConfig.model && prevConfig.apiKey) {
+    saveLlmConfig(prevConfig.model, prevConfig.apiKey);
+  }
 });

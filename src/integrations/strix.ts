@@ -688,17 +688,35 @@ export async function runStrixScan(
       let stderrData = '';
       let resolved = false;
 
-      // Watchdog: If the containerized scan hangs without progress for > 40 seconds, fallback automatically
-      const watchdog = setTimeout(() => {
+      // Activity-based idle watchdog: Only triggers if completely silent with zero output for > 90 seconds
+      let idleTimer: NodeJS.Timeout | undefined;
+      const IDLE_TIMEOUT_MS = 90000;
+
+      const resetIdleTimer = () => {
+        if (idleTimer) clearTimeout(idleTimer);
         if (!resolved) {
-          triggerImmediateFallback('Scan timed out waiting for AI model responses', false);
+          idleTimer = setTimeout(() => {
+            if (!resolved) {
+              triggerImmediateFallback('Pentest scan hung with no output for over 90 seconds', false);
+            }
+          }, IDLE_TIMEOUT_MS);
         }
-      }, 40000);
+      };
+
+      // Maximum overall scan duration watchdog (8 minutes)
+      const maxDurationTimer = setTimeout(() => {
+        if (!resolved) {
+          triggerImmediateFallback('Scan reached maximum duration limit (8 minutes)', false);
+        }
+      }, 480000);
+
+      resetIdleTimer();
 
       const triggerImmediateFallback = (reason: string, isRateLimitError = false) => {
         if (resolved) return;
         resolved = true;
-        clearTimeout(watchdog);
+        if (idleTimer) clearTimeout(idleTimer);
+        clearTimeout(maxDurationTimer);
 
         try {
           proc.kill('SIGTERM');
@@ -745,21 +763,26 @@ export async function runStrixScan(
       };
 
       proc.stdout.on('data', (d) => {
+        if (resolved) return;
         const text = d.toString();
         stdoutData += text;
+        resetIdleTimer();
         if (onLog) onLog(text);
         inspectChunkForFatalErrors(text);
       });
 
       proc.stderr.on('data', (d) => {
+        if (resolved) return;
         const text = d.toString();
         stderrData += text;
+        resetIdleTimer();
         if (onLog) onLog(text);
         inspectChunkForFatalErrors(text);
       });
 
       proc.on('close', (code) => {
-        clearTimeout(watchdog);
+        if (idleTimer) clearTimeout(idleTimer);
+        clearTimeout(maxDurationTimer);
         if (resolved) return;
         resolved = true;
 

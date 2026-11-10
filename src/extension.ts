@@ -378,19 +378,25 @@ export function activate(context: vscode.ExtensionContext) {
           outputChannel.append(chunk);
 
           if (chunk.includes('Docker daemon active') || chunk.includes('Penetration test initiated')) {
-            currentPct = 35;
+            currentPct = Math.max(currentPct, 30);
             updateProgress(currentPct, 'Secure sandbox ready · Testing project code...', chunk);
-          } else if (chunk.includes('Waiting for the first model response') || chunk.includes('model response')) {
-            currentPct = 55;
-            updateProgress(currentPct, 'AI assistant testing security defenses...', chunk);
-          } else if (chunk.includes('ast') || chunk.includes('Analyzing') || chunk.includes('Scanning')) {
-            currentPct = 75;
+          } else if (
+            chunk.includes('Starting turn') ||
+            chunk.includes('Calling LLM') ||
+            chunk.includes('Penetration test in progress') ||
+            chunk.includes('model response')
+          ) {
+            currentPct = Math.min(85, currentPct + 6);
+            updateProgress(currentPct, 'AI security agents analyzing attack surfaces...', chunk);
+          } else if (chunk.includes('coverage') || chunk.includes('coverage.json') || chunk.includes('AST')) {
+            currentPct = Math.max(currentPct, 80);
             updateProgress(currentPct, 'Analyzing code safety and dependencies...', chunk);
-          } else if (chunk.includes('findings.sarif') || chunk.includes('complete')) {
-            currentPct = 90;
+          } else if (chunk.includes('findings.sarif') || chunk.includes('report.sarif') || chunk.includes('complete')) {
+            currentPct = Math.max(currentPct, 92);
             updateProgress(currentPct, 'Finalizing project security report...', chunk);
           } else {
-            updateProgress(Math.min(85, currentPct + 1), 'Running security simulation...', chunk);
+            currentPct = Math.min(85, currentPct + 1);
+            updateProgress(currentPct, 'Running security simulation...', chunk);
           }
         });
 
