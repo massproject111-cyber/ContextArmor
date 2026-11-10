@@ -88,47 +88,59 @@ export class SidebarWebviewProvider implements vscode.WebviewViewProvider {
         }
         case 'removeDep': {
           if (data.file && data.line !== undefined) {
-            const uri = vscode.Uri.file(data.file);
-            const doc = await vscode.workspace.openTextDocument(uri);
-            const edit = new vscode.WorkspaceEdit();
-            const lineRange = doc.lineAt(data.line).rangeIncludingLineBreak;
-            edit.delete(uri, lineRange);
-            await vscode.workspace.applyEdit(edit);
-            await doc.save();
-            vscode.commands.executeCommand('contextarmor.auditWorkspace');
+            try {
+              const uri = vscode.Uri.file(data.file);
+              const doc = await vscode.workspace.openTextDocument(uri);
+              if (data.line < doc.lineCount) {
+                const edit = new vscode.WorkspaceEdit();
+                const lineRange = doc.lineAt(data.line).rangeIncludingLineBreak;
+                edit.delete(uri, lineRange);
+                await vscode.workspace.applyEdit(edit);
+                await doc.save();
+                vscode.commands.executeCommand('contextarmor.auditWorkspace');
+              }
+            } catch {}
           }
           break;
         }
         case 'pinDep': {
           if (data.file && data.line !== undefined && data.pin) {
-            const uri = vscode.Uri.file(data.file);
-            const doc = await vscode.workspace.openTextDocument(uri);
-            const edit = new vscode.WorkspaceEdit();
-            const line = doc.lineAt(data.line);
-            let updated = line.text;
-            if (data.file.endsWith('package.json')) {
-              updated = line.text.replace(/:\s*["'][^"']+["']/, `: "${data.pin}"`);
-            } else if (data.file.endsWith('requirements.txt')) {
-              updated = line.text.replace(/([a-zA-Z0-9_\-\.]+)(?:[=><~!]=*[^#\s]+)?/, `$1==${data.pin}`);
-            }
-            edit.replace(uri, line.range, updated);
-            await vscode.workspace.applyEdit(edit);
-            await doc.save();
-            vscode.commands.executeCommand('contextarmor.auditWorkspace');
+            try {
+              const uri = vscode.Uri.file(data.file);
+              const doc = await vscode.workspace.openTextDocument(uri);
+              if (data.line < doc.lineCount) {
+                const edit = new vscode.WorkspaceEdit();
+                const line = doc.lineAt(data.line);
+                let updated = line.text;
+                if (data.file.endsWith('package.json')) {
+                  updated = line.text.replace(/:\s*["'][^"']+["']/, `: "${data.pin}"`);
+                } else if (data.file.endsWith('requirements.txt')) {
+                  updated = line.text.replace(/([a-zA-Z0-9_\-\.]+)(?:[=><~!]=*[^#\s]+)?/, `$1==${data.pin}`);
+                }
+                edit.replace(uri, line.range, updated);
+                await vscode.workspace.applyEdit(edit);
+                await doc.save();
+                vscode.commands.executeCommand('contextarmor.auditWorkspace');
+              }
+            } catch {}
           }
           break;
         }
         case 'fixTorch': {
           if (data.file && data.line !== undefined) {
-            const uri = vscode.Uri.file(data.file);
-            const doc = await vscode.workspace.openTextDocument(uri);
-            const edit = new vscode.WorkspaceEdit();
-            const line = doc.lineAt(data.line);
-            const updated = line.text.replace(/torch\.load\(([^)]+)\)/, 'torch.load($1, weights_only=True)');
-            edit.replace(uri, line.range, updated);
-            await vscode.workspace.applyEdit(edit);
-            await doc.save();
-            vscode.commands.executeCommand('contextarmor.auditWorkspace');
+            try {
+              const uri = vscode.Uri.file(data.file);
+              const doc = await vscode.workspace.openTextDocument(uri);
+              if (data.line < doc.lineCount) {
+                const edit = new vscode.WorkspaceEdit();
+                const line = doc.lineAt(data.line);
+                const updated = line.text.replace(/torch\.load\(([^)]+)\)/, 'torch.load($1, weights_only=True)');
+                edit.replace(uri, line.range, updated);
+                await vscode.workspace.applyEdit(edit);
+                await doc.save();
+                vscode.commands.executeCommand('contextarmor.auditWorkspace');
+              }
+            } catch {}
           }
           break;
         }
