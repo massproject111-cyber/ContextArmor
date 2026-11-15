@@ -5,3 +5,4 @@ dist/
 .DS_Store
 *.vsix
 strix_runs/
+data/eval/fixtures/
